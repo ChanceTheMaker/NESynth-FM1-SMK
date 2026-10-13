@@ -64,7 +64,8 @@
     {
       "path": "firmware/board.c",
       "upstream": "../arcade-fm1-smk/firmware/board.c",
-      "sha256": "aae4428e358d432f78cf63583cdcdd914cf8e5f5ad7869c554ac3b66e35077ae"
+      "sha256": "aae4428e358d432f78cf63583cdcdd914cf8e5f5ad7869c554ac3b66e35077ae",
+      "adapted_sha256": "d8c27b0531f4caff29894e65f3cca6b1b2912525198751f56355a15d79fdbfae"
     },
     {
       "path": "firmware/start.S",
@@ -74,7 +75,8 @@
     {
       "path": "firmware/multicore_video.h",
       "upstream": "../arcade-fm1-smk/firmware/multicore_video.h",
-      "sha256": "31b01068515ad86b82e0fe80f26431f5cdabafcfeda1efe7841afef650d752da"
+      "sha256": "31b01068515ad86b82e0fe80f26431f5cdabafcfeda1efe7841afef650d752da",
+      "adapted_sha256": "5bce2623d35bb48af6fdb35783d3aa7ab1ae88c3d62618bed5238d38e85930d3"
     },
     {
       "path": "firmware/master_volume.h",
@@ -84,7 +86,8 @@
     {
       "path": "firmware/fm1_recovery.h",
       "upstream": "../arcade-fm1-smk/firmware/fm1_recovery.h",
-      "sha256": "4af6abe1169d8a354c4cfce936ddd3833c8442f8b6a0d441493352c0ad179d82"
+      "sha256": "4af6abe1169d8a354c4cfce936ddd3833c8442f8b6a0d441493352c0ad179d82",
+      "adapted_sha256": "526417d8682007e28a31a0229666c8c5b7c6546c594b5e19b9d06f4873644d43"
     },
     {
       "path": "firmware/smk37_game_pads.h",
@@ -109,7 +112,8 @@
     {
       "path": "src/freestanding/string.h",
       "upstream": "../arcade-fm1-smk/src/freestanding/string.h",
-      "sha256": "cc49dd34ab85289bd07a1018f62596cd07ee461a413ceae5f1c8360b06775201"
+      "sha256": "cc49dd34ab85289bd07a1018f62596cd07ee461a413ceae5f1c8360b06775201",
+      "adapted_sha256": "69e96185a1c3757471bb704cde1d437fc5c9184172508a9cb2d5bf25d72e9689"
     },
     {
       "path": "src/freestanding/stdlib.h",
@@ -460,21 +464,6 @@
       "path": "vendor/felucca/tests/ota_test.c",
       "upstream": "../arcade-fm1-smk/vendor/felucca/tests/ota_test.c",
       "sha256": "06eda3def98b7771581f91a4a0d538fbd612b60eff00cb81a828173a3368a631"
-    },
-    {
-      "path": "vendor/felucca/tools/__pycache__/fm1_install.cpython-312.pyc",
-      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/__pycache__/fm1_install.cpython-312.pyc",
-      "sha256": "49b869328cb3d80b3e08a2fe051a2118ee6e0b4d76b638ac46502b1cc840f6ce"
-    },
-    {
-      "path": "vendor/felucca/tools/__pycache__/fm1pkg_make.cpython-312.pyc",
-      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/__pycache__/fm1pkg_make.cpython-312.pyc",
-      "sha256": "e9b8818bc15e09b2b756bc3ce0841891e04ac75fe422ebb0b7bd84992d9aebd7"
-    },
-    {
-      "path": "vendor/felucca/tools/__pycache__/lz4blk.cpython-312.pyc",
-      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/__pycache__/lz4blk.cpython-312.pyc",
-      "sha256": "d5fdd6fb90b649b4f25e29fc08abb076401ce3cc2225e96b39ce09e27640d263"
     },
     {
       "path": "vendor/felucca/tools/fm1_install.py",
