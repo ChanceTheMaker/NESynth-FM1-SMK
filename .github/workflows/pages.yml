@@ -21,6 +21,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Build native reference for browser parity checks
+        run: |
+          python -c "import sys; sys.path.insert(0, 'tools'); from prepare_core import prepare; prepare()"
+          g++ -std=c++11 -O2 -fno-strict-aliasing -Wno-write-strings -Isrc -Ibuild/infones build/infones/InfoNES.cpp build/infones/K6502.cpp build/infones/InfoNES_pAPU.cpp src/mapper.cpp src/nes_port.cpp tests/runtime.cpp -o build/runtime-test
+          ./build/runtime-test web/diagnostic.nes
       - name: Check shipped assets and firmware builder
         run: npm run test:site
       - uses: actions/configure-pages@v5
