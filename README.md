@@ -17,6 +17,8 @@ Open <http://127.0.0.1:8816/>. The diagnostic starts silently. Loading a cartrid
 
 Drop a `.nes` or `.zip` file onto **Insert cartridge**, or click the area to choose one. Load one file at a time. ZIPs containing one `.nes` file open automatically; archives containing several show a cartridge picker. Standard stored and DEFLATE ZIPs are supported, including cartridges in subfolders and uppercase `.NES` extensions. Mac metadata files are ignored. Extraction and checksum validation happen locally; nothing is uploaded. The browser limits archives to 64 MiB and extracted cartridges to 1 MiB, and rejects encrypted, split, ZIP64, damaged, or unsupported-compression archives. DEFLATE extraction requires a browser with `DecompressionStream('deflate-raw')` support.
 
+Legacy `DiskDude!` headers are repaired in memory when imported. The checksum-identified Ms. Pac-Man (Tengen) overdump also has its excess graphics removed and horizontal mirroring restored, using the verified PRG/CHR and board metadata in [MAME](https://github.com/mamedev/mame/blob/master/hash/nes.xml) (`mspacmnt`). Unknown oversized dumps are still rejected; this does not enable NES 2.0 or special consoles. The original NES/ZIP file is never rewritten. The browser player, firmware builder, and Python cartridge reader use the same repair.
+
 Accepted cartridges have a standard iNES 1.0 header. Mapper 0 accepts 16/32 KiB PRG and zero/8 KiB CHR; mapper 9 accepts power-of-two PRG sizes from 32 to 128 KiB and CHR ROM from 8 to 128 KiB. Mapper 1 supports standard MMC1B boards with power-of-two 16?256 KiB PRG, zero/8?128 KiB CHR, and at most 8 KiB PRG RAM. Expanded SxROM RAM/512 KiB PRG boards and MMC1A variants are not supported. An optional 512-byte trainer is supported. NES 2.0, PAL, other mappers, special console variants, and unsupported RAM sizes are rejected before entering the core. ZIP support does not change cartridge compatibility. A valid header does not guarantee accurate gameplay.
 
 Battery RAM persists in browser storage, keyed by cartridge SHA-256, with `.sav` import/export. Only cartridges with the battery flag expose saves. Device save RAM remains volatile. A reset preserves battery RAM; loading a cartridge starts a fresh core session before browser save restoration.
@@ -36,7 +38,7 @@ python tools/build.py smk37
 
 Run `npm run firmware` to regenerate the verified browser template (requires the local pinned AC79 SDK and restore fixture configured in `tools/package_fm1.py`). The template contains only our original diagnostic.
 
-Hardware outputs are under `build/fm1/` and `build/smk37/`, with ELF symbols, section reports, manifests, and `nes-NOT-FOR-INSTALL.bin`. These are raw link products, **not `.fwsc` packages**. `tools/package_fm1.py` creates and validates `.fwsc` packages with forward/reverse loader simulations. The experimental source identity is `FM-1_958`. Do not feed raw link binaries to an updater.
+Hardware outputs are under `build/fm1/` and `build/smk37/`, with ELF symbols, section reports, manifests, and `nes-NOT-FOR-INSTALL.bin`. These are raw link products, **not `.fwsc` packages**. `tools/package_fm1.py` creates and validates `.fwsc` packages with forward/reverse loader simulations. The experimental source identity is `FM-1_959`. Do not feed raw link binaries to an updater.
 
 `--rom path.nes` or `--rom path.zip` embeds a private cartridge. For a ZIP containing several cartridges, add `--rom-entry "folder/game.nes"`. `--rom-capacity` changes the reserved file slot. Build artifacts are ignored. The default 64 KiB slot accommodates NROM; MMC2 cartridges may need a larger slot (for example, `--rom-capacity 262672`). Enlarging it does not enable more mappers.
 
@@ -121,3 +123,5 @@ Version 4 retains those 40 fields and appends cumulative CPU, PPU, APU and scan-
 `tools/import_sources.py` and `tools/adapt_platform.py` record the one-time bootstrap and refuse to overwrite the completed port. They are not normal build steps. No files in the reference project were changed.
 
 Website transport, packaging, progress and simulator adaptations are recorded in `vendor/web-provenance.json`. Local firmware artifacts are experimental, not a published release.
+
+FM-1_959 shares the browser core's bounded vblank/NMI scheduling fix. This lets foreground status polling coexist with an NMI handler that also reads PPUSTATUS. The known legacy Ms. Pac-Man ZIP reaches gameplay with audio in a 3,600-frame browser-core test; full/adaptive modes agree. Native/WASM tests, sanitizers, firmware packaging, and SMK37 compilation pass. This revision has not been physically tested on an instrument.

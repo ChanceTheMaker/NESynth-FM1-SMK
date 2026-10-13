@@ -7,7 +7,7 @@ from zipfile import ZipFile, ZIP_STORED, ZIP_DEFLATED, ZIP_BZIP2
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
-from cartridge import read_cartridge, ROM_LIMIT
+from cartridge import read_cartridge, normalize_cartridge, ROM_LIMIT
 from diagnostic import make_rom
 
 OUT = ROOT / 'build/zip-tests'
@@ -42,6 +42,23 @@ fixture('unsupported.zip', [('diagnostic.nes', ROM)], ZIP_BZIP2)
 
 
 class CartridgeTests(unittest.TestCase):
+    def test_legacy_header(self):
+        dirty = bytearray(ROM)
+        dirty[7:16] = b'DiskDude!'
+        original = bytes(dirty)
+        self.assertEqual(normalize_cartridge(dirty), ROM)
+        self.assertEqual(bytes(dirty), original)
+        self.assertEqual(read_cartridge(fixture('legacy.zip', [('Legacy.nes', dirty)])), ROM)
+        for header in [b'DiskDude?', bytes([8]) + bytes(8), bytes([1]) + bytes(8)]:
+            dirty[7:16] = header
+            self.assertEqual(normalize_cartridge(dirty), dirty)
+        unknown = bytearray(65552)
+        unknown[:7] = b'NES\x1a\x02\x04\x01'
+        unknown[7:16] = b'DiskDude!'
+        result = normalize_cartridge(unknown)
+        self.assertEqual(len(result), len(unknown))
+        self.assertEqual(result[4:7], unknown[4:7])
+
     def test_raw_stored_deflated_and_streamed(self):
         for name in ['diagnostic.nes', 'stored.zip', 'deflated.zip', 'streamed.zip']:
             with self.subTest(name=name):

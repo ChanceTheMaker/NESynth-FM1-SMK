@@ -29,12 +29,12 @@
     {
       "path": "web/rom-firmware.js",
       "source_sha256": "c27c14398763eab2012e9d400a3a182ccd5b36bdd88dfbce8301476b67da3df5",
-      "adapted_sha256": "80f9b14ef837f5d6f68e819c863da8b858cb99de1db101ba85f2fdd0d9a70b82"
+      "adapted_sha256": "6dddee6bf87b485e40fd035ca2191b8ed2d18e24561161d7cc2edfc8574ad9c6"
     },
     {
       "path": "web/flash-ui.js",
       "source_sha256": "4cb50d65afb301b0c742841cc031d0084b9f42905a3c33f23bcf824d13c026f6",
-      "adapted_sha256": "039a336c194eed2f1e52b7988f17c2a48e734811b61f0b94e6ac381b4b13da94"
+      "adapted_sha256": "8347acd24b861c41d1e37afc536982af149bd61d3e0e3b36a3d62f7ef4f79c41"
     },
     {
       "path": "web/simulator.js",

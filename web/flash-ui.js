@@ -1,4 +1,4 @@
-﻿import {prepareFirmware} from './rom-firmware.js?v=20261013';
+﻿import {prepareFirmware} from './rom-firmware.js?v=959';
 import {Updater} from './vendor/fm1ota.js?v=20261013';
 import {installFirmware,fm1Identity} from './install-firmware.js?v=20261013';
 import {restoreLatest} from './restore-firmware.js?v=20261013';

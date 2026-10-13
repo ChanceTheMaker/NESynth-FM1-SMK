@@ -74,6 +74,25 @@ def prepare():
     # Only cycle-loop occurrences, leaving the other core timing constants intact.
     p=dest/'InfoNES.cpp'; t=p.read_text(); a=t.index('void InfoNES_Cycle()'); b=t.index('int InfoNES_HSync()',a)
     t=t[:a]+t[a:b].replace('STEP_PER_SCANLINE','lineSteps')+t[b:]; p.write_text(t)
+    # Let the current CPU instruction observe vblank before accepting its NMI.
+    # Immediate scanline-boundary dispatch starves programs polling $2002 while
+    # their NMI handler also reads it (e.g. Ms. Pac-Man's startup).
+    # This is a bounded instruction-level approximation, not cycle-exact PPU timing.
+    # https://www.nesdev.org/wiki/Consistent_frame_synchronization
+    edit('InfoNES.cpp','BYTE PPU_R2;','BYTE PPU_R2;\nstatic BYTE np_vblank_nmi_pending;')
+    edit('InfoNES.cpp','  PPU_R0 = PPU_R1 = PPU_R2 = PPU_R3 = PPU_R7 = 0;',
+         '  PPU_R0 = PPU_R1 = PPU_R2 = PPU_R3 = PPU_R7 = 0;\n  np_vblank_nmi_pending = 0;')
+    edit('InfoNES.cpp','      if ( PPU_R0 & R0_NMI_VB )\n        NMI_REQ;',
+         '      if ( PPU_R0 & R0_NMI_VB )\n        np_vblank_nmi_pending = 1;')
+    edit('InfoNES.cpp','    int nStep;\n\n    // Set a flag',
+         '    int nStep;\n    const unsigned fullLineSteps = lineSteps;\n'
+         '    if (np_vblank_nmi_pending) {\n'
+         '      np_vblank_nmi_pending = 0;\n'
+         '      { unsigned started=np_profile_now(); K6502_Step(2); np_profile_end(0,started); }\n'
+         '      lineSteps -= 2;\n'
+         '      if ((PPU_R0 & R0_NMI_VB) && (PPU_R2 & R2_IN_VBLANK)) { NMI_REQ; }\n'
+         '    }\n\n    // Set a flag')
+    edit('InfoNES.cpp','    FrameStep += lineSteps;','    FrameStep += fullLineSteps;')
     edit('K6502_rw.h','#if 0\n        // Reset a V-Blank flag','#if 1\n        // Reset a V-Blank flag')
     edit('InfoNES_pAPU.cpp','ApuC5Freq = ApuC5Phaseacc;','ApuC5Freq = ApuC5Phaseacc = 0;\n  ApuC3Index = ApuC3Skip = 0;')
     for name in ['ApuC1EnvPhase','ApuC2EnvPhase','ApuC4EnvPhase','ApuC1SweepPhase','ApuC2SweepPhase']:

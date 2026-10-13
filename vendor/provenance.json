@@ -87,7 +87,7 @@
       "path": "firmware/fm1_recovery.h",
       "upstream": "../arcade-fm1-smk/firmware/fm1_recovery.h",
       "sha256": "4af6abe1169d8a354c4cfce936ddd3833c8442f8b6a0d441493352c0ad179d82",
-      "adapted_sha256": "526417d8682007e28a31a0229666c8c5b7c6546c594b5e19b9d06f4873644d43"
+      "adapted_sha256": "67fe73d57a14411f2537bd46c0f44108380029d25e0f086c9502d23607ffb95a"
     },
     {
       "path": "firmware/smk37_game_pads.h",

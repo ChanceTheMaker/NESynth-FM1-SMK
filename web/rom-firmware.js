@@ -1,5 +1,6 @@
 import {Package,sha256hex,logicalImage} from './vendor/fm1pkg.js?v=20261013';
 import {prepareInstall} from './install-firmware.js?v=20261013';
+import {normalizeCartridge} from './cartridge.js';
 export async function protectedAppHash(app,offset,capacity){
  const code=new Uint8Array(app.length-capacity);code.set(app.subarray(0,offset));code.set(app.subarray(offset+capacity),offset);return sha256hex(code);
 }
@@ -16,6 +17,7 @@ export function validateHardwareRom(rom){
  if(mapper===9&&(![2,4,8].includes(rom[4])||![1,2,4,8,16].includes(rom[5])||(rom[6]&8)))throw Error('Unsupported MMC2 cartridge size or mirroring.');
 }
 export async function prepareFirmware(rom,template,metadata){
+ rom=(await normalizeCartridge(rom)).bytes;
  validateHardwareRom(rom);
  if(await sha256hex(template)!==metadata.sha256)throw Error('Firmware template failed its integrity check. Reload and retry.');
  const pkg=new Package(template),offset=metadata.cartridge_offset,capacity=metadata.cartridge_capacity;

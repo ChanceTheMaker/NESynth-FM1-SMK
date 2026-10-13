@@ -4,10 +4,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {openCartridge} from '../web/zip.js';
+import {normalizeCartridge} from '../web/cartridge.js';
 const filename=process.argv[2]||'web/diagnostic.nes';
 const entries=await openCartridge(new File([fs.readFileSync(filename)],path.basename(filename)));
 assert.equal(entries.length,1);
-const rom=await entries[0].read(),wasm=fs.readFileSync('web/nes.wasm');
+const {bytes:rom}=await normalizeCartridge(await entries[0].read()),wasm=fs.readFileSync('web/nes.wasm');
 async function core(stride){
   const {instance}=await WebAssembly.instantiate(wasm,{}),g=instance.exports;
   new Uint8Array(g.memory.buffer,g.gp_upload(),rom.length).set(rom);
