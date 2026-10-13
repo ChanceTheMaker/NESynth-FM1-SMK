@@ -1,0 +1,21 @@
+{
+  "product": "FM-1_958",
+  "package": "fm1-template.fwsc",
+  "sha256": "c67cfba9d75ad9c6b85c4c61ce13eba856f7f21d16320da991917f6a5354a573",
+  "cartridge_offset": 24580,
+  "cartridge_capacity": 393744,
+  "usb_updater": true,
+  "usb_protocol": "fm1-ota-v1",
+  "dual_core": true,
+  "mappers": [
+    0,
+    1,
+    9
+  ],
+  "protected_app_sha256": "d5fdfd65338ab2f8267187776927bdedd6bf78dc428519a241ac362071490602",
+  "loader_sha256": "804ae28b788a037cb2c23c73ce08634fd84da541e0cb71103e402f8fc65e51f5",
+  "app_bytes": 436516,
+  "diagnostic_sha256": "5c81371f34dfa7f214494c61db1290d43f5847ba051a9fec48f94a379c0645be",
+  "notice": "Original diagnostic only. User ROMs are inserted locally in the browser.",
+  "hardware_status": "Experimental FM-1 firmware. Picture, controls and both cores tested. Adaptive drawing prioritizes game timing and audio; compatibility remains experimental. SMK37 flashing is not enabled."
+}

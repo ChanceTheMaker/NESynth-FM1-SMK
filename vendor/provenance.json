@@ -1,0 +1,495 @@
+{
+  "infones_revision": "fe3295c0a86bf5bbecc22aeab3b3af11f6f47908",
+  "files": [
+    {
+      "path": "vendor/infones/InfoNES.cpp",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/InfoNES.cpp",
+      "sha256": "e41599d583bd8c88e33537e19a3f1e274e93e52b04db32ca14cba05f97c212c6"
+    },
+    {
+      "path": "vendor/infones/InfoNES.h",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/InfoNES.h",
+      "sha256": "46165fa8438a892189f2e115e35264578b3f4fa13bb3a2faccaf6155e1853248"
+    },
+    {
+      "path": "vendor/infones/InfoNES_System.h",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/InfoNES_System.h",
+      "sha256": "c38d7eefe78480d6b0b5b9eed10bf696f40354f52e53b6e0b14c0e3c835d98df"
+    },
+    {
+      "path": "vendor/infones/InfoNES_Types.h",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/InfoNES_Types.h",
+      "sha256": "c658acc17df2d4bb50b514ae3fa1921a6241886863784a243144d12a0e5547f4"
+    },
+    {
+      "path": "vendor/infones/InfoNES_pAPU.cpp",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/InfoNES_pAPU.cpp",
+      "sha256": "1d3ef3615ebf821444a57115045a45137698be36af56d5cd4442c6a1ccfd084f"
+    },
+    {
+      "path": "vendor/infones/InfoNES_pAPU.h",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/InfoNES_pAPU.h",
+      "sha256": "7930b5daafb64ae670bca053d901ef6e79a274d32d40975dd451397bd576be3c"
+    },
+    {
+      "path": "vendor/infones/K6502.cpp",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/K6502.cpp",
+      "sha256": "9f522800083eba4ee08ca82c913ba4a211990a14ab9fc11584219987a9928c55"
+    },
+    {
+      "path": "vendor/infones/K6502.h",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/K6502.h",
+      "sha256": "c6426f07787561a3a89ee4b78048224ea7ba2bc86fc117a027a7af7900601c4a"
+    },
+    {
+      "path": "vendor/infones/K6502_rw.h",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/K6502_rw.h",
+      "sha256": "bd6808975af049cbd64627e2bf493a4c2daadf34c4e5b447a32e55e6e19e90b9"
+    },
+    {
+      "path": "vendor/infones/InfoNES_Mapper.h",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/InfoNES_Mapper.h",
+      "sha256": "c9f605e9213461fff0209be9649b9dcf5dc76441fd11b9ced1bc0ff8dce412fa"
+    },
+    {
+      "path": "vendor/infones/mapper/InfoNES_Mapper_000.cpp",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/src/mapper/InfoNES_Mapper_000.cpp",
+      "sha256": "ed6434aa358cbfa8a92cc90d1585d193fc24c5f7c3fc8b1903a18689f635dda2"
+    },
+    {
+      "path": "vendor/infones/LICENSE",
+      "upstream": "https://raw.githubusercontent.com/jay-kumogata/InfoNES/fe3295c0a86bf5bbecc22aeab3b3af11f6f47908/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "firmware/board.c",
+      "upstream": "../arcade-fm1-smk/firmware/board.c",
+      "sha256": "aae4428e358d432f78cf63583cdcdd914cf8e5f5ad7869c554ac3b66e35077ae"
+    },
+    {
+      "path": "firmware/start.S",
+      "upstream": "../arcade-fm1-smk/firmware/start.S",
+      "sha256": "0a9130b551d4a63e0bed1a6dafc756d10ebf16fba1fc3ccdaf561c10702b1cdc"
+    },
+    {
+      "path": "firmware/multicore_video.h",
+      "upstream": "../arcade-fm1-smk/firmware/multicore_video.h",
+      "sha256": "31b01068515ad86b82e0fe80f26431f5cdabafcfeda1efe7841afef650d752da"
+    },
+    {
+      "path": "firmware/master_volume.h",
+      "upstream": "../arcade-fm1-smk/firmware/master_volume.h",
+      "sha256": "e97bcf6e2a839b26534c350bf8daadbbbfab41e8e8b3429f9cf6f6da90efd48c"
+    },
+    {
+      "path": "firmware/fm1_recovery.h",
+      "upstream": "../arcade-fm1-smk/firmware/fm1_recovery.h",
+      "sha256": "4af6abe1169d8a354c4cfce936ddd3833c8442f8b6a0d441493352c0ad179d82"
+    },
+    {
+      "path": "firmware/smk37_game_pads.h",
+      "upstream": "../arcade-fm1-smk/firmware/smk37_game_pads.h",
+      "sha256": "7b30d180ace88741f1bc38d442f463a1242532d6b3351d069b10c2af32034c4f"
+    },
+    {
+      "path": "src/smk37_game_controls.h",
+      "upstream": "../arcade-fm1-smk/src/smk37_game_controls.h",
+      "sha256": "9e2ad5c40314f334ea71d25c067638721f9822d62e52a85236e0ba3eb447c078"
+    },
+    {
+      "path": "src/fm1_game_lights.h",
+      "upstream": "../arcade-fm1-smk/src/fm1_game_lights.h",
+      "sha256": "bb096a534965c6bf399dbc44718e9af5e69116a544825c4885a564785c3322d6"
+    },
+    {
+      "path": "src/libc.c",
+      "upstream": "../arcade-fm1-smk/src/libc.c",
+      "sha256": "963da273f77c6efd64b74021a2c7507d33aed918a3d8c383399ca4f4ae01e6f5"
+    },
+    {
+      "path": "src/freestanding/string.h",
+      "upstream": "../arcade-fm1-smk/src/freestanding/string.h",
+      "sha256": "cc49dd34ab85289bd07a1018f62596cd07ee461a413ceae5f1c8360b06775201"
+    },
+    {
+      "path": "src/freestanding/stdlib.h",
+      "upstream": "../arcade-fm1-smk/src/freestanding/stdlib.h",
+      "sha256": "da503cead9e48679f64d4fe8cc745c6b9874b4579cfed0563fce71477e2060b0"
+    },
+    {
+      "path": "LICENSE",
+      "upstream": "../arcade-fm1-smk/LICENSE",
+      "sha256": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+    },
+    {
+      "path": "vendor/felucca/firmware/app.ld",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/app.ld",
+      "sha256": "e26451c57dc934dfbc945f2aa6ebcd29643f6691e990181c4eefa8cdabe6b1a9"
+    },
+    {
+      "path": "vendor/felucca/firmware/crt0.S",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/crt0.S",
+      "sha256": "c3a83e6fde60ab52705f170516e1ab1d2dba114463b31ac6408709c5cca701c2"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_adc.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_adc.h",
+      "sha256": "980b221d9de19389961087335d6ed5c757967cf85c508d73e23a822e345af42f"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_audio.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_audio.h",
+      "sha256": "024a8202cb0b428067b83c9135b208e0511b15d9b23a6a06a05c96ec258f8955"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_cc.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_cc.h",
+      "sha256": "3a4a44eb638b5e0e1b78c3ca77a9eb74cb7ad8fa8d61454713d4b5649a541d46"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_flash.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_flash.h",
+      "sha256": "232ae3507c31a899e9b1b4ec0e510ec24d433b89a2522b052dd9e9863ff07676"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_gpio.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_gpio.h",
+      "sha256": "945fa4831c0856453f323ae4b1cfc93f1159d5570a9b5f75ed1592d35b0373d0"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_guard.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_guard.h",
+      "sha256": "4ced3c4ee3742d10c8c45fb989e066ed61df1d581b4f2045f90f2032479db624"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_input.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_input.h",
+      "sha256": "53e862ce95718fbdbec9764e86fbcaf13bab8ebb38aab7dbb75c10808af2fb40"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_irq.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_irq.h",
+      "sha256": "cd0afba212def1f825a70a3ead9bdb7c2ce5f200f10618ca5e45cc6f06ba06f6"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_isr.S",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_isr.S",
+      "sha256": "ecda5efaf53a251169dfc3ad52dc39bf0e77ab862637618d4e18e87ca923f445"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_lcd_hw.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_lcd_hw.h",
+      "sha256": "9097a062f7b5fdd671a1fe47ecb509073780a0b3e227cf94028b831e3fe6cda1"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_led_anim.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_led_anim.h",
+      "sha256": "9e1948f9aa3a86acf6e3d581de758c13ab634eab0b98f55a61e903a108fd5450"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_multicore.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_multicore.h",
+      "sha256": "852f49b9cb82b70e14d281de7edc681c6fe22632443af0a150a445eee1335a50"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_sys.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_sys.h",
+      "sha256": "f14844afc2d27f9ee9a56c425044f1c18fbc5ac0b909da55d750ee8567a18758"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_time.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_time.h",
+      "sha256": "54367c16d7a8577a6c80f743b693bb3314698646886aaf74108dd20ec5117828"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_timer.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_timer.h",
+      "sha256": "90beea888ed1389bffe4d937781f8c8f752bd270848c203612b87ff4b8e2a845"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_uart.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_uart.h",
+      "sha256": "9fce2189522d05982d8ae674d54dec8733e072f6c3f9c5d4aa92c65dcb05dd7a"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_usb.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_usb.h",
+      "sha256": "d585e9ca4ada4db1efbf126fbb0fbbbc5fc27a9d149b104014cd678dd2bedad8"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_vec.S",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_vec.S",
+      "sha256": "a15de84eae13f2a77291992167bad160c1e367569a6430029735bea32121f4e8"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/fm1_xip.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/fm1_xip.h",
+      "sha256": "48e0ee6ab2ff94ba58fc7f636533baf9f6bc8f9896e15d3e550f5f204271f73b"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_adc.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_adc.h",
+      "sha256": "132a1e3ea7fb57b69c77371cd0cc83bcf96c21758b9c93f9b81d2058dbc8c6b7"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_analog_controls.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_analog_controls.h",
+      "sha256": "3fc51d7a935e25f3120a487e73faeb1b543423ec68030fb3093d5e5d5b22d1ba"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_analog_scan.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_analog_scan.h",
+      "sha256": "cb575d13aab1a3310071f780be21ef7250884fcbebb75abf00406969580f9182"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_analog_watch.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_analog_watch.h",
+      "sha256": "f0d0cc15bd6095e100bfcef3f77a206fbb43b3d885746666cafcb9d0e9f1e948"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_audio.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_audio.h",
+      "sha256": "d7cf79907a2bda0774855feeae87ffec8de18a534e47a052b12e160449c570bc"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_boot.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_boot.h",
+      "sha256": "0a904676d002f99ad8076041edb3cebd0d3cc995af68c4ceec8e0b5e908757be"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_bootguard.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_bootguard.h",
+      "sha256": "40f84811974e1e55bba62b2fcb7e3ec371569185ad58ffcd38fe689242c7961a"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_button_watch.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_button_watch.h",
+      "sha256": "08b2581bf20e36e0f8f68445ae4632d25e97e0ec35a4e4abe75d8931083fb749"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_contacts.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_contacts.h",
+      "sha256": "e6f323d1c2a5f42d3a3cd090d59b1967742e1ac0d76209f0d603ac233c3d4252"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_controls.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_controls.h",
+      "sha256": "6d22a11ddc1c09ae9bc438049f5c49034c0ca707eebfbc7875a251fbb17e295d"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_events.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_events.h",
+      "sha256": "1f290853891f3a24f1b708a1c82b81313c3ea224f356a4311716ba38a7078697"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_expanded_presets.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_expanded_presets.h",
+      "sha256": "0a06e817eb6c21043f05139707b741ebd666915964a62c8c10e3cd9c963fbeb7"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_keyscan.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_keyscan.h",
+      "sha256": "5fab3ddbbb68704bd5f62017c8f980f39cf18bb77291dd7cf8fe4a4721235985"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_lcd_hw.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_lcd_hw.h",
+      "sha256": "6036a7ce9c423c87385016e4f09964769e693d4f28ce531a183391fb5f3bf74a"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_lights.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_lights.h",
+      "sha256": "8c65ef98d780d13bdb2d5dfedb57cb31fb3b5053827fa70fda5e6db1440730cd"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_lights_hw.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_lights_hw.h",
+      "sha256": "0d40fbf22147e968e053915b323396360db0e6463435df47c92ef9a79666ac37"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_memory.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_memory.h",
+      "sha256": "39e77ea7b9003aa2d30f679b7db0747d2f6d1ae674aeaae1b4460386bd7b87a8"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_midi_tx.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_midi_tx.h",
+      "sha256": "7233f74775fd17dcbaa27856e4404ebd40a032197916ca78893d4bc99d1a47ee"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_object_store.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_object_store.h",
+      "sha256": "ff7de8a6facfeea5d7b883e676be0d8806fabae7af32184a1c7ded232c81cf71"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_panel.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_panel.h",
+      "sha256": "8c8c554b320a27ee31baa7a7a75dc391c32f4030dd3a22658e24ab5a2d21c11a"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_pedal.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_pedal.h",
+      "sha256": "3824ef393c6a99a71ddc5b7be9033da90a95290063b7f8f6de841ccf80accfa2"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_public_profile.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_public_profile.h",
+      "sha256": "5a93bf39f8455fafd7661f295f54936c30c015b6d80cb4903e1a4f77ca4e21c5"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_rawscan.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_rawscan.h",
+      "sha256": "baf08265f16219889f043efdebe25827b2cc6f797e9f4476783a3932a57cf415"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_response.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_response.h",
+      "sha256": "73e7dd36b75356d66a95ac9650827d9bef875471d1faacf2a4d32557d053e23b"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_sample_store.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_sample_store.h",
+      "sha256": "72d6cb2f7e7a256a4a8fb2e991d92afdd2e266506e4445bf9c89b4dde442fd64"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_scanner.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_scanner.h",
+      "sha256": "6219f5b38e8d11b3371dee57f14fe9a04c4edcee54b9f34c8b0babe0518aa3ea"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_store.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_store.h",
+      "sha256": "decf477acccff555c380495eb5999543a4b1da6e41fb20c3b64b4e0da8a61ec4"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_time.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_time.h",
+      "sha256": "aadc395d2d6d09aa00283348f74123e87526b1ab7f088a1a24c45e83cb72fa39"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_trim.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_trim.h",
+      "sha256": "6eea6c0532034ea1a8d7d14bd1f450e3d676e9429c11db6563009268f6183587"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_uart_tx.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_uart_tx.h",
+      "sha256": "47c24f130a9850599a8777b64a8d8e3ee27905b9869c596e0674649249d20c21"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_update_format.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_update_format.h",
+      "sha256": "9fd736431f00015fbf418b9c56a1e566a1902b72614a2eaf6bf9e29b169d620a"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_velocity.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_velocity.h",
+      "sha256": "a8ae493bc050bf00b6372e68188ac2ff3cf742afcd0f2d0c470d002eda2a27f2"
+    },
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_version.h",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/hal/smk37_version.h",
+      "sha256": "51a66584261194142f9e52ee5a87c353badf33d416a3fe07a9d6749a5ac9c515"
+    },
+    {
+      "path": "vendor/felucca/firmware/loader/crt0_ldr.S",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/loader/crt0_ldr.S",
+      "sha256": "61c70491990652b2650fe586c3489904ac114bd9d019fe91ca3fced2c80846a7"
+    },
+    {
+      "path": "vendor/felucca/firmware/loader/ldr_core.c",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/loader/ldr_core.c",
+      "sha256": "de187f0758b3d08631807f11b6db404364d5d12a3540a3b5602a173cfc49e1d5"
+    },
+    {
+      "path": "vendor/felucca/firmware/loader/loader.c",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/loader/loader.c",
+      "sha256": "4f32c78ebfb50d656d9eb191577a6f4b8349968c8512dc31a73748736b2dd7ac"
+    },
+    {
+      "path": "vendor/felucca/firmware/loader/loader.ld",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/loader/loader.ld",
+      "sha256": "4d30093ec428acea9bc9f397371c226f297d67d691032e7918de04eb0e42755f"
+    },
+    {
+      "path": "vendor/felucca/firmware/smk37_crt0.S",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/smk37_crt0.S",
+      "sha256": "6c84c205107f1a1abdf0cd8656ac15db5eeae0ec20dc266b62a44f65873f48f7"
+    },
+    {
+      "path": "vendor/felucca/firmware/src/lcd.c",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/src/lcd.c",
+      "sha256": "73b1c42c32aee5d85c1eec5d7b50a05a01b4944b89730944ee7052126e0cdae5"
+    },
+    {
+      "path": "vendor/felucca/firmware/src/libc.c",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/src/libc.c",
+      "sha256": "cf5f101bf8495630589b2e56b7284a29c2c49456b863dbcac26bd1ec1f313c81"
+    },
+    {
+      "path": "vendor/felucca/firmware/src/ota.c",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/src/ota.c",
+      "sha256": "84e32b66a7364478baa5352e74e82c979ff83bb221adb2d9eb82a19bedce2ccb"
+    },
+    {
+      "path": "vendor/felucca/firmware/src/usb.c",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/firmware/src/usb.c",
+      "sha256": "e5158a3a01bb0781816808ee426598c0facdf7db150789372a5e457e60a32714"
+    },
+    {
+      "path": "vendor/felucca/LICENSE",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/LICENSE",
+      "sha256": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+    },
+    {
+      "path": "vendor/felucca/LICENSES/Apache-2.0.txt",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/LICENSES/Apache-2.0.txt",
+      "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6"
+    },
+    {
+      "path": "vendor/felucca/LICENSING.md",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/LICENSING.md",
+      "sha256": "16a113302e190a105f211d92e82381922947158d85329046b7ae31aab81114a3"
+    },
+    {
+      "path": "vendor/felucca/tests/ldr_test.c",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/tests/ldr_test.c",
+      "sha256": "637084da4cc2142e0c49de4673a8dfb8a58c215ab7f79402cfe23998cf53e8f0"
+    },
+    {
+      "path": "vendor/felucca/tests/ota_test.c",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/tests/ota_test.c",
+      "sha256": "06eda3def98b7771581f91a4a0d538fbd612b60eff00cb81a828173a3368a631"
+    },
+    {
+      "path": "vendor/felucca/tools/__pycache__/fm1_install.cpython-312.pyc",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/__pycache__/fm1_install.cpython-312.pyc",
+      "sha256": "49b869328cb3d80b3e08a2fe051a2118ee6e0b4d76b638ac46502b1cc840f6ce"
+    },
+    {
+      "path": "vendor/felucca/tools/__pycache__/fm1pkg_make.cpython-312.pyc",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/__pycache__/fm1pkg_make.cpython-312.pyc",
+      "sha256": "e9b8818bc15e09b2b756bc3ce0841891e04ac75fe422ebb0b7bd84992d9aebd7"
+    },
+    {
+      "path": "vendor/felucca/tools/__pycache__/lz4blk.cpython-312.pyc",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/__pycache__/lz4blk.cpython-312.pyc",
+      "sha256": "d5fdd6fb90b649b4f25e29fc08abb076401ce3cc2225e96b39ce09e27640d263"
+    },
+    {
+      "path": "vendor/felucca/tools/fm1_install.py",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/fm1_install.py",
+      "sha256": "28376b3bd3e880b20379fbf1bc31cf81a6ef066d0e3571eceec1734590dcf89f"
+    },
+    {
+      "path": "vendor/felucca/tools/fm1pkg_make.py",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/fm1pkg_make.py",
+      "sha256": "7ae21bbabadcfd25d711908b15a8319794f63846485b3908c5748b544c8a263a"
+    },
+    {
+      "path": "vendor/felucca/tools/lz4blk.py",
+      "upstream": "../arcade-fm1-smk/vendor/felucca/tools/lz4blk.py",
+      "sha256": "ee7c0331d1fb99af46a9dcf4a7987a8ad168449075b53802cfd8da6546360760"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#cecec9"><title>NESynth · NES on FM-1 &amp; SMK37</title><meta name="description" content="Play NES homebrew in your browser. Build and flash dual-core FM-1 firmware, or try the SMK37 simulator. Bring your own NES and ZIP cartridges."><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="launch.css"></head>
+<body>
+<header><a class="brand" href="./" aria-label="NESynth home">NESynth</a><span class="header-label">8-BIT EXPERIMENTS <b>001</b></span></header>
+<main>
+<section class="launch-hero" aria-labelledby="hero-heading">
+<div class="hero-copy"><p class="eyebrow">INSERT CARTRIDGE. PRESS START.</p><h1 id="hero-heading">NES games.<br><em>Synth hardware.</em></h1><p class="hero-description">Your favorite little synth has a new game to play. Load a cartridge, turn up the chiptunes, and take 8-bit adventures from your browser to the FM-1.</p><div class="hero-actions"><a class="hero-primary" href="#homebrew">Play a homebrew <span aria-hidden="true">→</span></a><a href="#flash-panel">Build firmware ↓</a></div><p class="hero-footnote">FM-1 firmware · SMK37 browser simulator &amp; development builds</p></div>
+<figure class="hero-art"><div class="art-grid" aria-hidden="true"></div><span class="art-stamp">8-BIT / NEW STAGE</span><img class="hero-smk" src="artwork/hero-smk-pro.svg" width="940" height="370" alt="Detailed red SMK-37 illustration with CodeMaster on its screen"><img class="hero-fm1" src="artwork/hero-fm1.svg" width="590" height="350" alt="FM-1 illustration playing From Below"><figcaption><span class="hero-led"></span> REAL GAMES. A DIFFERENT KIND OF KEYBOARD.</figcaption></figure>
+</section>
+<section id="homebrew" class="homebrew-shelf" aria-labelledby="homebrew-heading"><div class="shelf-heading"><div><p class="eyebrow">THE STARTER COLLECTION</p><h2 id="homebrew-heading">Small cartridges. Big ideas.</h2></div><p>Three free homebrews. One click to play.<br>Or <a href="#player">bring your own .nes or .zip</a>.</p></div>
+<div class="game-grid">
+<article class="game-card"><button class="game-preview" data-homebrew="from-below" aria-label="Play From Below" disabled><img src="homebrew/from-below.png" width="256" height="240" alt="From Below gameplay: falling blocks above a kraken"><span>PLAY FROM BELOW <b aria-hidden="true">↗</b></span></button><div class="game-description"><p class="game-genre">01 / FALLING BLOCKS</p><h3>From Below</h3><p>Stack blocks. Clear lines. Keep the kraken at bay.</p><a href="credits.html#homebrew-credits">Matt Hughson · MIT</a></div></article>
+<article class="game-card"><button class="game-preview" data-homebrew="codemaster" aria-label="Play CodeMaster" disabled><img src="homebrew/codemaster.png" width="256" height="240" alt="CodeMaster gameplay: rows of symbols on a green circuit board"><span>PLAY CODEMASTER <b aria-hidden="true">↗</b></span></button><div class="game-description"><p class="game-genre">02 / CODE-BREAKING PUZZLE</p><h3>CodeMaster</h3><p>Four symbols. Ten guesses. Crack the secret code.</p><a href="credits.html#homebrew-credits">Daniel Vukelich · GPL-3.0</a></div></article>
+<article class="game-card"><button class="game-preview" data-homebrew="diamond-chase" aria-label="Play Diamond Chase" disabled><img src="homebrew/diamond-chase.png" width="256" height="240" alt="Diamond Chase gameplay: a white diamond and yellow target"><span>PLAY DIAMOND CHASE <b aria-hidden="true">↗</b></span></button><div class="game-description"><p class="game-genre">03 / MINI ARCADE</p><h3>Diamond Chase</h3><p>A tiny chase with a chiptune reward. Find the yellow target.</p><a href="credits.html#homebrew-credits">TeneoPython01 · MIT</a></div></article>
+</div></section>
+<div id="player" class="workspace">
+<section class="console" aria-label="NES player">
+<div class="console-top"><span class="console-wordmark">NES <small>ENTERTAINMENT EXPERIMENT</small></span><span id="fps">READY</span></div>
+<div class="simulator-picker"><label for="simulator-model">PLAY ON</label><select id="simulator-model"><option value="nes">NES · classic controller</option><option value="fm1">FM-1</option><option value="smk-pro">SMK-37 Pro</option><option value="smk-elite">SMK-37 Elite</option></select><button id="zoom-screen" aria-pressed="false" hidden>Enlarge screen</button></div>
+<div id="large-screen" hidden></div><div id="hardware" hidden><div id="instrument-art" aria-label="Playable hardware panel"></div><p id="hardware-legend"></p></div>
+<div class="screen-frame"><div class="screen-label"><span>VIDEO</span><span>NTSC / 60 HZ</span></div><canvas id="screen" width="256" height="240" tabindex="0" aria-label="NES game display"></canvas></div>
+<div class="console-bottom"><span class="power-label"><i id="power"></i>POWER</span><span id="title">Original diagnostic</span><button id="pause" disabled>Pause</button><button id="reset" disabled>Reset</button></div>
+<div class="controller" aria-label="Game controls">
+<div class="dpad"><button data-bit="64" class="up" aria-label="Up">▲</button><button data-bit="32" class="left" aria-label="Left">◀</button><span></span><button data-bit="16" class="right" aria-label="Right">▶</button><button data-bit="128" class="down" aria-label="Down">▼</button></div>
+<div class="middle"><div class="controller-stripes" aria-hidden="true"></div><div class="system-buttons"><button data-bit="4"><span>SELECT</span></button><button data-bit="8"><span>START</span></button></div></div>
+<div class="actions"><div><button data-bit="2" aria-label="B">B</button><span>B</span></div><div><button data-bit="1" aria-label="A">A</button><span>A</span></div></div>
+</div>
+<div class="console-foot"><span>FM-1 / SMK37</span><div class="vents" aria-hidden="true"></div></div>
+</section>
+<aside>
+<section class="panel cartridge-panel"><div class="panel-label"><span>01 / CARTRIDGE SLOT</span><span class="red-square" aria-hidden="true"></span></div><h2>What are we playing?</h2><label id="dropzone" class="file-label" for="rom"><span>INSERT CARTRIDGE<small>Drop a .nes or .zip here, or click to choose</small></span><span class="insert-arrow" aria-hidden="true">↓</span></label><input id="rom" type="file" accept=".nes,.zip,application/zip" aria-label="Choose a NES cartridge or ZIP archive" disabled>
+<div id="archive-picker" hidden><p id="archive-name"></p><label for="archive-entry">CARTRIDGES IN THIS ZIP</label><select id="archive-entry"></select><button id="archive-play">Load cartridge</button></div>
+<div class="or-line"><span>OR START HERE</span></div><button id="diagnostic" class="primary" disabled>Play the diagnostic <span aria-hidden="true">→</span></button><p class="hint">NTSC · iNES 1.0 · Mappers 0, 1 &amp; 9<br>ZIPs open automatically. Your files stay on this computer.</p><p id="status" role="status">Loading emulator…</p></section>
+<details class="local-library"><summary>Browse your ROM folder</summary><p class="hint">Choose a folder to browse its .nes and .zip files locally. Nothing is uploaded.</p><label class="save-label" for="folder">Choose folder</label><input id="folder" type="file" webkitdirectory multiple aria-label="Choose local ROM folder"><input id="library-search" type="search" placeholder="Find a cartridge…" aria-label="Search local cartridges"><p id="library-count" class="hint">No folder selected.</p><select id="library" size="5" aria-label="Local cartridges"></select><button id="library-play">Play selected cartridge</button></details>
+<section class="panel"><div class="panel-label"><span>02 / CONTROL DECK</span></div><div class="sound-row"><button id="sound" disabled>Enable sound</button><label for="volume">VOLUME <output id="level">25%</output></label></div><input id="volume" type="range" min="0" max="100" value="25" aria-label="Volume"><p id="sound-state" class="hint" role="status">Sound starts when you load a cartridge or use a game control.</p><dl class="key-guide"><div><dt>MOVE</dt><dd>Arrows / WASD</dd></div><div><dt>A / B</dt><dd>Enter / X · Space / Z</dd></div><div><dt>START / SELECT</dt><dd>P / Shift</dd></div></dl><p id="diagnostic-hint" class="hint">Try it: move the diamond. Hold A to change pitch, B to change color.</p></section>
+<section class="panel hardware"><div class="panel-label"><span>03 / NEXT LEVEL</span></div><h2>From browser to instrument.</h2><p>Put your cartridge on the FM-1. Build your firmware here, connect by USB, and install.</p><a class="tag" href="#flash-panel">OPEN FIRMWARE DECK ↓</a></section>
+</aside>
+</div>
+<section id="flash-panel" class="firmware-deck" aria-labelledby="firmware-heading">
+<div class="deck-heading"><div><p class="eyebrow">03 / FIRMWARE DECK</p><h2 id="firmware-heading">Take the game with you.</h2></div><span class="tag">DUAL CORE / EXPERIMENTAL</span></div>
+<p class="deck-intro">Build a cartridge firmware locally, then install over USB. Your ROM stays on this computer.</p>
+<div class="deck-grid">
+<div class="deck-build">
+<label class="deck-label" for="flash-model">YOUR INSTRUMENT</label><select id="flash-model"><option value="fm1">FM-1 · USB flashing</option><option value="smk37">SMK37 · development build</option></select>
+<p id="flash-availability" class="hint"></p>
+<div id="rom-summary" hidden><span class="deck-label">LOADED CARTRIDGE</span><strong id="rom-name"></strong><p id="rom-info"></p></div>
+<div class="install-steps"><button id="build-firmware" disabled>1 Build firmware</button><button id="connect-device">2 Connect FM-1</button></div>
+<p id="firmware-version" role="status">Checking firmware version…</p><p id="device-status" role="status">No device connected.</p>
+<div id="build-review" hidden><strong id="build-title"></strong><p id="build-details"></p><a id="download-firmware" download>Download .fwsc</a><p class="hint">Installing replaces the current device application. Device game saves last until power-off or restart.</p><button id="flash-device" class="primary" disabled>3 Install / resume</button></div>
+<p id="flash-status" role="status">Load a cartridge to build firmware.</p>
+</div>
+<div class="deck-recovery">
+<div class="trial-note"><span class="deck-label">HARDWARE STATUS</span><p>FM-1 picture, controls, USB updating, and both cores have been tested. Adaptive drawing prioritizes game timing and audio. Compatibility remains experimental.</p><p>SMK37 builds and controls are checked in development. SMK37 USB flashing is not enabled yet.</p></div>
+<details id="install-progress" tabindex="-1"><summary>Install progress &amp; recovery</summary><p id="install-log-heading">Keep your instrument connected until its restart is verified.</p><pre id="install-log" aria-label="Installation log"></pre><div class="log-actions"><button id="retry-install" hidden>Retry install / resume</button><button id="save-install-log">Save log</button></div></details>
+<details id="restore-panel"><summary>Restore original FM-1 firmware</summary><p>Restore the official M-VAVE V15 firmware. The file is included and verified before any transfer.</p><p id="restore-status" role="status">Ready when you need it.</p><p>This replaces NESynth with the original synth application.</p><button id="restore-device">Restore M-VAVE firmware</button></details>
+</div></div>
+</section>
+<section class="save-row"><div><span class="save-heading">KEEP YOUR PROGRESS</span><p>Battery saves stay in this browser. Export a copy to take them with you.</p></div><button id="export" disabled>Export save</button><label class="save-label" for="save">Import save</label><input id="save" type="file" accept=".sav" aria-label="Import battery save" disabled></section>
+</main>
+<footer><span>NESYNTH <b>×</b> INFONES <b>/</b> BUILT ON GAMEDUDE<br><a href="credits.html">Credits &amp; licenses</a></span><span>Experimental compatibility. NTSC / NROM + MMC1 + MMC2.<br>Independent project. Not affiliated with Nintendo.</span></footer>
+<dialog id="confirm-loader"><form method="dialog"><h2>Confirm your instrument</h2><p>The connected loader identifies as <strong id="loader-identity"></strong>. Some SMK37 loaders use the same name.</p><p>Continue only if the connected instrument is an FM-1.</p><div class="log-actions"><button value="cancel">Cancel</button><button value="fm1">It is an FM-1</button></div></form></dialog>
+<script type="module" src="app.js"></script>
+</body></html>

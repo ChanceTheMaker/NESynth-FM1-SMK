@@ -1,0 +1,1 @@
+Device vector illustrations retained from the Sloop/Felucca websites, GPL-3.0-only. Felucca: Leo Kuroshita / Huegelton Instruments; SMK and Sloop adaptations: Chance Roth / ChanceTheMaker. GameDude adapted the simulator controls. NESynth changes display branding and presentation. See the repository LICENSE and vendor/web-provenance.json.

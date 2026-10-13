@@ -1,0 +1,13 @@
+{
+  "product": "FM-1_015",
+  "version": "V15",
+  "release_date": "2026-07-30",
+  "checked_date": "2026-10-13",
+  "package": "fm1-original.fwsc",
+  "bytes": 699956,
+  "sha256": "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a",
+  "source_page": "https://www.m-vave.com/download",
+  "source_url": "https://yms-file-store.oss-cn-hongkong.aliyuncs.com/software/firmware/FM-1.fwsc",
+  "copyright": "Original manufacturer firmware by M-VAVE; not covered by GameDude’s GPL license.",
+  "note": "Unmodified copy of the latest official release verified on the checked date. New upstream versions require validation before replacing this package."
+}

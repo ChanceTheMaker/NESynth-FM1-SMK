@@ -1,0 +1,11 @@
+{
+  "bytes": 155234,
+  "sha256": "8ac5524a4dbf094e5898172a2c5a39819ed1b1c57cb260947da2c1483ecd9244",
+  "mappers": [
+    0,
+    1,
+    9
+  ],
+  "region": "NTSC",
+  "core": "InfoNES"
+}

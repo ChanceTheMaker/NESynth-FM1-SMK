@@ -1,0 +1,51 @@
+export const games = [
+  {
+    "id": "from-below",
+    "title": "From Below",
+    "author": "Matt Hughson",
+    "genre": "Falling blocks",
+    "description": "Stack blocks. Clear lines. Keep the kraken at bay.",
+    "controls": "Press Start through the intro and menus. Left/right move; A/B rotate; down drops.",
+    "license": "MIT",
+    "source": "https://github.com/mhughson/mbh-firstnes",
+    "revision": "8a8bfcf7e0b395350fd97b3e40430ba8182fcf51",
+    "upstream_path": "promotion/itch_emulator/roms/from_below_2020_09_16_v_1_0_0.nes",
+    "rom": "homebrew/from-below.nes",
+    "screenshot": "homebrew/from-below.png",
+    "license_file": "homebrew/from-below-LICENSE.txt",
+    "sha256": "1a3ac4faf4b35640505344059ae5d91dae07cd47e1fb4d9d2a33c76391f1c555"
+  },
+  {
+    "id": "codemaster",
+    "title": "CodeMaster",
+    "author": "Daniel Vukelich",
+    "genre": "Code-breaking puzzle",
+    "description": "Four symbols. Ten guesses. Crack the secret code.",
+    "controls": "Start selects one player and difficulty. Left/right choose a slot; up/down change symbols; A submits. This game has no soundtrack.",
+    "license": "GPL-3.0",
+    "source": "https://github.com/DanielVukelich/Codemaster-NES-homebrew",
+    "revision": "db5405b2860af7f6238dca13f398c505f4a4529d",
+    "upstream_path": "Game/ROM/CodeMaster_Main.nes",
+    "source_download": "homebrew/codemaster-source.zip",
+    "rom": "homebrew/codemaster.nes",
+    "screenshot": "homebrew/codemaster.png",
+    "license_file": "homebrew/codemaster-LICENSE.txt",
+    "sha256": "ca5c79562c8b87eea91c4c79d668fceb812ab8c7f1c1f1e79ac890341977a03d"
+  },
+  {
+    "id": "diamond-chase",
+    "title": "Diamond Chase",
+    "author": "TeneoPython01",
+    "genre": "Mini arcade",
+    "description": "A tiny chase with a chiptune reward. Find the yellow target.",
+    "controls": "Use the direction keys to guide the white diamond into the yellow target. Start plays again after a win.",
+    "license": "MIT",
+    "source": "https://github.com/TeneoPython01/nes-game-01",
+    "revision": "b7ee8416d33b2eb52f4b346f6385a5826cf55cff",
+    "upstream_path": "game.nes",
+    "rom": "homebrew/diamond-chase.nes",
+    "screenshot": "homebrew/diamond-chase.png",
+    "license_file": "homebrew/diamond-chase-LICENSE.txt",
+    "sha256": "26f5c7e18141e9092a8aa740f5163edcd25a93a56353e7758521fbb60e18d982"
+  }
+];

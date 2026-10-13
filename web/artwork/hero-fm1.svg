@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="25 45 590 350" role="img" aria-label="FM-1 NESynth illustration with homebrew gameplay">
+<style>
+.hero-product{color:#cdd7d4}.product-body{fill:#343b43;stroke:#687887}.product-rubber{fill:#263b40;stroke:#1118}.product-button{fill:var(--button-fill,#82aaa5);stroke:#182b30}.product-detail{opacity:.25}.product-bezel{fill:#0a111b;stroke:#000}.product-screen{fill:#090d19;stroke:#566b73}.product-labels{font-family:Arial,sans-serif;letter-spacing:.3px}.product-control-ink{color:#173631}
+</style><title id="fm1-wire-title" data-i18n="ui.wireTitle">FM-1 synthesizer wireframe</title>
+<desc id="fm1-wire-desc" data-i18n="ui.wireDesc">The FM-1's rounded enclosure, eight rotary controls, central screen, twelve function buttons, octave buttons, and 27 touch keys.</desc>
+<defs>
+ <g id="fm1-knob"><circle r="13" /><ellipse cy="3" rx="16" ry="15" opacity=".35" /><path d="M0 -10v7" stroke-width="2.5" /></g>
+ <g id="fm1-key"><rect width="24" height="49" rx="12" /><path d="M12 12v24" opacity=".65" stroke-width="2.5" /></g>
+
+ <g id="fm1-product-knob" class="product-knob"><ellipse cy="3" rx="16" ry="15" fill="#111" opacity=".45" stroke="none" /><circle r="13" fill="url(#fm1-knob-shade)" stroke="#111" /><path d="M0 -10v7" stroke="#ddd" stroke-width="2.5" /></g>
+ <g id="fm1-product-key"><rect class="product-button" width="24" height="49" rx="12" /><path d="M12 12v24" opacity=".7" stroke-width="2.5" /></g>
+ <linearGradient id="fm1-knob-shade" x2=".2" y2="1"><stop stop-color="#525453" /><stop offset=".55" stop-color="#242625" /><stop offset="1" stop-color="#111312" /></linearGradient>
+ <linearGradient id="fm1-body-sheen" x2=".4" y2="1"><stop stop-color="#fff" stop-opacity=".16" /><stop offset=".5" stop-color="#fff" stop-opacity="0" /><stop offset="1" stop-color="#000" stop-opacity=".1" /></linearGradient>
+<symbol id="gd-logo" viewBox="0 0 192 36"><title>NESynth</title><rect x="2" y="2" width="188" height="32" rx="16" fill="none" stroke="#e63c31" stroke-width="3"/><text x="96" y="25" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="25" fill="#e63c31">NESynth</text></symbol></defs>
+<g class="hero-product">
+<g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+ <path class="product-detail" d="M40 101v257q0 27 30 27h500q30 0 30-27V101M46 364q10 10 26 10h497q15 0 24-10" />
+ <rect class="product-body" x="40" y="55" width="560" height="320" rx="30" />
+ <rect fill="url(#fm1-body-sheen)" stroke-opacity=".3" x="52" y="67" width="536" height="296" rx="23" class="product-detail" />
+
+ <g><use href="#fm1-product-knob" x="87" y="105" /><use href="#fm1-product-knob" x="146" y="105" /><use href="#fm1-product-knob" x="87" y="161" /><use href="#fm1-product-knob" x="146" y="161" />
+ <use href="#fm1-product-knob" x="358" y="105" /><use href="#fm1-product-knob" x="421" y="105" /><use href="#fm1-product-knob" x="484" y="105" /><use href="#fm1-product-knob" x="547" y="105" /></g>
+ <rect class="product-bezel" x="185" y="78" width="133" height="131" rx="17" />
+ <rect x="199" y="93" width="105" height="99" rx="3" class="product-screen" />
+ <rect class="product-rubber" x="72" y="197" width="90" height="27" rx="6" />
+ <rect class="product-button" x="77" y="202" width="34" height="16" rx="3" /><rect class="product-button" x="119" y="202" width="37" height="16" rx="3" />
+ <rect class="product-rubber" x="337" y="142" width="230" height="81" rx="12" />
+ <rect class="product-rubber" x="60" y="240" width="520" height="117" rx="20" />
+
+<rect class="product-button" x="346" y="151" width="29" height="27" rx="5" />
+<rect class="product-button" x="382" y="151" width="29" height="27" rx="5" />
+<rect class="product-button" x="418" y="151" width="29" height="27" rx="5" />
+<rect class="product-button" x="454" y="151" width="29" height="27" rx="5" />
+<rect class="product-button" x="490" y="151" width="29" height="27" rx="5" />
+<rect class="product-button" x="526" y="151" width="29" height="27" rx="5" />
+<rect class="product-button" x="346" y="185" width="29" height="27" rx="5" />
+<rect class="product-button" x="382" y="185" width="29" height="27" rx="5" />
+<rect class="product-button" x="418" y="185" width="29" height="27" rx="5" />
+<rect class="product-button" x="454" y="185" width="29" height="27" rx="5" />
+<rect class="product-button" x="490" y="185" width="29" height="27" rx="5" />
+<rect class="product-button" x="526" y="185" width="29" height="27" rx="5" />
+<use class="product-control-ink" href="#fm1-product-key" x="68" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="100" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="132" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="164" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="196" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="228" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="260" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="292" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="324" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="356" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="388" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="420" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="452" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="484" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="516" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="548" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="84" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="116" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="148" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="212" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="244" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="308" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="340" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="372" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="436" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="468" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="532" y="248" />
+</g><g class="product-labels" fill="currentColor" font-size="7" text-anchor="middle">
+<text x="87" y="81">MASTER</text>
+<text x="146" y="81">SELECT</text>
+<text x="87" y="139">PRESETS</text>
+<text x="146" y="139">ALGORITHM</text>
+<text x="358" y="81">KNOB 1</text>
+<text x="421" y="81">KNOB 2</text>
+<text x="484" y="81">KNOB 3</text>
+<text x="547" y="81">KNOB 4</text>
+<text class="product-control-ink" x="94" y="213">OCT−</text>
+<text class="product-control-ink" x="138" y="213">OCT+</text>
+<text class="product-control-ink" x="360" y="168" font-size="6">FX</text>
+<text class="product-control-ink" x="396" y="168" font-size="6">SCL</text>
+<text class="product-control-ink" x="432" y="168" font-size="6">ENV</text>
+<text class="product-control-ink" x="468" y="168" font-size="6">LFO</text>
+<text class="product-control-ink" x="504" y="168" font-size="6">EDIT</text>
+<text class="product-control-ink" x="540" y="168" font-size="6">GLO</text>
+<text class="product-control-ink" x="360" y="202" font-size="6">HOME</text>
+<text class="product-control-ink" x="396" y="202" font-size="6">SAVE</text>
+<text class="product-control-ink" x="432" y="202" font-size="6">ARP</text>
+<text class="product-control-ink" x="468" y="202" font-size="6">SEQ</text>
+<text class="product-control-ink" x="504" y="202" font-size="6">PLAY</text>
+<text class="product-control-ink" x="540" y="202" font-size="6">REC</text>
+</g><g id="game-screen-brand"><use href="#gd-logo" x="205" y="126" width="93" height="19" /></g></g><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAADwCAIAAABg9S2cAAAVwUlEQVR4nO2dvXIcNxLHsVsqRo5YVHoOLnAiJ1Ip8wM4EQMq8UaOVFSgN7jYb6BALEWKqIQMeIkewJnLl0h1VXoGsxg5YnIX9KqJBRoYfDRmgdn/r1isXQwWM4PtBvoDg109/vWrCfDu9EvoEPP65slkna7468MP+76ERRGRnyF4FDlmC3dIGd6dfhlOB7J49lwo/POPnUP01v9Iz+WR+3LqOIULQ1YAW9xJvlnKJ6cFqrBgrViqQIj3tdSbZdb86t3pF/ozxry+eeJIPB+1D/kVzDfRTzGfRoGEICQK45bH7yt+aDGsyIazLRlRjl/fPBFf+3Q+9sMH0GV4HyA0bDvGfbphY+uJ7rXuBduAtu1mHh2dCqOU2zci3teB8Chu3DuDPWmFXzNk9izSRQ7ZEv6hnst9J/jQRJ/YOsGi9EcsfhtR+h3XeXSWKhxLva90VgU23NBxHvgAugzvAxR8ZlDRb8EokfKy6xzl7mooUYCe+d+//0MvVi+eqjdu+5TEKMIRv07/vhI/6NO0/1swvALYPc6vb+82j43O1GwLhy8NoeRrb/jXGb+veLlN6/5vzXq6St+sXjylwYZ73xhzcnyp1T4HTMS1A1Shc+knnOucvK9EWvd/a4ZXAJ/Vi6e3dxvFBp2AunNoCEIXHzF+ilHv/6YMbwIRrS3OUQQ9F637GsXi91ngDJDCs+e1U/9hsrx+O1AFKDDcF/bFM1n3NYrDk05JIqx//vrwg+2H3d5tRLcspVzLnNXyC+cxr+lqK/ttCNEq8QHI3xfNPjsUwBWc+v/793/8uIH4Eb88Ef/rsYN0ZeUq/qJ9I2JfJZYr4t+X3XvF/TZKIEjZBOIvzBfZ0PdHcTT/m+byXOknBeNP0ZBJKyAKyrNOHYeEg//svsoqn4f6fhti1cl8USD6OkOK4Qt6cU7x9m5jPuiXL8z2Zfz7cqwsrf7sk1nDoOK86cu3MxtkDX629V9jwtqFiadeElr99teHHzr3BBRMoCzbNCLKKjbuyfGlfYrQ6XLLDaJAxpjMfhvCDSiJAiU6r8VOcLEHbLfMIzerhF1YUF4JSUO9EzzbjFTfbxxK6nkSWFQYlCZcXcEl6kNAfYZBWyyFsDk5voQCzARZ//bYw6jkASplJaQAe/cxxPtSyQPw12E6fm5mJie4JuadaALRFPzYfCVDyLejavIAWiPlDHH9LCLST1T2GyuSytW2YI6lEE5cnzsotzx+CkdP1PMA9U7wfuP6IUL3Vd9vthvWbU5g7tWgIWnOLXfgJzC2DgDyAMk0zQOEjKV+mFUBROOkoNyBrH8eY1rkAfjxkYWpQei+VPqNfABWpz5zAvOtBg1N+rnlPlvr/9ev9GcfUswDLG8hJJF1X7n9dnJ8SbrR7TwwUxSonRPs6In9WCq9UMkDhIb/9GkhlAeYx0EsuH6VfnOiSR2GRIcPg/oK0CIJYKqNnw7DoDMbdX3mBIZXgH/8VwgvhL5UJ+IhVnMigwW/D9Abub8n4FRwbjZS3/6guP1EAa3lc4FPhMX3+47vj5kS6+xc3HXxt04R+y30qf4XUC1BASb3uRdJH5ni7Y+iDwXXnzJDjs7wJlC3GRagAkygCWifAt7jyX4rVnA+6xcqtt8VoessuP5QZ2a1c3Eqv/bfNmUh+wLZ5O7fnzuhp7ffG7m/JxBvZ9x+sBl+BiBa9/hA3+gQ+GP8viaB4WcAZ7/LeIUO25+N1k58cTtzGjw+wytAnKxcT+7v6WbF0SP1tcr5qEo7Jqf3CnJq5zfu64vT7Yvzm+5ngNBTi1lLG1Ia8ZuKkLt/f1lEL+sjM88P6l54oo5l9TMJuv9frNAazY2x4s/++uVESnnkYnL375/cF1/07ehTkdlAJMtk0irPuph4O85MqNXP/tjvv/bfNqLcBJrct6fygY/QfkEOtnSmCFykfuTjYtyjtQhqpa5UVEixn0XmGe99ShSgZt8en5AipbeZ/q1M1jf5v6fr1J/8skP1tcq1zuuj28+d0NAJTlSMkAmU1Y7WYOwcFc2e+vh3bjxeN35f045uP4uj/sxBoXIfgPH3skwszzrLful8GBsRcnPFfPCcttBy1gLlzrb9z859ot7Ptg74oo+1QKnozs7ABH4Ppr6fHSOHhd6R/nlsoU4VwN4+JPEjuSHwnheu9UMk4pmIWH9SuHtPhDUlnjcAs9FokrSt/4gT3HseYB7SZwCYQPOgYgKxcIs5YPFQI7pWgMR9gcBYxJf6zDwDdOoDmHzLBz7APKj08/lNTL7jR3XpUQFs6z9dDWACzYNWP4s+AC8LnY1OTaBcrxdJgHlQ7OfQGD/ziqAeZ4ACQks1teofJn4eoEU/k7M75zMANp3OALlgBmiE00vD9fO70y/8+vXNEy7k1wtZCpH7RFLBE0zANOvnUE7AVCyFsEXfWNJvH31982QhM4CBEzwXLfpZ3e4XpZ8LX988eX3zhN4uygdIN09z6wNixH4mWbdVgl+/O/2CGQDkMVw/O7OBw0JmgNAwk1sO4gzRz3GJZ8guWsIMEPG0xEJ4wGUsr59f3zwZPgoU+n2Amv18AGFLcG5/is9PMyR19sbGoZJKIrNB+QwQ3xbFJr4tSmL9XFQ2QQBE7g4U9lHWHzsbEBfrSqH3o/527F/8iL4JlLifT3F9H3sHjpRyPgriRHY6mazMRHJhumM8BTe5hLJd9lGzqwZUocQESpkBnKP8EXtxW3wbucQZAL8PMBa6Jred0+XcltnVCvE103AGaFTfIbSND6O1n8+BE9kuSazg+APqnSyKu9lVCaeaiEIYtPJH3tXb+TPww7d+OZdA+gtI788WnewYPP5R+y0bRX41ha0RU8p5a6AU1zleLgLHdx56609R+mkSEHXAhioMHwaFDzAWe5Q30RyKzQCV4ch5QLx/fkL5gc77WfQEggrAFkjTXUmyfk8gkc6/hmVgbycqxvtHQVYAJ1jZSAfKfk/AB/H+mQktfBixqwUFCLmqTW2hYlfYjjCENj0GTRm6n90wqCPo8+zJU7Mx+rOl/I7vAhixk3dmAFHg2CxpZwgVS7+IPyDZBitox4hJle0MMCnfLUQ/5GYUuB9jdTroh9XJ8eXDm8ACHvFtJyAPMBa95Z0eTKBJyY5kc/dI1vof0JTOn4ARR3B5LZC9Mb/vB6d4xrm7+yviWKLYA2tOtKRfXX5C8iyHQRNLxHiRvZ/z7d3msWk+5cXzAIPGp0ekpp+byk8kr7XjAzDOE1vxPcrjYdPW9hJ8gLGI+wAt5CcU2afCtXMa+mFqZ/aJz0Sho6sXT2/vNhVXnsRkHsCMGZ8GKvIzmdd6ZHal3z59ugXGp+nBPw7lAWAI9Y+u/KTktQQnmOR+rN9lgXADm/S81iMTdpCHwBZ9qAGIyLAYy1F7Jlh8Nuflh62TenJ8efH+6OXLl3zIcYaKf0d+cgUookBDoCU/TGJeq+HOcOev7vn1xfujUDXn0ifzzYnrQwk4vr2Rvp6gTH4m6zimkebeoHTF9nUbY+wwK722S0IDfygJItaHjzsc4verKD/OucSzb1VRzAOUcXu3OTm+5P/xyo9//epcfSScytft158h0goU8eWNv81G8uNXsCOcagrAk9TLly+vrq64/PzVPd8MnYve8nkj2yTKV7xb//t/bhvH+p8hsL93+ztlH0BFfrjxSd1ouD36+at7ms5sHXM0u2bsDxHaFwj0RnxXzGL5CeW1xGtQVgDHgCMi09mDKZa2X1CoPiR+OEJC7xeWyY9zouAgq+gDGGt6mrTktM4LH2As4t/7/PKjFgb95gOw9XZljKG4LV9rC2HFThDLYF/y09YHMHqamg6kfxnMIz/N8wC21vpxXBWQB1gGe5GfveUB4AMcJpHvfS/yo+sDbO02fm3CcVwtJvetB0OwL/mZYy2QrdDO1dtJjbLX3//TPS9Ev3/879Fyf7ekyE89e84DaAGhXwbzy8/e8gAA2Dgz/Gx5gJV9vpqGxAWrtIC7LI7r37/YDvIAy4BW/NNrngecEJAvDylyG6pD5et243RNHNf/VHo7kP7lIcpDRG5FV1MsXyu6F+px3JPjS/qLt4M8wJIQ3QBClIeQ3FK5s3TUL1/ZmsRNlw3bWXFcAGqIyK1oODkyyW8f2aU1noB6HNex+MUbNsgDLAX+TvlhgPNX9/ZzwI48pMhtaCC2y9cpHygjZT13BP8+E9vB8wCjw5Jjm0O+PDChRIGtGKHyHQUQJ5HcS/cLtZQqLvTgYLHl1pkKHKvBL1+FGi12AwzyAGAcggpgMuOsdh4gMY5bhtMO8gCLoem6/xDBpRC5cVYWevJd/NYqLjKvHUj/iMz/3AgRVIDiOOvF+yNSBv+Ddhy3Bqcd5AEWwAzPjeRhn56lzRffPV8lAHUEl0Pnxlnt8NHV1RUZQn4SwFRbeE47yAMsg5AstSZpOXRKnJVrmuiaiPq7mmwHeYBBKcsXVZKkAClxVvHtbEDiFwCC5gDMTSwPkMte4rjIAyyMmfOnao9E9hMOgvSPy/xSpKYAe4zjIg+wMLTyRQCACdR8gH3FcZEHWBgze5Ka26LsJY7rgzzA0GjlixLRVID9Cj0AAIA+OSs6lMCz5w9/AEzgCdtaOFYnkUI7Z4EK9eeyjB/HCQa9007eQuVSBckHuK67IL8dfiFeotLp8Ivwo6Iub6FySQ53FeDMPVyI006o2Wud01HYB9I/Ho3kLVQuVVvvHCNqNNJvxymxL+IsUK0UMoFgCA1AO3kLlQfkcLVz7Hr3dfHVXE8J9PWu9BvvLVgwTeUt9Frk2s4EN1LK0FvWSwj9YTLzJBB465lAlQZJpB3nIs4g/QdMa3lLlsNV8Ny5I7To4/qGjZbeg3E5k4yT692joU+F3k62H+DbDBA6ZcrbiExfSyX2izO9eDAYgviQGpKBSAjRD/LkDKzrbVviiUPx+1A1+604tUXyADCHDgQ/Ks+EAiEp5We7gifWl1jHJovJMK1TwT63GOK89vQ1ZB2BpRIay01g0AyVh+Qn0r7EOhiHisTv/aMOZ7uzx/Vu5evdF3Y5dGDxXAdem3BeKDSYivITaV9i9dB6ivBFRnT/ZmDSgDhnkkQZq6QyX+S37xGOAtmIgu5PEZB4kEtibKdYuqZ0YC0X24iTQ1Y+y7feYOoAwh5PRSmqzBdNffDbUogUE8gZ5uO6K84YiXFcAJhJOUmUwwDriROEoviTvnbEpbYrIA8A4sTlJFcOPVFfT8dN/bj+pCMyGbHyyzEhgBAhOcmVQ8nMWcd0KBTXD3kVYnQoVB95AJBCRE6y5DA1yM5jfGSiEecjsXW/tfhFQAdAChG5CsnhmVXferty64UMEieclDsNlcVxAQhRLIe7GuLtDBfRAbFaIjDxQQvS5SpgXORvjRhRtUgECtIPdCmTw/IzFTcHsx60oECuPAfAnE1mguvj94j3gxbkylWJER5as5ArzZB+0IJiuUqdAVTi94j3gxaUyaHN9ITQLn4PHQAtSJcre01DsMZZ+C0A45JhOEHowSJJEn1IPzggKuP9AAyMVsQTgPGA9INDZW0M1uuDAwfr9cHhgng/ABB6cKhgyAcHDaQfAEQ8wQED6QeHyhrxfgA8oAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB0Qt4PZZ8cXxpjbu82lWfVagcsnpPjSy15E5lQgMgnmZTr02onxLPnxhjz5x/FDSi3Mzr99KcvOVryRqzSq85DgRo8e64jslrtjE5X/dlaPqd+KR6ApXDx/sh/mzQD2J88f3WvfmU2cAyAzdXVlV+YKIQpcrsST5B7JkWgAMDGGaCdUTxEutw+zAB+0/NLv4ECgF0mLZRKuV2CE5wCwjvtaNq3cIIVgPQ3hTqWOnk4Hqm0QsP2G2suentv7BJ621Sb40E351CkMoKhRLwfnKN//hFUgB76M+I51CoAi/6PPz8Ufv5k3hyZt/cPcv/m783be3N7t9mLxWV/AfR92IPW3r+egeAe4w7k3uutG0noyR+IeAVVPoAt/Z8/bcWdoLHfKUmZB5o6wf5o1MP4NBDzd2CPPsDt3Yb+To4vSdBJ+k+OL/lybROIyt/e79hI8yPO0ZD+LMTuGtT6J/IUwJb7N0fml7+3ozVJ/28/bX77aWvkkMQbY94cbQf1k+PLj9+19QHi8MRd2c6BkNgPk73aeX9mmEAk+iz0DrYPcH5jLk7N+c327cWp+fzJfPzukjUhfpbE6wGHQC8m0O3d5vGvX1cvnjrlbyXvgi6aZgljzOdPxhgT0hwVIsMMH3r2fKea+JHOh6vZiPeD0412D2e10wNJM8Dt3YbNd/J3GduydwJBP/5szm927H6aBMQzcnnxDCB6Y1Tofw3pAb6DZbIfxF5t4SU3nQSmZwBb+o3ZkX6CJoG39+bzp+2fMYL0G2kSsMW98nmAyV5O8QEg/UR6P8R7tf/+nFAAkn57aHdg7eS459t7c36zlf4ff3ZtJPsBH1/i65+JEXG+g6GdttlICSpE3qa3M0lTtzCmAGSWkPQ7OsBiTYM6v31zZC5Ot380CTiInoDKHYpfgJ+mSZkogEnrh5TuVelPLUvBJ+YDsPHj2/3GWubA4R0RP/bPnoDunUymdRPzvkgPE1rdpdWftouo6BUEFSAS9HQUgGAlsfVB1B/zLW8wW8STZ2GIdQvm6V5HYLR0IGYCZQUu2ff97acNBUBZ+o1nQRnticwJcfokrlicbOdASO+H+ACv2J+NhsvspRA0eJtABsCHFMOZAXQDW6HvwAlXJ+YsMUtk9QP1qphgGaI/YyaQuHTn7f1OljeSG46TqD8paE3BsJSIUfpTZRitfSDm9m5DoU97nY8YNnUKeclQ5QUkEk9YggJCKfaxKFGAf/1+eXH68JZCn7/9tGEd8JNlfiHNG4pPCKQPM/GaBz78M1rx4nb9qeIVTCgAD9v8gp1xXvBDQZ7Pn6YvSJwETPU8kLjMUyVVfAjk9kOo8gz9WZ8fmFAAju3wfxq5//X75e3dhrJdIfgQm/scJ6W3PAkYDVuIJmKai7MW/2S1czhk9UM8DzBDfxbPBjEFcEwatmFoEqBFzuc323VvHB1iuD4/C0b88veDscTZDbKFtKaCyoFHq53RGaU/I4trJpl4Jvjjd9sgjzN4E7wM7sKr71Q+MebjbmKBlpH+8vfm4zebql1ebIh43NDssYcrxWZiKcTkkEynp8Bo7vjttI9HYUA9uULY3cZYRu/3B9D+YbafRY8K4KC7HzzaP7T24wygAAC0Y8lbI4r7waN9tG/T3Qwg3obifvBof9nt59KdAjio7weP9g+q/Ul6VwCf1r9jgPaX3b7DeAoAgCJLdoIBmETn9wEKiBh/e/lppiziliuuf19cvD/KvfhOTSD+hvr5Muz95hMrp9efgdGvP0TWffl0qgAOBZrdFbj+bhlDAQBoBJxgcNBAAcBB838JCzlbSuyRkwAAAABJRU5ErkJggg==" x="200" y="95" width="103" height="93" preserveAspectRatio="none" style="image-rendering:pixelated"/></svg>

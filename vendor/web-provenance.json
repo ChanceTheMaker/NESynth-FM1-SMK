@@ -1,0 +1,65 @@
+{
+  "reference": "../arcade-fm1-smk/web",
+  "files": [
+    {
+      "path": "web/vendor/fm1pkg.js",
+      "source_sha256": "65ea7de496ba8163c012e411ddeb42c5e31df790f01ac07857f5a3b5edc9ce8a",
+      "adapted_sha256": "65ea7de496ba8163c012e411ddeb42c5e31df790f01ac07857f5a3b5edc9ce8a"
+    },
+    {
+      "path": "web/vendor/fm1ota.js",
+      "source_sha256": "61da23309b1b5bc9b0e59a61e00fc2fb9003b78c5f672749197f5c7030f91f74",
+      "adapted_sha256": "61da23309b1b5bc9b0e59a61e00fc2fb9003b78c5f672749197f5c7030f91f74"
+    },
+    {
+      "path": "web/install-firmware.js",
+      "source_sha256": "97af121708cc55782327a3e57f853d626b262b7b7ce7d0b9f5eeada27ce23079",
+      "adapted_sha256": "97af121708cc55782327a3e57f853d626b262b7b7ce7d0b9f5eeada27ce23079"
+    },
+    {
+      "path": "web/restore-firmware.js",
+      "source_sha256": "2ff64c6070776cefcfabe60d5122cd959cf8236aec391e483566a2626dc19292",
+      "adapted_sha256": "2ff64c6070776cefcfabe60d5122cd959cf8236aec391e483566a2626dc19292"
+    },
+    {
+      "path": "web/update-progress.js",
+      "source_sha256": "0cca4d33e19a6fdfa7a92a45b72d312c7d2a85730d1aafd87aaa201a59f39ce5",
+      "adapted_sha256": "6d876b71da12d8bea0a0a2ce718511fb65d7d78a14c23fa84fdeb92dd03c4da1"
+    },
+    {
+      "path": "web/rom-firmware.js",
+      "source_sha256": "c27c14398763eab2012e9d400a3a182ccd5b36bdd88dfbce8301476b67da3df5",
+      "adapted_sha256": "80f9b14ef837f5d6f68e819c863da8b858cb99de1db101ba85f2fdd0d9a70b82"
+    },
+    {
+      "path": "web/flash-ui.js",
+      "source_sha256": "4cb50d65afb301b0c742841cc031d0084b9f42905a3c33f23bcf824d13c026f6",
+      "adapted_sha256": "039a336c194eed2f1e52b7988f17c2a48e734811b61f0b94e6ac381b4b13da94"
+    },
+    {
+      "path": "web/simulator.js",
+      "source_sha256": "a3e0634d954e582ac01496bb96d7f8cf58484932e7033a3e552e6f4ef082586d",
+      "adapted_sha256": "bc4f6b232ce7c3199380db09595d7a2ef4988552295142903d644dca444dc013"
+    },
+    {
+      "path": "web/artwork/fm1.svg",
+      "source_sha256": "d9dcd90d287282279c45b2d3ce305aa52886aa36331a209b2460017c098272b2",
+      "adapted_sha256": "5c38a79a7aa564569fc20549b70123f40885d02c0ae5033a8b2adbbc04a822a6"
+    },
+    {
+      "path": "web/artwork/smk-pro.svg",
+      "source_sha256": "cd3a87141bfa3f5880ae5a383ba1a4713a429fdc0e70ba8820d15683559452bc",
+      "adapted_sha256": "a802a252f23c712cc3b773d723c6cca9792acf3da85fc69b4348c56962c7cacc"
+    },
+    {
+      "path": "web/artwork/smk-elite.svg",
+      "source_sha256": "0a184a3fd8d2976b825ebb7f1c088969d0a4ae0275795d4fc00268d300cc550b",
+      "adapted_sha256": "13e3f2a95e63aa999b46d8b0f91825435809cd813613e1629c5d04c3d9307b10"
+    },
+    {
+      "path": "web/firmware/fm1-original.fwsc",
+      "source_sha256": "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a",
+      "adapted_sha256": "db1642b2b6fa5c2cccb11ffd13878068bb28601678d3644049f99dc40e7edb8a"
+    }
+  ]
+}
