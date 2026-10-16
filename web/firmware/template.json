@@ -21,5 +21,5 @@
   "app_bytes": 570204,
   "diagnostic_sha256": "5c81371f34dfa7f214494c61db1290d43f5847ba051a9fec48f94a379c0645be",
   "notice": "Original diagnostic only. User ROMs are inserted locally in the browser.",
-  "hardware_status": "Experimental FM-1 firmware. Picture, controls and both cores tested. Adaptive drawing prioritizes game timing and audio; compatibility remains experimental. SMK37 flashing is not enabled."
+  "hardware_status": "Experimental FM-1 firmware. Picture, controls and both cores tested. Adaptive drawing prioritizes game timing and audio; compatibility remains experimental. SMK firmware has separate experimental candidate metadata."
 }

@@ -1,6 +1,6 @@
 import './simulator.js';
 import './fullscreen.js?v=20261016';
-import './flash-ui.js?v=20261016-realistic';
+import './flash-ui.js?v=20261016-smk';
 import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';
 import {fetchHomebrew} from './homebrew.js';

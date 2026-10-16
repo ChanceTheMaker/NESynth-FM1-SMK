@@ -30,14 +30,18 @@ try{
  const metadata=JSON.parse(await fs.readFile('web/firmware/template.json','utf8'));
  await page.route('**/vendor/fm1ota.js*',route=>route.fulfill({contentType:'text/javascript',body:`
   export class Updater {
-   constructor() { this.waits=0; }
-   device(text='FM-1_015') { return {name:'Simulated FM-1',id:{model:text.startsWith('ota')?'ota-FM-1':'FM-1',text,version:15},link:{send(){return true},async close(){}}}; }
-   async findAny() { return this.device(); }
-   async serve() { return {finished:true}; }
+   constructor(access,log,pattern) { this.waits=0;if(window.testDevice?.startsWith('SMK')&&!pattern?.test(window.testDevice))throw Error('SMK MIDI port excluded from discovery'); }
+   device(text=window.testDevice||'FM-1_015') { const split=text.lastIndexOf('_');return {name:'Simulated instrument',id:{model:text.slice(0,split),text,version:Number(text.slice(split+1))},link:{send(){return true},async close(){}}}; }
+   async findAny(filter) { const device=this.device();return !filter||filter(device.id)?device:null; }
+   async serve(link,bytes,finish) { if(finish===0xf0000000)window.midiWrites++;return {finished:true}; }
    async write() { window.midiWrites++;return {finished:true}; }
-   async waitForAny() { return this.device(++this.waits===1?'ota-FM-1_015':'${metadata.product}'); }
+   async waitForAny(filter) { const device=this.device(window.testWaits?.shift()||(++this.waits===1?'ota-FM-1_015':'${metadata.product}'));return !filter||filter(device.id)?device:null; }
   }
  `}));
+ for(const [name,file] of [['Pro','pro'],['Elite','elite']]){
+  const stock=await fs.readFile(`build/smk37/stock-${file}.fwsc`);
+  await page.route(`**/SMK-37_${name}_016.fwsc`,route=>route.fulfill({contentType:'application/octet-stream',body:stock}));
+ }
  await page.goto(`http://127.0.0.1:${server.address().port}/`);
  await page.waitForFunction(()=>!document.getElementById('dropzone').disabled);
  assert.equal(await page.locator('.crt-tv #screen').count(),1,'NES canvas belongs inside the CRT');
@@ -104,7 +108,7 @@ try{
  await page.locator('#build-firmware').click();
  await page.waitForFunction(()=>!document.getElementById('flash-device').disabled);
  assert.equal(await page.evaluate(()=>window.midiWrites),0,'Choosing, connecting and preparing must not install');
- assert.match(await page.locator('#flash-status').textContent(),/Next:.*Install game/);
+ assert.match(await page.locator('#flash-status').textContent(),/Next:.*Install/);
  await page.locator('#flash-device').click();
  await page.waitForFunction(()=>document.getElementById('install-state').textContent==='Verified');
  assert.equal(await page.evaluate(()=>window.midiWrites),1);
@@ -119,12 +123,39 @@ try{
  await page.waitForFunction(()=>document.getElementById('flash-status').classList.contains('error'));
  assert(await page.locator('#flash-device').isDisabled(),'Rejected files must not leave a stale game installable');
  assert(await page.locator('#dropzone').isEnabled(),'File errors must allow another selection');
- await page.locator('#flash-model').selectOption('smk37');
- assert(await page.locator('#fm1-steps').isHidden());
+ await page.locator('#flash-model').selectOption('smk-pro');
+ assert(await page.locator('#fm1-steps').isVisible());
  assert(await page.locator('#dropzone').isVisible(),'SMK browser users retain the same game picker');
- assert(await page.locator('#restore-device').isDisabled());
- assert.match(await page.locator('#flash-availability').textContent(),/installation is not available/);
+ assert(await page.locator('#restore-device').isEnabled());
+ assert.match(await page.locator('#flash-availability').textContent(),/Experimental SMK candidate/);
+ for(const [value,model] of [['smk-pro','SMK-37 Pro'],['smk-elite','SMK-37 Elite']]){
+  await page.locator('#flash-model').selectOption(value);
+  assert(await page.locator('#flash-device').isDisabled(),'Changing instruments clears prepared firmware');
+  await page.evaluate(model=>{window.testDevice=model+'_016';window.testWaits=['ota-'+model+'_016','SMK-37_960'];},model);
+  await page.locator('[data-install][data-homebrew="from-below"]').click();
+  await page.waitForFunction(()=>document.getElementById('rom-name').textContent==='From Below'&&!document.getElementById('build-firmware').disabled);
+  await page.locator('#connect-device').click();
+  await page.waitForFunction(model=>document.getElementById('device-status').textContent.includes(model+'_016'),model);
+  const before=await page.evaluate(()=>window.midiWrites);
+  await page.locator('#build-firmware').click();
+  await page.waitForFunction(()=>!document.getElementById('flash-device').disabled);
+  assert.match(await page.locator('#build-title').textContent(),new RegExp(model));
+  assert.equal(await page.evaluate(()=>window.midiWrites),before,'SMK preparation never writes MIDI');
+  await page.screenshot({path:`build/install-ui/${value}.png`,fullPage:true});
+  await page.locator('#flash-device').click();
+  await page.waitForFunction(()=>document.getElementById('install-state').textContent==='Verified');
+  assert.equal(await page.evaluate(()=>window.midiWrites),before+1);
+  assert.match(await page.locator('#device-status').textContent(),/SMK-37_960/);
+  await page.evaluate(model=>{window.testDevice='SMK-37_960';window.testWaits=['ota-SMK-37_960',model+'_016'];},model);
+  await page.locator('#restore-device').evaluate(el=>el.closest('details').open=true);
+  await page.locator('#restore-device').click();
+  await page.waitForFunction(()=>document.getElementById('restore-status').textContent.includes('restored and restart verified'));
+  assert.equal(await page.evaluate(()=>window.midiWrites),before+2);
+  assert.match(await page.locator('#device-status').textContent(),new RegExp(model+'_016'));
+  assert.equal(await page.locator('#install-state').textContent(),'Not installed');
+ }
  await page.locator('#flash-model').selectOption('fm1');
+ await page.evaluate(()=>{window.testDevice='FM-1_015';window.testWaits=[];});
  await page.locator('[data-install][data-homebrew="from-below"]').click();
  await page.waitForFunction(()=>document.getElementById('rom-name').textContent==='From Below'&&!document.getElementById('build-firmware').disabled);
  await page.locator('#connection-help').evaluate(el=>el.open=false);
@@ -143,5 +174,5 @@ try{
  }
  const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));assert.equal(ids.length,new Set(ids).size,'No duplicate IDs');
  assert.deepEqual(errors,[]);
- console.log('PASS: single game picker, click and nested NES/ZIP drops, multi-game ZIP selection, desktop/mobile layout, factory V15 connection, blocked MIDI, preparation, simulated install, stale-game rejection and SMK gating.');
+ console.log('PASS: single picker, NES/ZIP drops, responsive layout, fullscreen, blocked MIDI, FM-1 install, stale-game rejection, SMK Pro/Elite prepare/install/restore, model isolation and exact restart checks.');
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

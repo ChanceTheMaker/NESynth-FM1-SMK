@@ -28,6 +28,16 @@ jobs:
           ./build/runtime-test web/diagnostic.nes
       - name: Check shipped assets and firmware builder
         run: npm run test:site
+      - name: Check SMK model packages and protected flash updater
+        run: |
+          mkdir -p build/smk37
+          curl --fail --location --retry 2 https://raw.githubusercontent.com/jonathaslacerda/smk-37-pro-docs/ab85d7340163ba9e171dc9396e31c034829bbc02/firmware/smk37pro/SMK-37_Pro_016.fwsc -o build/smk37/stock-pro.fwsc
+          curl --fail --location --retry 2 https://raw.githubusercontent.com/jonathaslacerda/smk-37-pro-docs/ab85d7340163ba9e171dc9396e31c034829bbc02/firmware/smk37elite/SMK-37_Elite_016.fwsc -o build/smk37/stock-elite.fwsc
+          npm run test:smk -- build/smk37/stock-pro.fwsc build/smk37/stock-elite.fwsc
+          cc -O1 -UNDEBUG -DTEST_PUBLIC -Ivendor/smk-updater vendor/smk-updater/update_test.c -o build/smk37-update-test
+          ./build/smk37-update-test
+          ./build/smk37-update-test build/smk37/synthetic-0.bin build/smk37/candidate-0.smkupdate
+          ./build/smk37-update-test build/smk37/synthetic-1.bin build/smk37/candidate-1.smkupdate
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

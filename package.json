@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:smk": "node tests/smk_firmware.mjs",
     "test:ui": "node tests/install_ui.mjs",
     "test:site": "node tests/cartridge.mjs && node tests/homebrew.mjs && node tests/firmware.mjs && node tests/browser_media.mjs && python tests/archives.py && node tests/zip.mjs && node tests/install_flow.mjs && node tests/restore.mjs && node tests/discovery.mjs && node tests/update_progress.mjs",
     "test": "python tools/build.py test && python tools/build.py web && node tests/cartridge.mjs && node tests/wasm.mjs && node tests/render_stride.mjs && python tests/archives.py && node tests/zip.mjs && node tests/firmware.mjs && node tests/install_flow.mjs && node tests/restore.mjs && node tests/discovery.mjs && node tests/update_progress.mjs && node tests/browser_media.mjs",

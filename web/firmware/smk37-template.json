@@ -1,0 +1,36 @@
+{
+  "product": "SMK-37_960",
+  "package": "smk37-template.bin",
+  "bytes": 572380,
+  "sha256": "7257d12e3d12c0b4b14aa1627919220c0de6280f7d9a6fff47255b39bcaa4fea",
+  "models": [
+    "SMK-37 Pro",
+    "SMK-37 Elite"
+  ],
+  "cartridge_offset": 22918,
+  "cartridge_capacity": 524816,
+  "usb_updater": true,
+  "usb_protocol": "smk37-ram-v2",
+  "dual_core": true,
+  "mappers": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    9,
+    11
+  ],
+  "protected_app_sha256": "c17214c245db6c7966bff71cb4397fbf6ec04d2d744cc201a79631526ff66d36",
+  "loader": {
+    "product": "SMK-37_960",
+    "bytes": 8160,
+    "sha256": "1ac953e584b3b9c7114fa4da80d2eb83217783249a4874c1027f6697a1e5fe68",
+    "entry": "0x01c0a800",
+    "write_lo": "0x4000",
+    "write_hi": "0x9d000",
+    "flash_staging": false
+  },
+  "hardware_validated": false,
+  "notice": "Experimental hardware candidate. Original diagnostic only; cartridges are inserted locally. Factory boot and calibration are preserved."
+}

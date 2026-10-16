@@ -22,6 +22,6 @@ meta={'product':p['product'],'package':'fm1-template.fwsc','sha256':p['sha256'],
       'loader_sha256':p['loader_sha256'],'app_bytes':len(app),
       'diagnostic_sha256':hashlib.sha256(diag).hexdigest(),
       'notice':'Original diagnostic only. User ROMs are inserted locally in the browser.',
-      'hardware_status':'Experimental FM-1 firmware. Picture, controls and both cores tested. Adaptive drawing prioritizes game timing and audio; compatibility remains experimental. SMK37 flashing is not enabled.'}
+      'hardware_status':'Experimental FM-1 firmware. Picture, controls and both cores tested. Adaptive drawing prioritizes game timing and audio; compatibility remains experimental. SMK firmware has separate experimental candidate metadata.'}
 (out/'template.json').write_text(json.dumps(meta,indent=2)+'\n')
 print(json.dumps(meta,indent=2))

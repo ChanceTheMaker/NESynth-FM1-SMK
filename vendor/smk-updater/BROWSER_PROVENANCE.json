@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/ChanceTheMaker/doom-fm1-smk",
+  "revision": "44315112d4a9855070488ea1b45604ec56491e3e",
+  "source_sha256": {
+    "smk37-package.js": "61014fcd7cdce5c15a71486d28e771fad4a248931b1b3d0af7abbce6eda37d5d",
+    "smk37-stock.js": "8f5bf099136c5e297bef75199cb70e2300fc63878cca265aedf0bc5e46312130"
+  },
+  "adaptations": [
+    "Shared FM-1 package import and local SMK format module.",
+    "NESynth version pattern and exported package parser for exact round-trip tests.",
+    "Read product marker bytes from the original model-specific wrapper."
+  ]
+}
