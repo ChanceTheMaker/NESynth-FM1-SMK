@@ -6,7 +6,7 @@
 #define FELUCCA_CDC 0
 #define FELUCCA_UAC 0
 #define FELUCCA_OTA_DRYRUN 0
-#define FELUCCA_ID "FM-1_959"
+#define FELUCCA_ID "FM-1_960"
 #define RING_PUBLISH() __asm__ volatile("csync" ::: "memory")
 #define FL_RANGE_OK(off,n) FL_IN(off,n,0xe0000u,0xe5000u)
 #include "fm1_flash.h"

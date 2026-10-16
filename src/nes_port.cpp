@@ -28,6 +28,7 @@ void np_render_stride(uint32_t stride){render_stride=stride<=6?stride:1;}
 uint32_t np_profile_read(uint32_t index){return index<3?np_profile_totals[index]:0;}
 extern unsigned int ApuSamplesPerSync;
 extern BYTE np_prg_ram_enabled;
+extern BYTE np_prg_ram_writable,np_mapper_irq_pending;
 /* Classic illustrative NES palette. RGB values are shared by browser and LCD. */
 static const uint32_t colors[64]={
 0x666666,0x002a88,0x1412a7,0x3b00a4,0x5c007e,0x6e0040,0x6c0600,0x561d00,
@@ -51,12 +52,15 @@ int gp_load(const uint8_t *r,uint32_t n){
     if(r[0]!='N'||r[1]!='E'||r[2]!='S'||r[3]!=0x1a)return error=GP_FORMAT;
     if((r[7]&15)!=0)return error=GP_FORMAT; // iNES 1.0, standard NES only
     unsigned mapper=(r[6]>>4)|(r[7]&0xf0);
-    if(mapper!=0&&mapper!=1&&mapper!=9)return error=GP_MAPPER;
+    if(mapper>4&&mapper!=9)return error=GP_MAPPER;
     if(r[9]&1)return error=GP_REGION;
     if(r[8]>1)return error=GP_RAM_SIZE;
     for(unsigned i=10;i<16;i++)if(r[i])return error=GP_FORMAT;
     if(np_rom_size(r,n)!=n)return error=GP_ROM_SIZE;
     if(mapper==0&&((r[4]!=1&&r[4]!=2)||r[5]>1))return error=GP_ROM_SIZE;
+    if(mapper==2&&(r[4]<2||r[4]>16||(r[4]&(r[4]-1))||r[5]||(r[6]&8)))return error=GP_ROM_SIZE;
+    if(mapper==3&&((r[4]!=1&&r[4]!=2)||!r[5]||r[5]>4||(r[5]&(r[5]-1))||(r[6]&8)))return error=GP_ROM_SIZE;
+    if(mapper==4&&(r[4]<2||r[4]>32||(r[4]&(r[4]-1))||r[5]>32||(r[5]&&(r[5]&(r[5]-1)))))return error=GP_ROM_SIZE;
     if(mapper==1){
         if(!r[4]||r[4]>16||(r[4]&(r[4]-1))||r[5]>16||(r[5]&&(r[5]&(r[5]-1)))||(r[6]&8))return error=GP_ROM_SIZE;
     }
@@ -70,7 +74,8 @@ int gp_load(const uint8_t *r,uint32_t n){
     ROM=(BYTE*)(r+16+((r[6]&4)?512:0));VROM=ROM+r[4]*16384u;
     for(unsigned i=0;i<64;i++)NesPalette[i]=(WORD)i;
     memset(pixels,0,sizeof pixels);sample_acc=total_samples=0;previous_mix=highpass=0;
-    np_prg_ram_enabled=1;InfoNES_Init();if(InfoNES_Reset())return error=GP_MAPPER;
+    np_prg_ram_enabled=np_prg_ram_writable=1;np_mapper_irq_pending=0;
+    InfoNES_Init();if(InfoNES_Reset())return error=GP_MAPPER;
     PPU_UpDown_Clip=0;APU_Mute=0;FrameSkip=0;save_hash=hash_save();ready=1;return 0;
 }
 int gp_frame(void){
@@ -93,6 +98,7 @@ void gp_buttons(uint32_t p){if((p&48)==48)p&=~48u;if((p&192)==192)p&=~192u;butto
 void gp_pause(uint32_t p){paused=!!p;gp_buttons(0);}
 void gp_reset(void){
     if(!ready)return;
+    np_prg_ram_enabled=np_prg_ram_writable=1;np_mapper_irq_pending=0;
     InfoNES_Init();InfoNES_Reset();PPU_UpDown_Clip=0;APU_Mute=0;
     error=paused=frames=sample_acc=total_samples=0;read_pos=write_pos=0;
     np_skip_pixels=0;video_frame=0;
@@ -108,7 +114,7 @@ uint32_t gp_audio_queued(void){uint32_t w=write_pos;BARRIER();return w-read_pos;
 uint32_t np_audio_samples(void){return total_samples;}
 uint32_t gp_error(void){return error;}
 uint32_t gp_frame_count(void){return frames;}
-const char *gp_title(void){return ready&&MapperNo==9?"NES / MMC2":ready&&MapperNo==1?"NES / MMC1":"NES / NROM";}
+const char *gp_title(void){return ready&&MapperNo==9?"NES / MMC2":ready&&MapperNo==4?"NES / MMC3":ready&&MapperNo==3?"NES / CNROM":ready&&MapperNo==1?"NES / MMC1":"NES / NROM";}
 void gp_audio_read(int16_t *out,uint32_t n){
     uint32_t r=read_pos,w=write_pos;BARRIER();
     for(unsigned i=0;i<n;i++){

@@ -221,14 +221,17 @@ static const BYTE *np_row_source[4096] NES_POOL;''')
     t=t.replace('MapperRenderScreen( 1 );','/* Mappers 0/9: no rendering-mode callback. */').replace('MapperRenderScreen( 0 );','/* Mappers 0/9: no rendering-mode callback. */')
     p.write_text(t)
     # MMC1 shares the fetched-row path, including banked CHR RAM (uncached).
-    edit('InfoNES.cpp','if (MapperNo != 9) return;','if (MapperNo != 9 && MapperNo != 1) return;')
-    edit('InfoNES.cpp','if (MapperNo == 9) return;','if (MapperNo == 9 || MapperNo == 1) return;')
+    edit('InfoNES.cpp','if (MapperNo != 9) return;','if (MapperNo != 9 && MapperNo != 1 && MapperNo != 3 && MapperNo != 4) return;')
+    edit('InfoNES.cpp','if (MapperNo == 9) return;','if (MapperNo == 9 || MapperNo == 1 || MapperNo == 3 || MapperNo == 4) return;')
     edit('InfoNES.cpp','  if(np_row_source[offset/8]==source)return;\n  np_row_source[offset/8]=source;',
          '  if(NesHeader.byVRomSize){\n    if(np_row_source[offset/8]==source)return;\n    np_row_source[offset/8]=source;\n  }')
-    edit('K6502_rw.h','#include "InfoNES_pAPU.h"','#include "InfoNES_pAPU.h"\nextern BYTE np_prg_ram_enabled;')
+    edit('K6502_rw.h','#include "InfoNES_pAPU.h"','#include "InfoNES_pAPU.h"\nextern BYTE np_prg_ram_enabled,np_prg_ram_writable,np_mapper_irq_pending;')
     edit('K6502_rw.h','return SRAMBANK[ wAddr & 0x1fff ];','return np_prg_ram_enabled ? SRAMBANK[ wAddr & 0x1fff ] : 0xff;')
     edit('K6502_rw.h','return SRAM[ wAddr & 0x1fff ];','return np_prg_ram_enabled ? SRAM[ wAddr & 0x1fff ] : 0xff;')
-    edit('K6502_rw.h','SRAM[ wAddr & 0x1fff ] = byData;','if(np_prg_ram_enabled) SRAM[ wAddr & 0x1fff ] = byData;')
+    edit('K6502_rw.h','SRAM[ wAddr & 0x1fff ] = byData;','if(np_prg_ram_enabled && np_prg_ram_writable) SRAM[ wAddr & 0x1fff ] = byData;')
+    # A mapper IRQ is a level: accepting it does not acknowledge the MMC3.
+    edit('K6502.cpp','#include "K6502.h"','#include "K6502.h"\nextern BYTE np_mapper_irq_pending;')
+    edit('K6502.cpp','IRQ_State = IRQ_Wiring;', 'IRQ_State = np_mapper_irq_pending ? 0 : IRQ_Wiring;')
     # This CPU core omits RMW dummy writes. MMC1 needs the original write and
     # ignores the next data bit, but a reset bit on the second write still acts.
     edit('K6502.cpp','#include "K6502_rw.h"', '''#include "K6502_rw.h"

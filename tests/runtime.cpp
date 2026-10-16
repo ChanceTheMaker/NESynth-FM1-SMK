@@ -13,6 +13,7 @@
 #define assert(x) do { if(!(x)){fprintf(stderr,"FAIL %s:%d: %s\n",__FILE__,__LINE__,#x);exit(1);} } while(0)
 #include "apu_release.h"
 #include "mmc1.h"
+#include "extra_mappers.h"
 #include "vblank.h"
 static int16_t audio[4096*2];
 static void advance(unsigned count){for(unsigned i=0;i<count;i++){assert(gp_frame());assert(!gp_error());memset(audio,0,sizeof audio);gp_audio_read(audio,gp_audio_queued());}}
@@ -78,7 +79,7 @@ int main(int argc,char **argv){
     assert(gp_load(nullptr,0)==GP_SHORT);
     auto bad=rom;bad[0]=0;assert(gp_load(bad.data(),bad.size())==GP_FORMAT);
     bad=rom;bad[7]=8;assert(gp_load(bad.data(),bad.size())==GP_FORMAT);
-    bad=rom;bad[6]=0x20;assert(gp_load(bad.data(),bad.size())==GP_MAPPER);
+    bad=rom;bad[6]=0x50;assert(gp_load(bad.data(),bad.size())==GP_MAPPER);
     bad=rom;bad[9]=1;assert(gp_load(bad.data(),bad.size())==GP_REGION);
     bad=rom;bad[4]=0;assert(gp_load(bad.data(),bad.size())==GP_ROM_SIZE);
     assert(gp_load(rom.data(),rom.size()-1)==GP_ROM_SIZE);
@@ -122,6 +123,7 @@ int main(int argc,char **argv){
     bad=rom;bad.resize(16+16384);bad[5]=0;assert(!gp_load(bad.data(),bad.size()));advance(10);
     test_mmc2();
     test_mmc1();
+    test_extra_mappers();
     test_apu_release();
     test_vblank_polling();
     FILE *report=fopen("build/host-benchmark.json","wb");assert(report);

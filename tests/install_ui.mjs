@@ -40,6 +40,17 @@ try{
  `}));
  await page.goto(`http://127.0.0.1:${server.address().port}/`);
  await page.waitForFunction(()=>!document.getElementById('dropzone').disabled);
+ assert.equal(await page.locator('.crt-tv #screen').count(),1,'NES canvas belongs inside the CRT');
+ assert.equal(await page.locator('.rig-logo').textContent(),'NESynth');
+ assert.equal(await page.locator('.controller button[data-bit]').count(),8);
+ for(const model of ['smk-pro','fm1','nes']){
+  await page.locator('#simulator-model').selectOption(model);
+  await page.waitForFunction(model=>document.querySelector('.console').dataset.simulator===model,model);
+  assert(await page.locator('#screen').isVisible(),'Live canvas remains visible on '+model);
+  if(model!=='nes')assert(await page.locator('.crt-tv').isHidden());
+ }
+ const tv=await page.locator('.crt-tv').boundingBox(),nes=await page.locator('.nes-console').boundingBox(),pad=await page.locator('.controller').boundingBox();
+ assert(tv.y+tv.height<nes.y&&nes.y+nes.height<pad.y,'CRT, NES, controller stack vertically');
  assert.equal(await page.locator('#dropzone').count(),1);
  assert.equal(await page.locator('#step-game #rom').count(),1,'The only cartridge picker belongs to step 1');
  assert.equal(await page.locator('.cartridge-panel,#install-choose-game').count(),0,'No duplicate cartridge flow');
@@ -112,6 +123,7 @@ try{
  await page.evaluate(()=>window.scrollTo(0,0));
  await fs.mkdir('build/install-ui',{recursive:true});
  await page.screenshot({path:'build/install-ui/desktop.png',fullPage:true});
+ await page.locator('.retro-rig').screenshot({path:'build/install-ui/retro-simulator.png'});
  const playerBox=await page.locator('.play-column').boundingBox(),installBox=await page.locator('#flash-panel').boundingBox();
  assert(installBox.x>playerBox.x&&Math.abs(installBox.y-playerBox.y)<2,'Desktop installer belongs beside the player');
  for(const width of [390,768]){

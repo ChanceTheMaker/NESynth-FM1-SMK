@@ -26,7 +26,7 @@ def wrap(image):
  return head(pkg.crc16(body),0x20,len(body),0x41)+body
 def main():
  p=argparse.ArgumentParser(description=__doc__)
- p.add_argument('--sdk',type=Path,default=Path('E:/AI_Apps/Felucca/Felucca-review/.build-deps/ac79-sdk'))
+ p.add_argument('--sdk',type=Path,default=ROOT.parent/'Felucca/Felucca-review/.build-deps/ac79-sdk')
  p.add_argument('--label',default='diagnostic');p.add_argument('--toolchain',default=DEFAULT_TC);p.add_argument('--zig',default=str(DEFAULT_ZIG));a=p.parse_args()
  for rel,digest in SDK_HASHES.items():
   assert sha((a.sdk/'cpu/wl82/tools'/rel).read_bytes())==digest,rel+' SDK revision mismatch'
@@ -57,7 +57,7 @@ def main():
  area=bytearray(flash[0x4000:]);pkg.sfc(area,0,len(area),0,pkg.KEY)
  assert area[0x120:0x120+len(app)]==app
  output=out/('nesynth-fm1-'+product.split('_')[1]+'-'+a.label+'.fwsc');output.write_bytes(raw)
- restore_source=Path('E:/AI_Apps/MusicCoach-firmware/build/musiccoach-0.3-dc1/musiccoach-fm1-0.3-dc1.fwsc')
+ restore_source=ROOT.parent/'MusicCoach/MusicCoach-firmware/build/musiccoach-0.3-dc1/musiccoach-fm1-0.3-dc1.fwsc'
  assert sha(restore_source.read_bytes())=='4b30d50ea70a225edd5c6c44f710c75ac7f9f861e5c0989f98e40cdad009d6f8','Restore package changed'
  restore=out/'recovery-musiccoach-fm1-903.fwsc';restore.write_bytes(restore_source.read_bytes())
  assert wire.product_of(restore.read_bytes())=='FM-1_903'

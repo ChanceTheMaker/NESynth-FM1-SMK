@@ -1,0 +1,43 @@
+/* A playable TV, console and controller, built around the existing canvas. */
+.retro-rig{padding:22px 22px 17px;background:linear-gradient(135deg,#dadbd4,#c5c7bf);border-radius:9px;overflow:visible;box-shadow:0 6px 0 #a6a89e,0 8px 0 #878b80,0 18px 30px #24281d17}
+.retro-rig .console-top{margin-bottom:19px}
+.retro-rig .console-wordmark{gap:12px}
+.rig-logo{display:block;border:2px solid var(--red);border-radius:99px;padding:3px 11px 4px;font-size:26px;letter-spacing:-1.3px;line-height:1;font-weight:900}
+.retro-rig .console-wordmark small{font:700 7px/1.55 var(--mono);color:#686b61;letter-spacing:.6px;max-width:none}
+.retro-rig #fps{font-size:9px}
+.retro-rig .simulator-picker{margin-bottom:20px}
+.crt-tv{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:10px;padding:16px 13px 0;border:2px solid #252923;border-radius:24px 24px 17px 17px;background:linear-gradient(120deg,#5e6359,#373d34 52%,#252b24);box-shadow:inset 0 2px 0 #a2a596,0 7px 0 #242921,0 13px 15px #24271e30;margin:0 0 26px}
+.crt-tv:after{content:"";position:absolute;bottom:-12px;left:13%;right:13%;height:7px;background:#30362c;border-radius:0 0 4px 4px;z-index:0}
+.crt-bezel{padding:10px;background:#10170f;border-radius:48% / 6%;box-shadow:inset 3px 4px 8px #000,inset -2px -2px 3px #777d6c}
+.retro-rig .screen-frame{position:relative;padding:0;overflow:hidden;border:0;border-radius:48% / 5%;background:#070b08;box-shadow:0 0 0 2px #000;isolation:isolate}
+.retro-rig .screen-frame canvas{position:relative;border-radius:inherit;box-shadow:none;filter:saturate(.95) contrast(1.04)}
+.retro-rig .screen-frame:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;background:repeating-linear-gradient(0deg,#00000017 0 1px,transparent 1px 3px),radial-gradient(ellipse at 45% 40%,transparent 50%,#0006 100%);box-shadow:inset 0 0 18px #0007}
+.tv-controls{display:flex;flex-direction:column;align-items:center;gap:15px;padding:6px 0 2px}
+.tv-channel{text-align:center;color:#bbbfae;font:7px/1.8 var(--mono);letter-spacing:1px}.tv-channel b{display:block;background:#182218;color:#91a779;border:2px solid #282d24;border-radius:3px;padding:2px 4px;font:16px var(--mono);box-shadow:inset 1px 2px 4px #000}
+.tv-dial{width:32px;height:32px;flex-shrink:0;border:3px solid #292e25;border-radius:50%;background:linear-gradient(100deg,#75796a,#363c30);box-shadow:0 3px 4px #0007,inset 1px 1px 0 #9c9f8e;position:relative}.tv-dial:after{content:"";position:absolute;top:3px;bottom:3px;left:11px;width:3px;background:#b6b8a9;transform:rotate(30deg);box-shadow:1px 0 2px #000}.tv-dial.small{width:25px;height:25px}.tv-dial.small:after{left:8px;transform:rotate(-20deg)}
+.tv-speaker{width:27px;flex:1;min-height:50px;max-height:100px;background:repeating-linear-gradient(0deg,#151b14 0 2px,#565d4c 2px 4px);border-radius:4px}
+.tv-light{width:5px;height:5px;border-radius:50%;background:#b3c076;box-shadow:0 0 7px #a9bd7a}
+.tv-foot{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;color:#afb49f;padding:1px 5px 12px;font:7px var(--mono);letter-spacing:.5px}.tv-foot>span:first-child{font:italic 700 12px Arial,sans-serif;letter-spacing:-.5px}.tv-foot small{font:6px var(--mono);letter-spacing:1px;margin-left:5px}
+.nes-console{position:relative;margin:0 9px;background:#c7c8c1;border:1px solid #999c91;border-radius:5px 5px 3px 3px;box-shadow:0 5px 0 #85897e,0 8px 10px #30352733}
+.nes-top{position:relative;height:92px;display:flex;gap:15px;padding:14px 19px 0;background:linear-gradient(115deg,#eeeee5,#d3d4cb);border-radius:4px 4px 0 0;border-bottom:5px solid #999e93}
+.cartridge-door{position:relative;flex:1;min-width:0;padding:12px 12px 14px;border:1px solid #b3b6a9;border-top:2px solid #999e91;border-bottom:0;background:linear-gradient(#dddfd3,#e8e9df);box-shadow:inset 0 1px 3px #6665}
+.cartridge-door .nes-mark{display:block;color:var(--red);font:bold 18px/1 Arial,sans-serif;letter-spacing:-.8px}.cartridge-door>span:nth-child(2){font:700 6px var(--mono);letter-spacing:1px;color:#b13429}.cartridge-door i{position:absolute;bottom:0;left:33%;right:33%;height:5px;background:#949b8c;border-radius:3px 3px 0 0}
+.nes-vents{width:45px;background:repeating-linear-gradient(90deg,#737a6b 0 3px,#282f24 3px 5px);border:4px solid #c6c9bc;border-bottom:0;box-shadow:inset 0 2px 3px #0007}
+.retro-rig .console-bottom{min-height:42px;margin:0;padding:9px 13px;gap:7px;flex-wrap:wrap;border-bottom:2px solid #b7baae;background:#d7d9cf}
+.retro-rig .power-label{font-size:6px;gap:4px;margin-right:0}.retro-rig .power-label i{width:4px;height:5px}
+.retro-rig #title{font:8px var(--mono);max-width:40%;min-width:0}
+.retro-rig .console-bottom button{font-size:7px;padding:5px 7px}
+.controller-cable{height:43px;width:35%;margin:0 auto;border-right:5px solid #30342d;border-bottom:5px solid #30342d;border-radius:0 0 18px 0;transform:translateX(-18%);position:relative;z-index:0;box-shadow:1px 2px 1px #0002}
+.controller-cable:after{content:"";position:absolute;left:0;bottom:-13px;width:5px;height:13px;background:#30342d;border-radius:4px 4px 0 0}
+.retro-rig .controller{position:relative;max-width:440px;margin:11px auto 0;border:7px solid #e3e4db;border-radius:5px;min-height:149px;padding:20px 17px 25px;gap:12px;box-shadow:0 5px 0 #9a9f91,0 7px 0 #707769,0 14px 16px #262d2026;background:#252a24}
+.retro-rig .controller:before{content:"NESynth";position:absolute;top:9px;right:14px;font:700 9px Arial,sans-serif;color:#e64232;letter-spacing:-.3px}
+.retro-rig .dpad{grid-template-columns:27px 27px 27px;grid-template-rows:27px 27px 27px;flex-shrink:0}
+.retro-rig .middle{min-width:80px;max-width:130px}.retro-rig .controller-stripes{inset:-20px 0 -25px;background:repeating-linear-gradient(to bottom,#737c6e 0 10px,transparent 10px 16px)}
+.retro-rig .system-buttons{top:47px;gap:9px;padding:10px 6px}.retro-rig .system-buttons button{width:32px;height:10px}.retro-rig .system-buttons button>span{font-size:7px;bottom:29px}
+.retro-rig .actions{gap:8px}.retro-rig .actions>div{padding:4px}.retro-rig .actions button{width:32px;height:32px}.retro-rig .actions>div>span{font-size:12px;bottom:-19px}
+.retro-rig .console-foot{height:40px;padding-top:12px}.retro-rig .console-foot>span{font-size:7px}
+.retro-rig:not([data-simulator="nes"]) .crt-tv,.retro-rig:not([data-simulator="nes"]) .nes-top{display:none}
+.retro-rig:not([data-simulator="nes"]) .nes-console{margin-top:14px}
+.retro-rig button:focus-visible{outline:3px solid #e35838;outline-offset:3px}
+@media(max-width:1100px) and (min-width:801px),(max-width:420px){.retro-rig{padding:17px 12px 10px}.rig-logo{font-size:23px}.retro-rig .console-wordmark small{display:none}.crt-tv{grid-template-columns:minmax(0,1fr) 33px;padding:11px 9px 0;gap:7px;border-radius:20px 20px 14px 14px}.crt-bezel{padding:7px}.tv-controls{gap:9px}.tv-dial{width:27px;height:27px}.tv-dial:after{left:9px}.tv-speaker{width:21px;min-height:25px}.tv-channel b{font-size:13px}.nes-console{margin-left:4px;margin-right:4px}.nes-top{height:80px;padding:10px 12px 0;gap:10px}.cartridge-door{padding:10px 9px}.nes-vents{width:33px}.retro-rig .controller{padding:20px 10px 25px;gap:8px;min-height:140px;border-width:6px}.retro-rig .dpad{grid-template-columns:23px 23px 23px;grid-template-rows:23px 23px 23px}.retro-rig .actions{gap:5px}.retro-rig .actions button{width:27px;height:27px}.retro-rig .middle{min-width:70px}.retro-rig .system-buttons{gap:7px}.retro-rig .system-buttons button{width:26px}.retro-rig .system-buttons button>span{font-size:6px}.retro-rig .console-bottom{padding:8px}.retro-rig #title{max-width:34%}}
+@media(prefers-reduced-motion:reduce){.retro-rig *{transition:none}}

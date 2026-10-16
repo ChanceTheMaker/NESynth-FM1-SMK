@@ -6,6 +6,7 @@ static BYTE mmc1_shift,mmc1_control,mmc1_chr[2],mmc1_prg;
 static DWORD mmc1_last_write;
 static bool mmc1_wrote;
 BYTE np_prg_ram_enabled=1;
+BYTE np_prg_ram_writable=1;
 static void mmc1_sync(){
     static const BYTE mirror[4]={3,2,1,0};
     InfoNES_Mirroring(mirror[mmc1_control&3]);

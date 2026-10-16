@@ -5,8 +5,9 @@ from diagnostic import make_rom
 from cartridge import read_cartridge
 from prepare_core import prepare
 ROOT=Path(__file__).resolve().parents[1]
-ZIG='E:/AI_Apps/Felucca/Felucca-website/build/wasm-tools/ziglang/zig.exe'
-TC='/mnt/e/AI_Apps/Felucca/Felucca-review/.build-deps/jieli/jieli-linux-toolchains-20250324.1'
+ZIG=str(ROOT.parent/'Felucca/Felucca-website/build/wasm-tools/ziglang/zig.exe')
+_tc=ROOT.parent/'Felucca/Felucca-review/.build-deps/jieli/jieli-linux-toolchains-20250324.1'
+TC='/mnt/'+_tc.drive[0].lower()+_tc.as_posix()[2:] if _tc.drive else str(_tc)
 CPP=['build/infones/InfoNES.cpp','build/infones/K6502.cpp','build/infones/InfoNES_pAPU.cpp','src/mapper.cpp','src/nes_port.cpp']
 EXPORTS=['gp_upload','gp_load_upload','gp_frame','gp_buttons','gp_pause','gp_reset','gp_volume','gp_pixels','gp_save_data','gp_save_size','gp_save_dirty','gp_save_clean','gp_audio_queued','gp_render_audio','gp_error','gp_frame_count','np_palette','np_audio_samples','np_render_stride','np_video_frame']
 def run(cmd):subprocess.run(list(map(str,cmd)),cwd=ROOT,check=True)
@@ -26,7 +27,7 @@ def main():
     sources=CPP+['src/libc.c']
     if native:
         rom=read_cartridge(a.rom,a.rom_entry) if a.rom else make_rom()
-        if a.rom_capacity<len(rom) or a.rom_capacity>524288:raise ValueError('Invalid ROM capacity')
+        if a.rom_capacity<len(rom) or a.rom_capacity>524816:raise ValueError('Invalid ROM capacity')
         storage=rom+b'\xff'*(a.rom_capacity-len(rom))
         (out/'cartridge.h').write_text('static const unsigned char cartridge[]={\n'+',\n'.join(','.join(str(v) for v in storage[i:i+32]) for i in range(0,len(storage),32))+'\n};\n')
         sources+=['firmware/board.c','firmware/start.S','vendor/felucca/firmware/hal/fm1_vec.S']
@@ -42,7 +43,7 @@ def main():
         run([*compiler,*flags,*opts,'-c',src,'-o',obj])
     if not native:
         run([a.zig,'cc','-target','wasm32-freestanding','-nostdlib','-Wl,--no-entry','-Wl,-z,stack-size=0x10000','-Wl,--initial-memory=0x400000','-Wl,--max-memory=0x400000',*['-Wl,--export='+x for x in EXPORTS],*objs,'-o','web/nes.wasm'])
-        (ROOT/'web/diagnostic.nes').write_bytes(make_rom());blob=(ROOT/'web/nes.wasm').read_bytes();result={'bytes':len(blob),'sha256':hashlib.sha256(blob).hexdigest(),'mappers':[0,1,9],'region':'NTSC','core':'InfoNES'};(ROOT/'web/build.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result));return
+        (ROOT/'web/diagnostic.nes').write_bytes(make_rom());blob=(ROOT/'web/nes.wasm').read_bytes();result={'bytes':len(blob),'sha256':hashlib.sha256(blob).hexdigest(),'mappers':[0,1,2,3,4,9],'region':'NTSC','core':'InfoNES'};(ROOT/'web/build.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result));return
     elf=(out/'nes.elf').relative_to(ROOT).as_posix()
     run(['wsl','-e',a.toolchain+'/pi32v2/bin/ld','--gc-sections','-T','vendor/felucca/firmware/app.ld',*objs,'-o',elf])
     def capture(*args):return subprocess.check_output(['wsl','-e',a.toolchain+'/common/bin/objdump',*args],cwd=ROOT,text=True)
@@ -61,7 +62,7 @@ def main():
     if a.target=='fm1':
         for required in ['usb_start','ota_session.parm']:assert re.search(r'\s'+re.escape(required)+r'$',syms,re.M),'Missing USB updater'
     (out/'nes-NOT-FOR-INSTALL.bin').write_bytes(image)
-    result={'board':a.target,'installable':False,'hardware_validated':False,'app_bytes':len(image),'app_limit':0x8dfbc,'rom_capacity':a.rom_capacity,'rom_bytes':len(rom),'ram_bytes':sym('_bss_end')-0x1c08000,'ram_budget':73728,'pool_bytes':sym('_pool_end')-0x1c1a000,'cpu1_stack_bytes':sym('_cpu1_stacks_hi')-sym('_cpu1_stacks_lo'),'pool_budget':368640,'sha256':hashlib.sha256(image).hexdigest(),'dual_core':True,'cpu0_role':'NES CPU/PPU/APU, audio, input, USB, LCD DMA','cpu1_role':'immutable frame scaling and RGB565 conversion','usb_updater':a.target=='fm1','display_target_fps':20,'mappers':[0,1,9],'hardware_fps':None}
+    result={'board':a.target,'installable':False,'hardware_validated':False,'app_bytes':len(image),'app_limit':0x8dfbc,'rom_capacity':a.rom_capacity,'rom_bytes':len(rom),'ram_bytes':sym('_bss_end')-0x1c08000,'ram_budget':73728,'pool_bytes':sym('_pool_end')-0x1c1a000,'cpu1_stack_bytes':sym('_cpu1_stacks_hi')-sym('_cpu1_stacks_lo'),'pool_budget':368640,'sha256':hashlib.sha256(image).hexdigest(),'dual_core':True,'cpu0_role':'NES CPU/PPU/APU, audio, input, USB, LCD DMA','cpu1_role':'immutable frame scaling and RGB565 conversion','usb_updater':a.target=='fm1','display_target_fps':20,'mappers':[0,1,2,3,4,9],'hardware_fps':None}
     result.update(cartridge_offset=sym('cartridge')-0x2000120,cartridge_capacity=a.rom_capacity)
     (out/'manifest.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
 if __name__=='__main__':main()
