@@ -1,0 +1,66 @@
+{
+  "status": "Source comparison and host validation only; no radio code linked or device flashed",
+  "baseline": {
+    "commit": "f231955abf793cd3814f031f33c56a10ef482d5e",
+    "product": "SMK-37_963",
+    "owner_feedback": "much much better",
+    "post_change_fps": null
+  },
+  "references": {
+    "hortator": {
+      "repository": "https://github.com/deadactive/hortator",
+      "commit": "7e3415971c5800b4a3ad0146a7d95615883d7d96",
+      "credit": "DEADACTIVE (Hortator, derived from fm1-lsdj); Felucca by Leo Kuroshita / Hugelton Instruments",
+      "licensing": "Port GPL-3.0-only; SDK libraries/configs Apache-2.0 as documented upstream. Retain notices and review full license terms before import.",
+      "sdk": "AC79 V1.2.0; libraries/configuration pinned in tools/ble_libs.py",
+      "evidence": "docs/ble/DEVICE_STEPS.md records FM-1 start, SMC-Mixer reception during audio, connected USB update and UBOOT recovery. Upstream evidence, not our SMK test."
+    },
+    "felucca": {
+      "workspace": "Felucca/Felucca-bluetooth/experiments/ble-midi",
+      "status": "Unfinished reference work left untouched. Diagnostic 05 FM-1 peripheral MIDI output owner-confirmed; Diagnostic 07 masked/IRQ-context mutex assertion and Diagnostic 08 watchdog exception unresolved."
+    }
+  },
+  "reconciliation": [
+    {
+      "area": "Role",
+      "finding": "Hortator is a central/GATT client connecting to MIDI peripherals. Our previous Felucca experiment advertises a peripheral GATT service to phones. Hortator's outbound queue accepts 1-3 byte MIDI messages, not game files.",
+      "action": "Use the role-independent Hortator OS/HAL approach with a peripheral data service informed by our existing service and callback tests. Do not copy the central profile unchanged."
+    },
+    {
+      "area": "Startup",
+      "finding": "Hortator runs btstack_init inside a cooperative app_core task, with guarded stacks, main-loop service and nested interrupt masking. Our experiment uses the full SDK diagnostic runtime and a mutex-protected RAM config backend.",
+      "action": "Evaluate Hortator's integration while retaining our fault/start traces. This does not prove the old assertion's cause. Do not copy cpu_in_irq() returning zero as a substitute for correct IRQ-context handling."
+    },
+    {
+      "area": "Calibration",
+      "finding": "Hortator validates VM item 187, a 68-byte RF calibration record, read-only from FM-1 0xE5000..0xFC000. It bypasses fresh trimming which upstream reports hangs/crashes. No equivalent persisted RF scan was found in our experiment overlay; it reads the FM-1 factory Bluetooth address at 0xE9000.",
+      "action": "Identify each board's own stored RF record and address. Do not assume FM-1 offsets on SMK or substitute another unit's calibration."
+    },
+    {
+      "area": "Memory",
+      "finding": "Hortator FIT.md records roughly 125-127 KiB extra image, a 13824-byte heap configuration and four task stacks. These are upstream measurements, not a NESynth BLE link.",
+      "nesynth": {"app_bytes":573728,"app_limit":581564,"app_free":7836,"cartridge_bytes":524816,"ram_bytes":43984,"ram_limit":73728,"pool_bytes":353760,"cpu1_stacks":8192,"pool_limit":368640,"pool_free":6688},
+      "action": "Current 512 KiB template cannot simply accept BLE. Measure an opt-in loader mode reusing emulation buffers and a smaller initial cartridge slot, or design a verified new storage layout. Preserve current public ROM capacity until that design is complete."
+    },
+    {
+      "area": "Game transfer",
+      "finding": "Neither reference implements a validated wireless NES cartridge receiver.",
+      "action": "Share a bounded BEGIN/DATA/STATUS/COMMIT receiver across USB and BLE, with offsets, lengths, ROM validation, checksums, duplicate handling and interruption recovery. Separate emulator and cartridge storage. Persistent game replacement still writes flash; it avoids reinstalling the emulator, not storage writes."
+    },
+    {
+      "area": "Gameplay",
+      "action": "Initially use BLE in the front loader only. Verify radio/task teardown or reboot into radio-off gameplay. Retain CPU1 scaling, asynchronous LCD and SMK scanner divider 95. A multi-game library needs a separate capacity decision; begin with one replaceable game."
+    }
+  ],
+  "reference_tests": {
+    "compiler": "WSL host cc -O1, unchanged upstream test sources",
+    "passed": ["ble_midi", "ble_scan", "ble_central", "ble_vm", "ble_os", "check_ble_boot.py --selftest"],
+    "limitations": "No NESynth BLE target link, SMK radio test, calibration scan, throughput measurement or wireless game upload yet."
+  },
+  "implementation_order": [
+    "Read-only board calibration and SDK ABI/pin audit.",
+    "Opt-in peripheral prototype with measured memory budgets, explicit startup and retained USB recovery.",
+    "Front-loader UI and transport-independent ROM receiver over USB.",
+    "BLE transfer, cold-start/reconnect/interruption tests, then full-speed gameplay measurements."
+  ]
+}

@@ -142,6 +142,18 @@ Updater sources and browser packaging are adapted from [Doom's SMK updater](http
 
 ## Remaining hardware work
 
+The `feat/bluetooth-game-loader` branch investigates a resident game loader and
+wireless cartridge uploads. [Reconciliation evidence](experiments/bluetooth/reconciliation.json)
+compares DEADACTIVE's [Hortator Bluetooth implementation](https://github.com/deadactive/hortator/tree/7e3415971c5800b4a3ad0146a7d95615883d7d96/firmware/src/ble)
+with the existing Felucca peripheral diagnostics. Hortator's five Bluetooth host
+test groups and startup-check self-test pass locally. Its cooperative scheduler
+and stored-calibration approach are useful references; its central MIDI role is
+different from a phone-facing cartridge receiver. SMK calibration locations,
+memory fit, reliable file transfer and device performance remain open. No
+Bluetooth runtime is enabled by this branch yet, and the published SMK963 build
+remains unchanged. The owner reports substantially improved SMK963 playback;
+post-change FPS and complete control validation have not been measured.
+
 Improve LCD refresh and broader game/audio compatibility, and validate physical SMK37 installation, playback and recovery before promoting its experimental installer to a hardware-validated release. More mapper support needs separate compatibility work. The original diagnostic is the included NES cartridge; GameDude's Game Boy homebrew games are not NES-compatible.
 
 Read-only diagnostic SysEx requests use `7D 4E 53 version` (`7D 'N' 'S'`), separate from GameDude. Version 3 appends five uint32 fields to the retained 35-field platform record: last/max/total emulator ticks, measured frame count, and maximum observed LCD completion time. Values use five 7-bit little-endian chunks; timer frequency is 24 MHz. Total ticks wrap at 32 bits. LCD time includes delayed CPU polling and therefore bounds observed completion latency, not exact wire time.
