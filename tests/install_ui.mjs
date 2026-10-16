@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+execFileSync('python',['tests/archives.py'],{stdio:'pipe'});
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=path.resolve('web'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.wasm':'application/wasm','.svg':'image/svg+xml','.png':'image/png','.json':'application/json'};
 const server=http.createServer(async(req,res)=>{
@@ -37,7 +39,34 @@ try{
   }
  `}));
  await page.goto(`http://127.0.0.1:${server.address().port}/`);
- await page.waitForFunction(()=>!document.getElementById('install-choose-game').disabled);
+ await page.waitForFunction(()=>!document.getElementById('dropzone').disabled);
+ assert.equal(await page.locator('#dropzone').count(),1);
+ assert.equal(await page.locator('#step-game #rom').count(),1,'The only cartridge picker belongs to step 1');
+ assert.equal(await page.locator('.cartridge-panel,#install-choose-game').count(),0,'No duplicate cartridge flow');
+ const picker=page.waitForEvent('filechooser');await page.locator('#dropzone').click();
+ await (await picker).setFiles('web/diagnostic.nes');
+ await page.waitForFunction(()=>document.getElementById('rom-name').textContent==='diagnostic.nes'&&!document.getElementById('dropzone').disabled);
+ async function dropFile(file,name=path.basename(file)){
+  const bytes=[...await fs.readFile(file)];
+  const dataTransfer=await page.evaluateHandle(({bytes,name})=>{
+   const transfer=new DataTransfer();transfer.items.add(new File([new Uint8Array(bytes)],name));return transfer;
+  },{bytes,name});
+  await page.locator('#dropzone small').dispatchEvent('dragenter',{dataTransfer});
+  assert(await page.locator('#dropzone').evaluate(el=>el.classList.contains('drag-over')),'Nested drop target highlights');
+  await page.locator('#dropzone small').dispatchEvent('drop',{dataTransfer});
+  await page.waitForFunction(()=>!document.getElementById('dropzone').disabled);
+  assert(!await page.locator('#dropzone').evaluate(el=>el.classList.contains('drag-over')));
+  await dataTransfer.dispose();
+ }
+ await dropFile('web/diagnostic.nes','Dropped game.nes');
+ assert.equal(await page.locator('#rom-name').textContent(),'Dropped game.nes');
+ await dropFile('build/zip-tests/deflated.zip');
+ assert.match(await page.locator('#rom-name').textContent(),/diagnostic.nes/i);
+ await dropFile('build/zip-tests/multiple.zip');
+ assert(await page.locator('#step-game #archive-picker').isVisible(),'ZIP choices stay in the same flow');
+ assert.equal(await page.locator('#archive-entry option').count(),2);
+ await page.locator('#archive-entry').selectOption('1');await page.locator('#archive-play').click();
+ await page.waitForFunction(()=>document.getElementById('rom-name').textContent==='Second diagnostic.nes'&&!document.getElementById('dropzone').disabled);
  assert(await page.locator('#flash-device').isVisible(),'Install action stays visible before preparation');
  assert(await page.locator('#flash-device').isDisabled());
  await page.locator('[data-install][data-homebrew="from-below"]').click();
@@ -69,9 +98,10 @@ try{
  await page.locator('#rom').setInputFiles({name:'broken.nes',mimeType:'application/octet-stream',buffer:bad});
  await page.waitForFunction(()=>document.getElementById('flash-status').classList.contains('error'));
  assert(await page.locator('#flash-device').isDisabled(),'Rejected files must not leave a stale game installable');
- assert(await page.locator('#install-choose-game').isEnabled(),'File errors must allow another selection');
+ assert(await page.locator('#dropzone').isEnabled(),'File errors must allow another selection');
  await page.locator('#flash-model').selectOption('smk37');
  assert(await page.locator('#fm1-steps').isHidden());
+ assert(await page.locator('#dropzone').isVisible(),'SMK browser users retain the same game picker');
  assert(await page.locator('#restore-device').isDisabled());
  assert.match(await page.locator('#flash-availability').textContent(),/installation is not available/);
  await page.locator('#flash-model').selectOption('fm1');
@@ -92,5 +122,5 @@ try{
  }
  const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));assert.equal(ids.length,new Set(ids).size,'No duplicate IDs');
  assert.deepEqual(errors,[]);
- console.log('PASS: desktop/mobile layout, game selection, factory V15 connection, blocked MIDI, prepare without writing, simulated install, game replacement, invalid-file recovery and SMK gating.');
+ console.log('PASS: single game picker, click and nested NES/ZIP drops, multi-game ZIP selection, desktop/mobile layout, factory V15 connection, blocked MIDI, preparation, simulated install, stale-game rejection and SMK gating.');
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

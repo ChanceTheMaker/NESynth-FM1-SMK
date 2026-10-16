@@ -25,7 +25,15 @@ header nav a[href="#flash-panel"]{color:var(--red)}
 .install-step[data-complete="true"] .step-number{background:#3c6542}
 .install-step[data-complete="true"] .step-state{color:#315838}
 .install-step[data-current="true"] .step-number{background:var(--red)}
-.choose-game,#connect-device,#build-firmware{width:100%;text-align:center}
+#connect-device,#build-firmware{width:100%;text-align:center}
+#step-game{scroll-margin-top:20px}
+.firmware-deck #dropzone{min-height:132px;text-align:left;background:#e3e5da;border:2px dashed #8c9580;border-top:5px solid var(--ink);padding:22px 17px;font:700 13px/1.5 var(--mono)}
+.firmware-deck #dropzone:hover:enabled{background:#d8dfcc;border-color:#627254}
+.firmware-deck #dropzone.drag-over{background:#d0dfc0;border-color:var(--red);box-shadow:inset 0 0 0 2px var(--red)}
+.firmware-deck #dropzone small{font-size:11px;line-height:1.7}
+.firmware-deck .local-library,.firmware-deck .diagnostic-option{margin:14px 0 0;padding:12px 0 0}
+.firmware-deck .local-library summary,.firmware-deck .diagnostic-option summary{font-size:11px}
+.firmware-deck .diagnostic-option button{margin-top:12px}
 .install-homebrew{display:flex;gap:6px;flex-wrap:wrap}
 .install-homebrew button{flex:1;min-width:95px;font-size:10px;padding:8px 6px;background:#e6e7dc}
 #rom-summary{margin:15px 0 0;background:#e6e8dd;padding:12px;border-left-width:3px}

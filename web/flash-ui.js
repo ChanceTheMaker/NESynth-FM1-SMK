@@ -5,7 +5,7 @@ import {restoreLatest} from './restore-firmware.js?v=20261013';
 import {createProgress} from './update-progress.js?v=20261013';
 const $=id=>document.getElementById(id);
 let rom=null,filename='',prepared=null,access=null,busy=false,downloadUrl=null,lastAction=null,loading=false;
-let playerReady=false,connectionChecked=false,installed=false,operation='';
+let connectionChecked=false,installed=false,operation='';
 const progress=createProgress($('install-log-heading'));
 const message=(s,error=false)=>{$('flash-status').textContent=s;$('flash-status').classList.toggle('error',error);};
 async function showAvailableVersion(){
@@ -26,7 +26,6 @@ function controls(){
  $('build-firmware').disabled=busy||loading||!rom||!fm;$('connect-device').disabled=busy||loading||!fm;
  $('flash-device').disabled=busy||loading||!prepared||!fm;$('flash-model').disabled=busy||loading;
  $('restore-device').disabled=busy||loading||!fm;$('retry-install').disabled=busy||loading;
- $('install-choose-game').disabled=busy||loading||!playerReady||!fm;
  $('build-firmware').textContent=operation==='prepare'?'Preparing game…':prepared?'Prepare game again':'Prepare game for FM-1';
  $('connect-device').textContent=operation==='connect'?'Connecting…':connectionChecked?'Check connection again':'Connect FM-1';
  $('flash-device').textContent=operation==='game'?'Installing…':installed?'Install game again':'Install game on FM-1';
@@ -78,7 +77,7 @@ document.addEventListener('nesynth-loading',e=>{loading=e.detail;controls();});
 document.addEventListener('nesynth-load-error',e=>message(e.detail,true));
 document.addEventListener('nesynth-rom',e=>{
  if(busy)return;
- playerReady=true;installed=false;
+ installed=false;
  rom=new Uint8Array(e.detail.bytes);filename=e.detail.name;prepared=null;lastAction=null;
  $('retry-install').hidden=true;$('build-review').hidden=true;
  if(downloadUrl)URL.revokeObjectURL(downloadUrl);
