@@ -70,23 +70,50 @@ try{
  const picker=page.waitForEvent('filechooser');await page.locator('#dropzone').click();
  await (await picker).setFiles('web/diagnostic.nes');
  await page.waitForFunction(()=>document.getElementById('rom-name').textContent==='diagnostic.nes'&&!document.getElementById('dropzone').disabled);
- async function dropFile(file,name=path.basename(file)){
+ async function dropFile(file,name=path.basename(file),target='#dropzone small'){
   const bytes=[...await fs.readFile(file)];
   const dataTransfer=await page.evaluateHandle(({bytes,name})=>{
    const transfer=new DataTransfer();transfer.items.add(new File([new Uint8Array(bytes)],name));return transfer;
   },{bytes,name});
-  await page.locator('#dropzone small').dispatchEvent('dragenter',{dataTransfer});
-  assert(await page.locator('#dropzone').evaluate(el=>el.classList.contains('drag-over')),'Nested drop target highlights');
-  await page.locator('#dropzone small').dispatchEvent('drop',{dataTransfer});
+  const host=target.startsWith('#dropzone')?'#dropzone':'.retro-rig';
+  await page.locator(target).dispatchEvent('dragenter',{dataTransfer});
+  assert(await page.locator(host).evaluate(el=>el.classList.contains('drag-over')),'Nested drop target highlights');
+  await page.locator(target).dispatchEvent('drop',{dataTransfer});
   await page.waitForFunction(()=>!document.getElementById('dropzone').disabled);
-  assert(!await page.locator('#dropzone').evaluate(el=>el.classList.contains('drag-over')));
+  assert.equal(await page.locator('.drag-over').count(),0);
   await dataTransfer.dispose();
  }
  await dropFile('web/diagnostic.nes','Dropped game.nes');
  assert.equal(await page.locator('#rom-name').textContent(),'Dropped game.nes');
+ await dropFile('web/diagnostic.nes','Screen game.nes','#screen');
+ assert.equal(await page.locator('#rom-name').textContent(),'Screen game.nes');
+ await dropFile('build/zip-tests/deflated.zip','Console game.zip','.cartridge-door');
+ assert.match(await page.locator('#rom-name').textContent(),/diagnostic.nes/i);
+ for(const model of ['fm1','smk-pro','smk-elite']){
+  await page.locator('#simulator-model').selectOption(model);
+  await page.waitForFunction(model=>document.querySelector('.console').dataset.simulator===model,model);
+  await dropFile('web/diagnostic.nes',model+'.nes','#screen');
+  assert.equal(await page.locator('#rom-name').textContent(),model+'.nes');
+ }
+ await page.locator('#simulator-model').selectOption('nes');
+ await page.locator('#fullscreen').click();
+ await page.waitForFunction(()=>!!document.fullscreenElement);
+ await dropFile('web/diagnostic.nes','Fullscreen game.nes','#screen');
+ assert.equal(await page.locator('#rom-name').textContent(),'Fullscreen game.nes');
+ await page.locator('#fullscreen').click();
+ await page.waitForFunction(()=>!document.fullscreenElement);
+ // A file drop cannot replace the cartridge during installation.
+ await page.evaluate(()=>document.dispatchEvent(new CustomEvent('nesynth-install-busy',{detail:true})));
+ const blockedDrop=await page.evaluateHandle(()=>{const d=new DataTransfer();d.items.add(new File(['invalid'],'blocked.nes'));return d;});
+ await page.locator('#screen').dispatchEvent('dragenter',{dataTransfer:blockedDrop});
+ assert.equal(await page.locator('.drag-over').count(),0);
+ await page.locator('#screen').dispatchEvent('drop',{dataTransfer:blockedDrop});
+ assert.equal(await page.locator('#rom-name').textContent(),'Fullscreen game.nes');
+ await blockedDrop.dispose();
+ await page.evaluate(()=>document.dispatchEvent(new CustomEvent('nesynth-install-busy',{detail:false})));
  await dropFile('build/zip-tests/deflated.zip');
  assert.match(await page.locator('#rom-name').textContent(),/diagnostic.nes/i);
- await dropFile('build/zip-tests/multiple.zip');
+ await dropFile('build/zip-tests/multiple.zip','multiple.zip','#screen');
  assert(await page.locator('#step-game #archive-picker').isVisible(),'ZIP choices stay in the same flow');
  assert.equal(await page.locator('#archive-entry option').count(),2);
  await page.locator('#archive-entry').selectOption('1');await page.locator('#archive-play').click();

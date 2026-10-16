@@ -1,4 +1,5 @@
 /* A playable TV, console and controller, built around the existing canvas. */
+.retro-rig.drag-over{outline:3px dashed var(--red);outline-offset:5px}
 .simulator-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 #fullscreen{padding:7px 9px;border:1px solid #909689;background:#e8eadf;border-radius:3px;font:700 9px var(--mono);white-space:nowrap}
 .retro-rig{padding:22px 22px 17px;background:linear-gradient(135deg,#dadbd4,#c5c7bf);border-radius:9px;overflow:visible;box-shadow:0 6px 0 #a6a89e,0 8px 0 #878b80,0 18px 30px #24281d17}

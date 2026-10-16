@@ -119,27 +119,33 @@ $('#folder').onchange=e=>{localLibrary=Array.from(e.target.files).filter(f=>/\.(
 $('#library-search').oninput=showLibrary;
 $('#library-play').onclick=()=>{const f=localLibrary[Number($('#library').value)];if($('#library').value&&f)void loadCartridgeFiles([f]);};
 $('#rom').onchange=async e=>{const files=Array.from(e.target.files);e.target.value='';await loadCartridgeFiles(files);};
-const dropzone=$('#dropzone');let dragDepth=0;
+const dropTargets=[$('#dropzone'),$('.retro-rig')],dragDepth=new Map();
 const hasFiles=e=>Array.from(e.dataTransfer?.types||[]).includes('Files');
-function clearDrop(){dragDepth=0;dropzone.classList.remove('drag-over');}
-dropzone.addEventListener('dragenter',e=>{
-    if(!hasFiles(e))return;e.preventDefault();dragDepth++;
-    if(!$('#rom').disabled)dropzone.classList.add('drag-over');
-});
-dropzone.addEventListener('dragover',e=>{
-    if(!hasFiles(e))return;e.preventDefault();e.stopPropagation();
-    e.dataTransfer.dropEffect=$('#rom').disabled?'none':'copy';
-});
-dropzone.addEventListener('dragleave',()=>{if(--dragDepth<=0)clearDrop();});
-dropzone.addEventListener('drop',e=>{
-    if(!hasFiles(e))return;e.preventDefault();e.stopPropagation();clearDrop();
-    void loadCartridgeFiles(Array.from(e.dataTransfer.files));
-});
+function clearDrop(){dragDepth.clear();for(const target of dropTargets)target.classList.remove('drag-over');}
+for(const target of dropTargets){
+    target.addEventListener('dragenter',e=>{
+        if(!hasFiles(e))return;e.preventDefault();e.stopPropagation();
+        dragDepth.set(target,(dragDepth.get(target)||0)+1);
+        if(!$('#rom').disabled)target.classList.add('drag-over');
+    });
+    target.addEventListener('dragover',e=>{
+        if(!hasFiles(e))return;e.preventDefault();e.stopPropagation();
+        e.dataTransfer.dropEffect=$('#rom').disabled?'none':'copy';
+    });
+    target.addEventListener('dragleave',()=>{
+        const depth=Math.max(0,(dragDepth.get(target)||0)-1);dragDepth.set(target,depth);
+        if(!depth)target.classList.remove('drag-over');
+    });
+    target.addEventListener('drop',e=>{
+        if(!hasFiles(e))return;e.preventDefault();e.stopPropagation();clearDrop();
+        void loadCartridgeFiles(Array.from(e.dataTransfer.files));
+    });
+}
 // File drops elsewhere must not navigate away from the running cartridge.
 document.addEventListener('dragover',e=>{if(hasFiles(e)){e.preventDefault();e.dataTransfer.dropEffect='none';}});
 document.addEventListener('drop',e=>{
     if(!hasFiles(e))return;e.preventDefault();clearDrop();
-    status('Drop your .nes or .zip file onto the cartridge area.',true);
+    status('Drop your .nes or .zip file onto the screen, console, or cartridge area.',true);
 });
 document.addEventListener('dragend',clearDrop);window.addEventListener('blur',clearDrop);
 $('#archive-play').onclick=()=>{void sound();return fileAction(async()=>{const entry=archiveEntries[Number($('#archive-entry').value)];if(entry)await playEntry(entry);});};
