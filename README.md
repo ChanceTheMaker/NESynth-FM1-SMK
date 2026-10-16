@@ -148,9 +148,9 @@ compares DEADACTIVE's [Hortator Bluetooth implementation](https://github.com/dea
 with the existing Felucca peripheral diagnostics. Hortator's five Bluetooth host
 test groups and startup-check self-test pass locally. Its cooperative scheduler
 and stored-calibration approach are useful references; its central MIDI role is
-different from a phone-facing cartridge receiver. SMK calibration locations,
-reliable file transfer and device performance remain open. No
-Bluetooth runtime is enabled by this branch yet, and the published SMK963 build
+different from a phone-facing cartridge receiver. That initial branch did not
+enable a Bluetooth runtime. The follow-up diagnostic is described below; reliable
+file transfer and device performance remain open. The published SMK963 build
 remains unchanged. The owner reports substantially improved SMK963 playback;
 post-change FPS and complete control validation have not been measured.
 
@@ -177,15 +177,17 @@ The receiver has BEGIN/DATA/COMMIT/ABORT operations, 512-byte chunks, bounded
 relative offsets, chunk and full-image CRCs, exact duplicate acknowledgment,
 and a publish gate after readback and backend ROM validation. Host tests exercise
 corruption, gaps, retries, interruption and backend failures under ASan/UBSan.
-There is no physical flash backend, wire protocol adapter, frontend or peripheral
-GATT service yet. The callback backend must invalidate staging before writes and
+There is no physical flash backend, cartridge wire protocol adapter or frontend
+yet. The separate diagnostic GATT service below only echoes RAM data. The callback
+backend must invalidate staging before writes and
 publish only a fully validated image; power-loss recovery needs separate hardware
 implementation and tests. No old-game preservation is implied.
 
 `tools/inspect_ble_calibration.py` only reads private full-flash backups and
 prints candidate offsets/counts. Two byte-identical stock reads from the owner's
 SMK Pro contain two distinct checksum-valid VM item 187 candidates. Record
-generation/selection and SDK acceptance remain unverified. No private backup,
+selection was initially unverified; the follow-up below resolves the candidate
+under the pinned SDK's bank rules. Radio acceptance still needs a device test. No private backup,
 calibration payload or Bluetooth address is included in the repository.
 
 To repeat the link measurement on Windows with WSL and the JieLi toolchain
@@ -213,6 +215,62 @@ the ordinary ignored `build/smk37/` baseline outputs. The Bluetooth probe emits
 fail closed, and radio startup is never called. Do not convert its ELF into a
 device package. Neither the target link nor the host checks prove radio operation,
 transfer throughput, task-stack sufficiency or gameplay performance on hardware.
+
+### Local SMK Pro Bluetooth diagnostic (964)
+
+`python tools/build_bluetooth_probe.py --diagnostic` builds a **separate diagnostic**,
+not a game-playing release. `--peripheral` instead measures NESynth plus this GATT
+profile with inert hooks. Default invocation remains the original central fit probe.
+[Diagnostic evidence](experiments/bluetooth/diagnostic-evidence.json) records the
+local build, calibration selection and tests. The public site remains SMK963.
+
+The validated Pro016 flash directory places VM at `0x9d000` with length `0x23000`.
+The pinned SDK `cfg_tool.a` caps sector-aligned VM at 128 KiB and divides it into
+two banks. The reader uses bank headers at `0x9d000` and `0xad000`, walks records
+sequentially, checks every record CRC, and requires RF trim, crystal and PA data.
+It refuses ambiguous/transitional banks, malformed records and failed reads;
+it never runs SDK VM initialization, defrag or writes. On the owner's paired stock
+backup it selects RF record `0x9d015` after validating 14 records. The second
+candidate `0xbe015` is outside the SDK-managed range and is not used. This reader
+targets the audited SMK Pro layout; it does not claim to handle every VM revision.
+
+The diagnostic starts with CPU1, emulation, audio and Bluetooth inactive. The LCD
+shows **PRESS PLAY** and USB restoration is available. A fresh PLAY press starts
+the radio using the device's own calibration. Expected subsequent states are
+**STARTING**, **ADVERTISING**, then **CONNECTED**. It advertises **NESynth SMK Test**.
+The custom service has an eight-byte RAM echo; there are no cartridge writes or
+bonding. Startup uses the cooperative app task, actual ICFG interrupt detection,
+bounded callback lengths and duplicate-event guards from the reconciled references.
+The build verifies RAM code cannot reach XIP and that application flash-writing
+routines compile to immediate failure. The separate existing RAM updater retains
+its bounded application-write capability for installation/restoration.
+
+```powershell
+python tools/build_bluetooth_probe.py --diagnostic
+node tools/package_bluetooth_diagnostic.mjs build/smk37/stock-pro.fwsc
+python -m pip install --target build/bluetooth-python-deps bleak==3.0.2
+# After installing the local diagnostic and pressing PLAY:
+python tools/test_bluetooth_diagnostic.py
+```
+
+Local outputs are in `build/bluetooth-diagnostic/`: the model-specific
+`NESynth-SMK-Pro-964-Bluetooth-Test.fwsc`, its `.smkupdate` RAM-loader packet and
+JSON reports. The raw `.bin` is not an installer. The package round-trip verifies
+exact application bytes and protected boot; the actual update packet also passes
+the C RAM-loader simulation with a synthetic calibration fixture and preserved tail.
+No vendor firmware, device calibration or game ROM is committed or published.
+
+The test client uses [Bleak discovery](https://bleak.readthedocs.io/en/latest/api/scanner.html)
+and [GATT reads/writes](https://bleak.readthedocs.io/en/latest/api/client.html), matches
+both the diagnostic name and UUID, requires exactly one match, writes a random
+eight-byte nonce and checks its echo and counter before disconnecting. Service UUID:
+`f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7e0`; value UUID ends in `e7e1`.
+
+**Power-cycle before USB restoration and leave PLAY untouched.** A USB update
+request after Bluetooth starts reboots to radio-off mode; retry the update after
+that reboot. This avoids running the RAM updater while controller tasks/IRQs remain
+active. Host tests and the target build pass, but radio startup, physical recovery,
+Bluetooth connectivity and echo throughput have not yet been validated on the SMK.
 
 Improve LCD refresh and broader game/audio compatibility, and validate physical SMK37 installation, playback and recovery before promoting its experimental installer to a hardware-validated release. More mapper support needs separate compatibility work. The original diagnostic is the included NES cartridge; GameDude's Game Boy homebrew games are not NES-compatible.
 

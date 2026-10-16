@@ -7,8 +7,13 @@ on:
       - 'experiments/bluetooth/**'
       - 'tools/inspect_ble_calibration.py'
       - 'tools/build_bluetooth_probe.py'
+      - 'tools/package_bluetooth_diagnostic.mjs'
+      - 'tools/test_bluetooth_diagnostic.py'
       - 'tests/rom_transfer.c'
       - 'tests/ble_calibration.py'
+      - 'tests/rf_calibration.c'
+      - 'tests/diagnostic_gatt.c'
+      - 'tests/diagnostic_peripheral.c'
       - '.github/workflows/bluetooth-prototype.yml'
 permissions:
   contents: read
@@ -24,3 +29,11 @@ jobs:
           ./build/rom-transfer-test
       - name: Validate read-only calibration inspector
         run: python3 tests/ble_calibration.py
+      - name: Validate RF selection and diagnostic peripheral
+        run: |
+          cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/rf_calibration.c experiments/bluetooth/rf_calibration.c -o build/rf-test
+          ./build/rf-test
+          cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/diagnostic_gatt.c experiments/bluetooth/diagnostic_gatt.c -o build/gatt-test
+          ./build/gatt-test
+          cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/diagnostic_peripheral.c experiments/bluetooth/diagnostic_gatt.c -o build/peripheral-test
+          ./build/peripheral-test

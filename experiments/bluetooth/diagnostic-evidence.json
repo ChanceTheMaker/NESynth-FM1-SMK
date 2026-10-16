@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-16",
+  "branch": "feat/bluetooth-loader-prototype",
+  "status": "Local SMK Pro diagnostic prepared; no device flashed or radio validated",
+  "build": {
+    "kind": "SMK964 diagnostic candidate",
+    "reference": "7e3415971c5800b4a3ad0146a7d95615883d7d96",
+    "rom_capacity": 0,
+    "bluetooth_role": "diagnostic peripheral, RAM echo only",
+    "flash_writes": false,
+    "radio_started": false,
+    "app_bytes": 142228,
+    "app_limit": 581564,
+    "app_free": 439336,
+    "baseline_app_bytes": null,
+    "ble_added_bytes": null,
+    "ram_bytes": 12236,
+    "ram_limit": 73728,
+    "pool_and_cpu1_stacks_bytes": 177632,
+    "pool_limit": 368640,
+    "ram_code_bytes": 5056,
+    "ram_code_limit": 24576,
+    "ble_workspace_used_bytes": 23744,
+    "shared_workspace_bytes": 61440,
+    "shared_workspace": "inactive video_source; simultaneous gameplay/BLE is forbidden",
+    "sdk_hashes": {
+      "cpu/wl82/liba/btctrler.a": "885cd53747753488b380f761318bf30d691f75541dd28adc72457690aa51506a",
+      "cpu/wl82/liba/btstack.a": "d4c02f42e1be97a5288ecbcb5d42e6d0727e2ca4ffa2e0e2e6bb2ae61fede4bc",
+      "cpu/wl82/liba/wl_rf_common.a": "1e6f7cdf0f0956282d251cdf23dffc2dae39c4ca498cb314801dde35b00e1769",
+      "cpu/wl82/liba/crypto_toolbox_Osize.a": "373251c39f8de0851204b623601b348254023e98b3d0b062ecab743b0c3aa35e",
+      "cpu/wl82/liba/system.a": "a71bdc75e5afbcffaf7d79bc2b27f2b65fec63d94d2261b584744d3e9b9098ea",
+      "cpu/wl82/liba/cpu.a": "fe18129bfee7758074c486b2d33b2ed59a8c365600362d982992677c47821b2a",
+      "cpu/wl82/liba/lib_ccm_aes.a": "bd3dd110197ae0084826538bfb5e432a6fadb3a001acadfdbd5f3a409fb5da2c",
+      "include_lib/newlib/pi32v2-lib/libcompiler_rt.a": "141997ab6977c0c4abfb857bc32a897eb345f8d593e27e74c33bdebcf3fd5009"
+    },
+    "sdk_config_lf_hashes": {
+      "apps/common/config/log_config/lib_btctrler_config.c": "7323d979d70af02110ada6d3a6eaf76ad5a1292ccbbb7ff30a51e9c667d28fe8",
+      "apps/common/config/bt_profile_config.c": "1d385cbd6b07e1b8d87d7336debe51b34b414c1feae4366973b18468fac6f7f2"
+    },
+    "limitations": [
+      "Radio starts only after a fresh physical PLAY press",
+      "No game playback or cartridge upload in this diagnostic",
+      "No hardware test performed; power-cycle before USB restore"
+    ],
+    "product": "SMK-37_964",
+    "sha256": "2c72ea81997c0df6ae040972de0fa1531c255370bb963ad2e6fc304064e6c131",
+    "hardware_validated": false,
+    "ram_reach_check": true,
+    "application_flash_writers_disabled": true
+  },
+  "package": {
+    "product": "SMK-37_964",
+    "model": "SMK-37 Pro",
+    "app_sha256": "2c72ea81997c0df6ae040972de0fa1531c255370bb963ad2e6fc304064e6c131",
+    "fwsc_sha256": "25d0ecbb4a994a12cacf7cd5573d8420596c45836d59531d2e5a5b46b2ecd28a",
+    "update_sha256": "e20046d671115aa65b24fab1dcfc234bc5481c9854d0153710affc2bc752ae08",
+    "hardware_validated": false,
+    "flashed": false
+  },
+  "calibration": {
+    "method": "Pinned SDK VM bank header selection and sequential CRC-checked record traversal; no persistent SDK VM initialization",
+    "stock_model": "SMK-37 Pro 016",
+    "stock_sha256": "2d98ce72530e71d617384963423820536f094501299e2cfec0a8d3c3fb6bcfb0",
+    "vm_descriptor": {
+      "start": "0x9d000",
+      "size": "0x23000"
+    },
+    "sdk_vm_max_bytes": 131072,
+    "bank_headers": [
+      "0x9d000",
+      "0xad000"
+    ],
+    "paired_private_reads_match": true,
+    "selected_record": "0x9d015",
+    "sequential_records_validated": 14,
+    "unused_candidate": "0xbe015 outside managed range",
+    "payload_published": false,
+    "sdk_commit": "64afb30b805af5f5d3c2e6471e970c3fd0ba40ad",
+    "cfg_tool_archive_sha256": "e276ce59adddc701a71558f50cc331309efeba360350dc19a1de8c9104d889bd",
+    "source_evidence": [
+      "cfg_tool.a vm.c.o: vm_init and vm_renew_all_index_last_updated_addr",
+      "apps/common/system/init.c: cpu_in_irq and cpu_irq_disabled",
+      "Felucca diagnostics: bounded SDK controller event length exception and duplicate guards"
+    ]
+  },
+  "checks": [
+    "RF reader ASan/UBSan: stale copies, ambiguous banks, outer/inner CRC, failed reads and missing records",
+    "ATT ASan/UBSan: offset/length bounds, write validation, echoed nonce/count, handle zero and disconnect reset",
+    "Peripheral ASan/UBSan: calibration gate, one startup task, advertising command order, duplicate callbacks, errors and timeout",
+    "Target link: entry/region bounds, required USB recovery symbols, RAM reachability, disabled application flash writers",
+    "Package: pinned Pro stock validation, exact app round-trip and protected boot",
+    "Actual diagnostic update packet through C RAM-loader simulator: 152 changed sectors, saved tail preserved"
+  ],
+  "hardware": {
+    "usb_identity_probe": "No SMK-37 NESynth identity response",
+    "flashed": false,
+    "radio_started": false,
+    "echo_verified": false
+  },
+  "remaining": [
+    "Physical diagnostic install/recovery trial",
+    "Radio startup and Bluetooth echo test",
+    "Persistent game storage, transfer service, browser/front loader and gameplay reboot"
+  ]
+}
