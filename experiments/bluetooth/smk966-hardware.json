@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-16",
+  "board": "SMK-37 Pro",
+  "product": "SMK-37_966",
+  "scope": "Owner-confirmed same unit, private RF calibration; not a public firmware artifact",
+  "app_sha256": "a49e2c354581ec84f0fb3dc9f0950fdbd78de6b0e6a13a4092c01cb430dde8c2",
+  "fwsc_sha256": "cc14968ed9b67ef4cd83d9a2de1c97acf9a4e4eee082df396a7180b8f8ef8206",
+  "update_sha256": "fc4d79ba17535870584bc0d626cb33b9cd44475be7d59b8395820ea4787246d6",
+  "footprint": {
+    "app_bytes": 211640,
+    "app_limit": 356064,
+    "ram_bytes": 54428,
+    "ram_limit": 73728,
+    "pool_and_cpu1_stacks_bytes": 361952,
+    "pool_limit": 368640,
+    "ram_code_bytes": 22016,
+    "ram_code_limit": 24576,
+    "rom_capacity": 262672
+  },
+  "bluetooth": {
+    "name": "NESynth SMK",
+    "service": "f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7f0",
+    "controller_packet_bytes": 251,
+    "rom_data_per_write": 239,
+    "burst_packets": 8,
+    "test_cartridge": "Super Mario Bros. (JU)",
+    "bytes": 40976,
+    "crc32": "3337ec46",
+    "baseline_smk965_seconds": 62.2,
+    "runs": [
+      {
+        "verified": true,
+        "bytes": 40976,
+        "crc32": "3337ec46",
+        "seconds": 8.95,
+        "data_seconds": 5.09,
+        "burst": true,
+        "retries": 0,
+        "status": "SMK restarting to install and play; verify USB status afterward"
+      },
+      {
+        "verified": true,
+        "bytes": 40976,
+        "crc32": "3337ec46",
+        "seconds": 10.99,
+        "data_seconds": 6.31,
+        "burst": true,
+        "retries": 0,
+        "status": "SMK restarting to install and play; verify USB status afterward"
+      }
+    ],
+    "timing_scope": "CLI elapsed time includes connection and verification, excludes device discovery and subsequent install/restart; data_seconds covers data writes only",
+    "fresh_connection_paths": [
+      "Initial firmware installation boot",
+      "Game-to-loader restart"
+    ],
+    "installed_length_crc_verified_after_reboot": true,
+    "post_restart_loader_mode": 0,
+    "post_restart_error": 0,
+    "post_restart_radio_state": 0
+  },
+  "gameplay": {
+    "emulation_fps": 59.88616679039841,
+    "cpu1_online": 1,
+    "cpu1_faults": 0,
+    "cpu1_fallbacks": 0,
+    "lcd_timeouts": 0,
+    "lcd_failed": 0,
+    "core_error": 0,
+    "audio_underruns_at_first_sample": 3,
+    "new_audio_underruns_during_measurement": 0
+  },
+  "tests": [
+    "Target link and RAM reach",
+    "SMK package round-trip and protected-tail loader simulation",
+    "Browser transport: complete transfer, dropped packet replay, stalled link, invalid offsets, CRC rejection, small MTU, legacy acknowledged writes",
+    "ASan/UBSan loader peripheral: defer tuning until application access, one-shot connection/DLE request, refusal and disconnect handling"
+  ],
+  "limits": [
+    "Physical power-cycle and full-capacity radio transfer not tested this turn",
+    "Browser Bluetooth chooser/transfer not hardware-tested; CLI uses the same GATT wire protocol",
+    "One cartridge, 262672 bytes maximum",
+    "Radio active only in loader mode",
+    "Battery save RAM remains volatile",
+    "Private calibrated binary stays local"
+  ]
+}

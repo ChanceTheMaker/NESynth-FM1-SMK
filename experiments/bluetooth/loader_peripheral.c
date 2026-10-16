@@ -11,7 +11,11 @@ extern void att_server_register_packet_handler(btstack_packet_handler_t);
 extern void sm_set_request_security(int);
 static np_diag_gatt np_gatt;
 static uint32_t np_state,np_error,np_deadline;
-static uint8_t np_advertise;
+static uint8_t np_advertise,np_tune_pending;
+static uint32_t np_tune_due;
+/* AC79 ble_api.h: conn_update_param_t, BLE_CMD_REQ_CONN_PARAM_UPDATE=11.
+ * 15-30 ms, zero peripheral latency; refusal leaves the link usable. */
+static const uint16_t np_fast_connection[4]={12,24,0,400};
 static uint8_t np_mac[6];
 static uint8_t np_att_ram[BLE_SDK_ATT_CTRL_BLOCK_SIZE+247u+512u] __attribute__((aligned(4)));
 /* State: 0 off, 1 starting, 2 advertising pending, 3 advertising,
@@ -19,16 +23,20 @@ static uint8_t np_att_ram[BLE_SDK_ATT_CTRL_BLOCK_SIZE+247u+512u] __attribute__((
 uint32_t np_ble_diag_state(void){return np_state;}
 uint32_t np_ble_diag_error(void){return np_error;}
 uint32_t np_ble_diag_writes(void){return np_gatt.writes;}
-static uint16_t np_read(uint16_t h,uint16_t a,uint16_t o,uint8_t *p,uint16_t n){if(!np_gatt.connected||h!=np_gatt.handle)return 0;return a==6?np_loader_read(o,p,n):np_diag_read(&np_gatt,h,a,o,p,n);}
-static int np_write(uint16_t h,uint16_t a,uint16_t t,uint16_t o,uint8_t *p,uint16_t n){if(!np_gatt.connected||h!=np_gatt.handle||a!=6)return 3;if(t)return 6;if(o)return 7;return np_loader_write(p,n);}
+static void np_tune_after_discovery(void){
+    if(!np_tune_pending){np_tune_pending=1;np_tune_due=core_ms()+100;}
+}
+static uint16_t np_read(uint16_t h,uint16_t a,uint16_t o,uint8_t *p,uint16_t n){if(!np_gatt.connected||h!=np_gatt.handle)return 0;if(a==6){np_tune_after_discovery();return np_loader_read(o,p,n);}return np_diag_read(&np_gatt,h,a,o,p,n);}
+static int np_write(uint16_t h,uint16_t a,uint16_t t,uint16_t o,uint8_t *p,uint16_t n){if(!np_gatt.connected||h!=np_gatt.handle||a!=6)return 3;if(t)return 6;if(o)return 7;np_tune_after_discovery();return np_loader_write(p,n);}
 static void np_packet_impl(uint8_t type,uint16_t channel,uint8_t *p,uint16_t n,int controller){
     (void)channel;
     int event=np_diag_event(&np_gatt,type,p,n,controller);
     if(event==1){
         int result=ble_op_att_send_init(np_gatt.handle,np_att_ram,sizeof np_att_ram,247);
         np_advertise=0;
-        if(result){np_error=(uint32_t)result;np_state=5;ble_op_disconnect(np_gatt.handle);}else np_state=4;
+        if(result){np_error=(uint32_t)result;np_state=5;ble_op_disconnect(np_gatt.handle);}else {np_state=4;np_tune_pending=0;}
     }else if(event==2){
+        np_tune_pending=0;
         ble_op_att_send_init(0,0,0,0);
         if(np_state!=5){np_advertise=1;np_state=2;}
     }else if(event==3&&np_state!=5){
@@ -68,6 +76,12 @@ void np_ble_diag_service(void){
     if(!ble_on)return;
     ble_os_service(5000);ble_diag.heap_high=ble_os_heap_high();ble_diag.alloc_fails=ble_os_alloc_fails();
     if(np_state==1&&(int32_t)(core_ms()-np_deadline)>=0){np_error=2;np_state=5;}
+    if(np_tune_pending==1&&np_gatt.connected&&(int32_t)(core_ms()-np_tune_due)>=0){
+        np_tune_pending=2;
+        (void)ble_user_cmd_prepare(11,2,(int)np_gatt.handle,(void *)np_fast_connection);
+        /* ble_api.h: BLE_CMD_SET_DATA_LENGTH=20; 251 octets at 1M PHY. */
+        (void)ble_user_cmd_prepare(20,3,(int)np_gatt.handle,251,2120);
+    }
     if(!np_advertise||np_gatt.connected||np_state==5)return;
     np_advertise=0;
     int result=ble_user_cmd_prepare(2,3,160,0,7);

@@ -20,6 +20,9 @@ on:
       - 'tests/rf_calibration.c'
       - 'tests/diagnostic_gatt.c'
       - 'tests/diagnostic_peripheral.c'
+      - 'tests/loader_peripheral.c'
+      - 'tests/bluetooth_transfer.mjs'
+      - 'web/bluetooth*.js'
       - '.github/workflows/bluetooth-prototype.yml'
 permissions:
   contents: read
@@ -53,3 +56,7 @@ jobs:
           ./build/gatt-test
           cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/diagnostic_peripheral.c experiments/bluetooth/diagnostic_gatt.c -o build/peripheral-test
           ./build/peripheral-test
+          cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/loader_peripheral.c experiments/bluetooth/diagnostic_gatt.c -o build/loader-peripheral-test
+          ./build/loader-peripheral-test
+      - name: Validate burst transfer and recovery
+        run: node tests/bluetooth_transfer.mjs

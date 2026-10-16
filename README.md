@@ -6,11 +6,11 @@ The prototype fits the existing FM-1 memory map. The website plays NES/ZIP cartr
 
 Live site: **https://chancethemaker.github.io/NESynth-FM1-SMK/**
 
-## Bluetooth game loading (SMK-37 Pro, branch build 965)
+## Bluetooth game loading (SMK-37 Pro, branch build 966)
 
-**Hardware verified on the owner's SMK-37 Pro (2026-10-16):** Super Mario Bros. transferred over BLE in 62.2 seconds, passed the persistent length/CRC check after restart, and ran at 60.1 emulated frames/sec with CPU1 active, no new audio underruns and no display timeouts. See `experiments/bluetooth/smk965-hardware.json` for scope and remaining checks.
+**Hardware verified on the owner's SMK-37 Pro (2026-10-16):** The same 40,976-byte Super Mario Bros. cartridge transferred over BLE in **8.95 and 10.99 seconds**, down from 62.2 seconds on SMK965, with zero retries. These CLI timings include connection and verification, excluding discovery and the subsequent install/restart; data writes took 5.09 and 6.31 seconds. Both fresh connections passed, including reopening loading from gameplay. The installed length/CRC matched after restart, and gameplay ran at 59.9 emulated frames/sec with CPU1 active, no new audio underruns and no display timeouts. See `experiments/bluetooth/smk966-hardware.json` for scope and remaining checks.
 
-SMK965 combines the NES player with a Bluetooth cartridge loader. Hold **PLAY + REC** for two seconds to open loading, open `web/bluetooth.html` in Chrome or Edge through a localhost web server, connect **NESynth SMK**, and drop a `.nes` or `.zip` game. **Send and play** transfers and verifies it, restarts the SMK to install it with the radio off, and boots the game. Fader 1 and the existing GameDude-style game controls are retained. Bluetooth closes during gameplay. One cartridge up to **262,672 bytes** is stored persistently; save RAM remains volatile. USB firmware replacement clears that cartridge slot.
+SMK966 combines the NES player with a Bluetooth cartridge loader. Hold **PLAY + REC** for two seconds to open loading, open `web/bluetooth.html` in Chrome or Edge through a localhost web server, connect **NESynth SMK**, and drop a `.nes` or `.zip` game. **Send and play** transfers and verifies it, restarts the SMK to install it with the radio off, and boots the game. Fader 1 and the existing GameDude-style game controls are retained. Bluetooth closes during gameplay. One cartridge up to **262,672 bytes** is stored persistently; save RAM remains volatile. USB firmware replacement clears that cartridge slot.
 
 ```powershell
 python tools/build_bluetooth_probe.py --loader
@@ -20,6 +20,8 @@ python -m http.server 8766 --bind 127.0.0.1 --directory web
 ```
 
 The build requires the pinned local Hortator/AC79 dependencies described below. This owner's unit also needs the already-verified private calibration backup options; `--loader` accepts the same `--private-calibration-backups` and `--private-unit-backups` pairs as the diagnostic. These local artifacts stay under ignored `build/bluetooth-loader/`; **PRIVATE firmware must not be published**. The generated `.fwsc`/`.smkupdate` are separate from the public SMK963 website installer.
+
+SMK966 sends bounded bursts of eight packets, checks cumulative device progress, and replays missing data with a strict retry limit. Control messages still require acknowledgments, and the complete cartridge CRC is verified before installation. The controller enables 251-byte Data Length Extension and requests a 15-30 ms connection with zero peripheral latency; older peers can retain smaller packets. Tuning starts only after the application characteristic is accessed, allowing Windows service discovery to finish first. The browser automatically retains acknowledged writes for older SMK965 firmware. The pinned SDK files stay unchanged: only the generated controller configuration is adapted and its hash is recorded in the build report.
 
 For local verification, `tools/upload_bluetooth_game.py GAME.zip` sends the game over Bluetooth, and `tools/inspect_bluetooth_loader.py` checks the installed cartridge's length/CRC over USB. `--open-loader` enters loading from the player. A successful transfer ACK is followed by separate persistent-storage and gameplay checks. The browser uploader preserves the existing bounded ZIP extraction and exact legacy-header repairs.
 
