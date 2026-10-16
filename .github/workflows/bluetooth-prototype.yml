@@ -1,0 +1,26 @@
+name: Bluetooth loader prototype checks
+on:
+  push:
+    branches: [feat/bluetooth-loader-prototype]
+  pull_request:
+    paths:
+      - 'experiments/bluetooth/**'
+      - 'tools/inspect_ble_calibration.py'
+      - 'tools/build_bluetooth_probe.py'
+      - 'tests/rom_transfer.c'
+      - 'tests/ble_calibration.py'
+      - '.github/workflows/bluetooth-prototype.yml'
+permissions:
+  contents: read
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate bounded cartridge receiver
+        run: |
+          mkdir -p build
+          cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/rom_transfer.c experiments/bluetooth/rom_transfer.c -o build/rom-transfer-test
+          ./build/rom-transfer-test
+      - name: Validate read-only calibration inspector
+        run: python3 tests/ble_calibration.py

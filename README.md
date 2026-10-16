@@ -149,10 +149,70 @@ with the existing Felucca peripheral diagnostics. Hortator's five Bluetooth host
 test groups and startup-check self-test pass locally. Its cooperative scheduler
 and stored-calibration approach are useful references; its central MIDI role is
 different from a phone-facing cartridge receiver. SMK calibration locations,
-memory fit, reliable file transfer and device performance remain open. No
+reliable file transfer and device performance remain open. No
 Bluetooth runtime is enabled by this branch yet, and the published SMK963 build
 remains unchanged. The owner reports substantially improved SMK963 playback;
 post-change FPS and complete control validation have not been measured.
+
+The follow-up **`feat/bluetooth-loader-prototype`** branch contains a non-installable
+target link probe and a bounded cartridge receiver. [Measured fit evidence](experiments/bluetooth/prototype-fit.json)
+records the real NESynth + pinned Hortator central stack + receiver link:
+
+| Cartridge allocation | Application bytes | Free application bytes |
+| --- | ---: | ---: |
+| 256 KiB + 528-byte header/trainer allowance | 439,264 | 142,300 |
+| 384 KiB + 528-byte header/trainer allowance | 570,336 | 11,228 |
+
+Both use 56,288 of 73,728 bytes of regular RAM and 361,952 of 368,640 bytes
+of buffer/CPU1-stack RAM. Bluetooth's heap and cooperative task records share
+the inactive 61,440-byte `video_source` buffer. This measures the storage layout;
+it does **not** implement the required gameplay/loader ownership transition.
+Gameplay and Bluetooth must never use this buffer together. A future loader
+must quiesce CPU1, display DMA and emulation before radio startup, then use
+verified teardown or a reboot before gameplay. The 256 KiB option leaves more
+space for that integration; the 384 KiB result is not a promised final capacity.
+The existing 512 KiB public template is unchanged.
+
+The receiver has BEGIN/DATA/COMMIT/ABORT operations, 512-byte chunks, bounded
+relative offsets, chunk and full-image CRCs, exact duplicate acknowledgment,
+and a publish gate after readback and backend ROM validation. Host tests exercise
+corruption, gaps, retries, interruption and backend failures under ASan/UBSan.
+There is no physical flash backend, wire protocol adapter, frontend or peripheral
+GATT service yet. The callback backend must invalidate staging before writes and
+publish only a fully validated image; power-loss recovery needs separate hardware
+implementation and tests. No old-game preservation is implied.
+
+`tools/inspect_ble_calibration.py` only reads private full-flash backups and
+prints candidate offsets/counts. Two byte-identical stock reads from the owner's
+SMK Pro contain two distinct checksum-valid VM item 187 candidates. Record
+generation/selection and SDK acceptance remain unverified. No private backup,
+calibration payload or Bluetooth address is included in the repository.
+
+To repeat the link measurement on Windows with WSL and the JieLi toolchain
+configured for `tools/build.py`, place these references under ignored `build/references/`:
+
+- `hortator`: commit `7e3415971c5800b4a3ad0146a7d95615883d7d96` from `https://github.com/deadactive/hortator`.
+- `ac79-ble-sdk`: commit `64afb30b805af5f5d3c2e6471e970c3fd0ba40ad`, tag `AC79NN_SDK_V1.2.13_2026-04-20`, from `https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git`.
+  Include `cpu/wl82/liba`, `include_lib`, `apps/common/config`, `apps/common/include` and `apps/common/ble/include` if using sparse checkout.
+
+```powershell
+python tools/build_bluetooth_probe.py --rom-capacity 262672
+# Or test the larger allocation:
+python tools/build_bluetooth_probe.py --rom-capacity 393744
+python tests/ble_calibration.py
+wsl -e cc -O1 -g '-fsanitize=address,undefined' -fno-sanitize-recover=all tests/rom_transfer.c experiments/bluetooth/rom_transfer.c -o build/rom-transfer-test
+wsl -e ./build/rom-transfer-test
+```
+
+The script verifies Hortator source and SDK library/config hashes. Only the two
+pinned text config files are normalized to LF for hashing; libraries are checked
+byte-for-byte. Generated adaptations retain the original notices and stay under
+`build/bluetooth-probe/`. Each run replaces that directory's ELF/map/report and
+the ordinary ignored `build/smk37/` baseline outputs. The Bluetooth probe emits
+**no installable firmware**: hooks are deliberately inert, calibration reads
+fail closed, and radio startup is never called. Do not convert its ELF into a
+device package. Neither the target link nor the host checks prove radio operation,
+transfer throughput, task-stack sufficiency or gameplay performance on hardware.
 
 Improve LCD refresh and broader game/audio compatibility, and validate physical SMK37 installation, playback and recovery before promoting its experimental installer to a hardware-validated release. More mapper support needs separate compatibility work. The original diagnostic is the included NES cartridge; GameDude's Game Boy homebrew games are not NES-compatible.
 
