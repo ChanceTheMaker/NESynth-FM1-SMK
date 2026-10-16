@@ -6,7 +6,7 @@ from inspect_bluetooth_diagnostic import PREFIX,decode
 
 class StatusPacket(unittest.TestCase):
     def setUp(self):
-        values=[5,1,0xfffffffe,0,0,0,0xfffffffe,1,0x9d000,4,0,0,0,0]
+        values=[5,1,0xfffffffe,0,0,0,0xfffffffe,1,0x9d000,4,0,0,0,0]+[0]*9
         self.packet=PREFIX+bytes((v>>(j*7))&127 for v in values for j in range(5))+b'\xf7'
     def test_signed_errors(self):
         result=decode(self.packet)

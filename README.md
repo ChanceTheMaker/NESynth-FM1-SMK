@@ -271,11 +271,20 @@ For this case only, `--diagnostic --private-calibration-backups FIRST SECOND`
 accepts two identical full stock backups and validates their records with the
 same C parser. It embeds only RF/crystal/PA records and the protected 8 KiB
 factory region in an ignored local image. Before using the saved records, the
-device must match that entire factory region byte for byte. A mismatch fails
-closed. This does not restore or write VM/music storage. Packages are prefixed
+device must match the validated 556-byte `usrtrim` record at `0xc1000` byte for
+byte, the same record the SMK updater and Melodee use as the unit fingerprint.
+A mismatch or failed read refuses the saved RF data. The surrounding 8 KiB is
+compared separately to report changed-sector offsets without exposing bytes. This does not restore or write VM/music storage. Packages are prefixed
 `PRIVATE-`; neither the generated header nor firmware may be committed or
 published. This fallback is diagnostic-only and is not a general cartridge
-loader or calibration migration.
+loader or calibration migration. When the owner confirms the stock RF backup belongs
+to this same unit but its current factory data has changed, two current private
+reads can be collected with `tools/backup_bluetooth_factory.py --output-dir
+build/bluetooth-diagnostic/live-factory` while the radio is off. Optional
+`--private-unit-backups FIRST SECOND` uses that matching pair for the installation
+guard while retaining the validated stock RF records as the radio source. The
+source relationship must be confirmed by the owner; matching current reads alone
+does not prove an old RF backup belongs to that device.
 
 The test client uses [Bleak discovery](https://bleak.readthedocs.io/en/latest/api/scanner.html)
 and [GATT reads/writes](https://bleak.readthedocs.io/en/latest/api/client.html), matches

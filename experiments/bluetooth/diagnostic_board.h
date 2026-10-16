@@ -32,27 +32,41 @@ int core_flash_read(uint32_t off,void *p,uint32_t n){
     }
     return result;
 }
-/* Private diagnostic fallback: compare the whole preserved factory area.
- * The backup's RF records are accepted only for this exact device image.
+/* Private diagnostic: validate and exactly match the updater's usrtrim
+ * identity record. Compare surrounding bytes only to explain layout changes.
  * No saved VM/music bytes are restored or modified. */
 #include "private_calibration_guard.h"
+static np_factory_report np_factory_check;
 static int np_factory_read_adapter(void *ctx,uint32_t off,uint8_t *p,uint32_t n){
     (void)ctx;fm1_wdt_feed();fm1_irq_off();int rc=FL_FAR(fl_read_ram)(off,p,n);fm1_irq_on();return rc;
 }
-int core_private_factory_matches(const unsigned char *expected,unsigned n){
+int core_private_calibration_matches(const unsigned char *expected,unsigned n){
     np_private_match=0;
     if(np_ble_diag_state()||display_dma.busy)return 0;
-    np_private_match=np_private_factory_matches(np_factory_read_adapter,0,expected,n);
+    np_private_match=np_private_unit_matches(np_factory_read_adapter,0,expected,n,&np_factory_check);
     return (int)np_private_match;
 }
 /* Fixed read-only status query, never returns calibration payload bytes. */
-extern uint32_t np_ble_rf_status(unsigned);
+extern uint32_t np_ble_rf_status(unsigned),np_ble_runtime_status(unsigned);
+extern void np_ble_private_probe(void);
 static int np_ble_usb(const uint8_t *p,unsigned n){
-    if(n!=4||p[0]!=0x7d||p[1]!='N'||p[2]!='B'||p[3]!=2)return 0;
+    /* Fixed factory region only. Private bytes go to a local paired backup;
+     * radio must be off and display DMA idle. No arbitrary address access. */
+    if(n==5&&p[0]==0x7d&&p[1]=='N'&&p[2]=='B'&&p[3]==4&&p[4]<128){
+        uint8_t chunk=p[4],buffer[64],reply[136]={0xf0,0x7d,'N','B',4,chunk,0};unsigned count=7;
+        if(np_ble_diag_state()||!display_ready())reply[6]=1;
+        else if(np_factory_read_adapter(0,0xc0000u+(uint32_t)chunk*64,buffer,sizeof buffer))reply[6]=2;
+        else for(unsigned i=0;i<sizeof buffer;i++){reply[count++]=buffer[i]&127;reply[count++]=buffer[i]>>7;}
+        reply[count++]=0xf7;ota_wire_send(reply,count);return 1;
+    }
+
+    if(n!=4||p[0]!=0x7d||p[1]!='N'||p[2]!='B'||p[3]!=3)return 0;
     uint32_t values[]={np_ble_diag_state(),np_ble_diag_error(),
         np_ble_rf_status(0),np_ble_rf_status(1),np_ble_rf_status(2),np_ble_rf_status(3),
-        (uint32_t)np_read_result,np_read_count,np_read_off,np_read_size,np_read_sfc,np_read_magic[0],np_read_magic[1],np_private_match};
-    uint8_t response[5+sizeof(values)/sizeof(values[0])*5+1]={0xf0,0x7d,'N','B',2};unsigned k=5;
+        (uint32_t)np_read_result,np_read_count,np_read_off,np_read_size,np_read_sfc,np_read_magic[0],np_read_magic[1],np_private_match,
+        np_factory_check.full_match,np_factory_check.first_difference,np_factory_check.differences,np_factory_check.read_failed,
+        np_ble_runtime_status(0),np_ble_runtime_status(1),np_ble_runtime_status(2),np_ble_runtime_status(3),np_ble_runtime_status(4)};
+    uint8_t response[5+sizeof(values)/sizeof(values[0])*5+1]={0xf0,0x7d,'N','B',3};unsigned k=5;
     for(unsigned i=0;i<sizeof(values)/sizeof(values[0]);i++)for(unsigned j=0;j<5;j++)response[k++]=(values[i]>>(j*7))&127u;
     response[k++]=0xf7;ota_wire_send(response,k);return 1;
 }
@@ -87,6 +101,7 @@ static void np_number(unsigned y,uint32_t n){
     text[count]=0;np_text(y,text);
 }
 static __attribute__((noreturn)) void np_diag_run(void){
+    np_ble_private_probe(); /* read-only boot preflight; radio still requires PLAY */
     uint32_t previous=1,shown=~0u,last_draw=0,start_pending=0; /* require a fresh PLAY press */
     for(;;){
         fm1_wdt_feed();uint32_t now=core_ms();

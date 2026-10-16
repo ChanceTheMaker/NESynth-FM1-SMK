@@ -24,9 +24,11 @@ def main():
     p.add_argument('--rom-capacity',type=int,choices=[262672,393744,524816],default=262672)
     p.add_argument('--peripheral',action='store_true',help='Link the SMK diagnostic GATT profile instead of the reference central')
     p.add_argument('--diagnostic',action='store_true',help='Build local SMK964 radio diagnostic; never flashes or publishes')
-    p.add_argument('--private-calibration-backups',nargs=2,type=Path,help='PRIVATE diagnostic only: paired stock backups; exact live factory-region match required')
+    p.add_argument('--private-calibration-backups',nargs=2,type=Path,help='PRIVATE diagnostic only: paired stock backups; exact validated usrtrim match required')
+    p.add_argument('--private-unit-backups',nargs=2,type=Path,help='Optional paired current 8192-byte factory reads; only after confirming the RF backup belongs to this same unit')
     a=p.parse_args()
     if a.private_calibration_backups and not a.diagnostic:p.error('Private calibration is diagnostic-only')
+    if a.private_unit_backups and not a.private_calibration_backups:p.error('Current unit reference requires private RF backups')
     a.peripheral=a.peripheral or a.diagnostic
     ref=a.reference.resolve();out=ROOT/('build/bluetooth-diagnostic' if a.diagnostic else 'build/bluetooth-peripheral-probe' if a.peripheral else 'build/bluetooth-probe');out.mkdir(parents=True,exist_ok=True)
     (out/'report.json').unlink(missing_ok=True) # A failed run must not leave a success report.
@@ -34,7 +36,7 @@ def main():
     if a.private_calibration_backups:
         extractor=out/'extract-private-rf'
         run(['wsl','-e','cc','-O1','-Wall','-Wextra','-Werror','tools/extract_private_rf.c','experiments/bluetooth/rf_calibration.c','-o',wsl(extractor)])
-        run(['wsl','-e',wsl(extractor),*[wsl(x) for x in a.private_calibration_backups],wsl(out/'private_calibration.h')])
+        run(['wsl','-e',wsl(extractor),*[wsl(x) for x in a.private_calibration_backups],wsl(out/'private_calibration.h'),*[wsl(x) for x in (a.private_unit_backups or [])]])
     head=subprocess.check_output(['git','-C',str(ref),'rev-parse','HEAD'],text=True).strip()
     if head!=PIN:raise ValueError('Hortator revision does not match audited source')
     run(['git','-C',ref,'diff','--exit-code','HEAD','--','firmware','tools/ble_libs.py'])
@@ -90,12 +92,14 @@ static int ble_rf_trim_load(void){
 }
 '''+t[end:]
         if a.private_calibration_backups:
-            t=t.replace('static int np_rf_result;', 'static int np_rf_result;\n#include "private_calibration.h"\nextern int core_private_factory_matches(const unsigned char *,unsigned);')
-            t=t.replace('if(np_rf_result)return 0;', 'if(np_rf_result){\n        if(!core_private_factory_matches(np_private_factory,sizeof np_private_factory)){np_rf_result=-5;return 0;}\n        np_rf=np_private_rf;np_rf_result=0;\n    }')
+            t=t.replace('static int np_rf_result;', 'static int np_rf_result;\n#include "private_calibration.h"\nextern int core_private_calibration_matches(const unsigned char *,unsigned);')
+            t=t.replace('if(np_rf_result)return 0;', 'if(np_rf_result){\n        if(!core_private_calibration_matches(np_private_factory,sizeof np_private_factory)){np_rf_result=-5;return 0;}\n        np_rf=np_private_rf;np_rf_result=0;\n    }')
         t=t.replace('xosc[0] = 0x0B; xosc[1] = 0x0B;','xosc[0] = np_rf.xosc[0]; xosc[1] = np_rf.xosc[1];')
         t=t.replace('memcpy(pa, PA, 7);','memcpy(pa, np_rf.pa, 7);')
         t=t.replace('int cpu_in_irq(void) { return 0; }','int cpu_in_irq(void) { unsigned v; __asm__ volatile("%0 = icfg" : "=r"(v)); return v & 255u; }')
         t=t.replace('int cpu_irq_disabled(void) { return fm1_ble_irq_depth != 0; }','int cpu_irq_disabled(void) { unsigned a,b; __asm__ volatile("%0 = icfg" : "=r"(a)); __asm__ volatile("%0 = icfg" : "=r"(b)); return fm1_ble_irq_depth || ((a & 0x300u) != 0x300u && (b & 0x300u) != 0x300u); }')
+        t+='\nuint32_t np_ble_runtime_status(unsigned i){if(ble_diag.magic!=BLE_DIAG_MAGIC)return 0;return i==0?ble_diag.stage:i==1?ble_diag.trim:i==2?ble_diag.fatal:i==3?ble_diag.heap_high:ble_diag.alloc_fails;}\n'
+        t+='void np_ble_private_probe(void){'+('core_private_calibration_matches(np_private_factory,sizeof np_private_factory);' if a.private_calibration_backups else '')+'}\n'
         q.write_text(t)
     # Only the generated board copy exports the buffer; production source is unchanged.
     board=(ROOT/'firmware/board.c').read_text()+'\nunsigned char *np_ble_probe_workspace(void){return video_source;}\n'
@@ -213,7 +217,7 @@ static int ble_rf_trim_load(void){
                 offset=address-0x2000120;assert offset>=len(data)
                 data.extend(b'\xff'*(offset-len(data)));data.extend(blob)
         assert len(data)==size and len(data)%4==0;binary.write_bytes(data)
-        result.update(private_device_calibration=bool(a.private_calibration_backups),product='SMK-37_964',sha256=hashlib.sha256(data).hexdigest(),hardware_validated=False,
+        result.update(separate_current_unit_reference=bool(a.private_unit_backups),private_device_calibration=bool(a.private_calibration_backups),product='SMK-37_964',sha256=hashlib.sha256(data).hexdigest(),hardware_validated=False,
             baseline_app_bytes=None,ble_added_bytes=None,ram_reach_check=True,application_flash_writers_disabled=True,
             limitations=['Radio starts only after a fresh physical PLAY press','No game playback or cartridge upload in this diagnostic','No hardware test performed; power-cycle before USB restore'])
     (out/'report.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))

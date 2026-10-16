@@ -1,7 +1,7 @@
 {
   "date": "2026-10-16",
   "branch": "feat/bluetooth-loader-prototype",
-  "status": "SMK964 private diagnostic installed; RF startup blocked by existing Melodee storage and failed full factory-region match",
+  "status": "Current-unit private diagnostic installed; automatic factory preflight passes; awaiting physical PLAY and Bluetooth verification",
   "build": {
     "kind": "SMK964 diagnostic candidate",
     "reference": "7e3415971c5800b4a3ad0146a7d95615883d7d96",
@@ -9,12 +9,12 @@
     "bluetooth_role": "diagnostic peripheral, RAM echo only",
     "flash_writes": false,
     "radio_started": false,
-    "app_bytes": 151068,
+    "app_bytes": 151704,
     "app_limit": 581564,
-    "app_free": 430496,
+    "app_free": 429860,
     "baseline_app_bytes": null,
     "ble_added_bytes": null,
-    "ram_bytes": 12268,
+    "ram_bytes": 12300,
     "ram_limit": 73728,
     "pool_and_cpu1_stacks_bytes": 177632,
     "pool_limit": 368640,
@@ -40,11 +40,12 @@
     "limitations": [
       "Radio starts only after a fresh physical PLAY press",
       "No game playback or cartridge upload in this diagnostic",
-      "Installed and USB verified; saved RF fallback refused because the full factory-region comparison failed; radio never started"
+      "No hardware test performed; power-cycle before USB restore"
     ],
+    "separate_current_unit_reference": true,
     "private_device_calibration": true,
     "product": "SMK-37_964",
-    "sha256": "cb26894ac74876b435c4b611b768726c4565729716a960eec6f476119705fc32",
+    "sha256": "74b8dc9473f35c4d83e23e60e7d0e4508dde09a9512546ac9c01a0bae5073899",
     "hardware_validated": false,
     "ram_reach_check": true,
     "application_flash_writers_disabled": true
@@ -53,9 +54,9 @@
     "product": "SMK-37_964",
     "model": "SMK-37 Pro",
     "private_device_calibration": true,
-    "app_sha256": "cb26894ac74876b435c4b611b768726c4565729716a960eec6f476119705fc32",
-    "fwsc_sha256": "1cb9de3b7d5563cd34e04418ad93114ec1671565c2de9e71f43811188b6423f7",
-    "update_sha256": "2fbdcf9e6e71e7d53898a642b7e34a404e9ed3dfe3f6f6528d6744e71e30419e",
+    "app_sha256": "74b8dc9473f35c4d83e23e60e7d0e4508dde09a9512546ac9c01a0bae5073899",
+    "fwsc_sha256": "1cd6759d5338f48597213b530f2866b45ef1cf7b1167a103c59b763932ed97e2",
+    "update_sha256": "4ac633425d05f659432ce23d257606cd33a213e32b72ab4210b3babbaa5646c0",
     "hardware_validated": false,
     "flashed": true
   },
@@ -91,7 +92,65 @@
       "parser_result": -1,
       "explanation": "Melodee ms_sector uses 0x9d000..0xbffff for object storage; 0xc0000..0xc1fff remains protected",
       "vm_restored": false
-    }
+    },
+    "private_match_policy": "Validate and exactly match all 556 usrtrim bytes at 0xc1000, as used by smk37_update_core and Melodee ms_unit; compare the surrounding 8192 bytes separately for diagnostics",
+    "current_factory_reads": {
+      "identity": "SMK-37_964",
+      "read_only": true,
+      "radio_started": false,
+      "offset": "0xc0000",
+      "bytes": 8192,
+      "paired_reads_match": true,
+      "sha256": "f1fa887ca44d2741ffaa485bbf4d1f664d90ce658470e785369016eb9cd01824"
+    },
+    "current_factory_difference_metadata": {
+      "changed_bytes": 22,
+      "offsets": [
+        "0xc0000",
+        "0xc0005",
+        "0xc0006",
+        "0xc0007",
+        "0xc0008",
+        "0xc0009",
+        "0xc1008",
+        "0xc1012",
+        "0xc101c",
+        "0xc1026",
+        "0xc1030",
+        "0xc103a",
+        "0xc1044",
+        "0xc104e",
+        "0xc1058",
+        "0xc1062",
+        "0xc106c",
+        "0xc1076",
+        "0xc1080",
+        "0xc108a",
+        "0xc1094",
+        "0xc109e"
+      ],
+      "usrtrim_changed_offsets": [
+        "0x8",
+        "0x12",
+        "0x1c",
+        "0x26",
+        "0x30",
+        "0x3a",
+        "0x44",
+        "0x4e",
+        "0x58",
+        "0x62",
+        "0x6c",
+        "0x76",
+        "0x80",
+        "0x8a",
+        "0x94",
+        "0x9e"
+      ],
+      "key_curve_bytes_changed": 0,
+      "marker_bytes_changed": 0
+    },
+    "current_reference_basis": "Owner explicitly confirmed same SMK Pro. RF source remains paired stock full backups; unit guard is paired current factory reads. No VM or factory writes."
   },
   "checks": [
     "RF reader ASan/UBSan: stale copies, ambiguous banks, outer/inner CRC, failed reads and missing records",
@@ -101,7 +160,8 @@
     "Package: pinned Pro stock validation, exact app round-trip and protected boot",
     "Actual diagnostic update packet through C RAM-loader simulator: 152 changed sectors, saved tail preserved",
     "ASan/UBSan exact 8192-byte factory match: mismatches across region, last byte, failed reads, invalid size and null inputs",
-    "USB status decoder: signed errors, malformed packet and uint32 overflow"
+    "USB status decoder: signed errors, malformed packet and uint32 overflow",
+    "ASan/UBSan: every possible single-byte change across 8192 bytes; all usrtrim changes reject, surrounding changes reported; invalid trim, read errors and bounds reject"
   ],
   "hardware": {
     "usb_identity_before": "SMK-37_963",
@@ -154,11 +214,37 @@
       "ble_scan_matches": 0,
       "radio_started": false,
       "echo_verified": false
-    }
+    },
+    "current_unit_preflight": {
+      "identity": "SMK-37_964",
+      "state": 0,
+      "error": 0,
+      "rf_result": 0,
+      "rf_bank": 0,
+      "rf_record": 0,
+      "rf_records": 0,
+      "read_result": 0,
+      "read_count": 0,
+      "read_offset": 0,
+      "read_size": 0,
+      "sfc_con": 0,
+      "bank0_header": 0,
+      "bank1_header": 0,
+      "private_unit_match": 1,
+      "private_full_match": 1,
+      "private_first_difference": 4294967295,
+      "private_differences": 0,
+      "private_read_failed": 0,
+      "sdk_stage": 0,
+      "sdk_trim": 0,
+      "sdk_fatal": 0,
+      "sdk_heap_high": 0,
+      "sdk_alloc_fails": 0
+    },
+    "current_unit_diagnostic_installed": true
   },
   "remaining": [
-    "Reconcile backup identity and changed factory-region bytes before accepting saved RF calibration",
-    "Radio startup and Bluetooth echo test",
+    "Physical PLAY, radio startup and Bluetooth echo test",
     "Power-cycle and USB restoration trial",
     "Persistent game storage, transfer service, browser/front loader and gameplay reboot"
   ],
@@ -188,6 +274,17 @@
         "bank0_header": 4294967295,
         "bank1_header": 844125005
       }
+    },
+    {
+      "app_sha256": "cb26894ac74876b435c4b611b768726c4565729716a960eec6f476119705fc32",
+      "package_sha256": "2fbdcf9e6e71e7d53898a642b7e34a404e9ed3dfe3f6f6528d6744e71e30419e",
+      "result": "Private diagnostic refused full 8192-byte match; radio remained off. This comparison included bytes outside the established unit fingerprint."
+    },
+    {
+      "app_sha256": "34250321950757c90b3785c97ead166458467f08994762f42ef203c4fecf6b91",
+      "package_sha256": "c25a24f96bdcd3f15ef87c2cf275f25a41256b75d2b406fa11de0baa141151b8",
+      "result": "Read-only preflight: 22 factory bytes differed, including 16 usrtrim bytes; no radio started"
     }
-  ]
+  ],
+  "owner_confirmation": "Owner confirmed this is the same SMK-37 Pro used for the stock backup and Melodee tests"
 }

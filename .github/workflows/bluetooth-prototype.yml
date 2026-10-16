@@ -10,6 +10,8 @@ on:
       - 'tools/package_bluetooth_diagnostic.mjs'
       - 'tools/test_bluetooth_diagnostic.py'
       - 'tools/inspect_bluetooth_diagnostic.py'
+      - 'tools/backup_bluetooth_factory.py'
+      - 'tests/bluetooth_factory.py'
       - 'tools/extract_private_rf.c'
       - 'tests/private_calibration_guard.c'
       - 'tests/bluetooth_status.py'
@@ -34,7 +36,9 @@ jobs:
       - name: Validate read-only calibration inspector
         run: python3 tests/ble_calibration.py
       - name: Validate read-only Bluetooth status decoder
-        run: python3 tests/bluetooth_status.py
+        run: |
+          python3 tests/bluetooth_status.py
+          python3 tests/bluetooth_factory.py
       - name: Validate private calibration device match
         run: |
           cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/private_calibration_guard.c -o build/private-calibration-guard-test

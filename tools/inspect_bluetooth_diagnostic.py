@@ -4,8 +4,8 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT/'build/python-deps'),str(ROOT/'vendor/felucca/tools')]
 import fm1_install as wire
-FIELDS=['state','error','rf_result','rf_bank','rf_record','rf_records','read_result','read_count','read_offset','read_size','sfc_con','bank0_header','bank1_header','private_factory_match']
-PREFIX=bytes([0xf0,0x7d,ord('N'),ord('B'),2])
+FIELDS=['state','error','rf_result','rf_bank','rf_record','rf_records','read_result','read_count','read_offset','read_size','sfc_con','bank0_header','bank1_header','private_unit_match','private_full_match','private_first_difference','private_differences','private_read_failed','sdk_stage','sdk_trim','sdk_fatal','sdk_heap_high','sdk_alloc_fails']
+PREFIX=bytes([0xf0,0x7d,ord('N'),ord('B'),3])
 
 def decode(packet):
     if len(packet)!=6+5*len(FIELDS) or packet[:5]!=PREFIX or packet[-1]!=0xf7 or any(b>127 for b in packet[5:-1]):
