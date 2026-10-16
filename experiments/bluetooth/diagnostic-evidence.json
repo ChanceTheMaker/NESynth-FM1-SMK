@@ -1,14 +1,14 @@
 {
   "date": "2026-10-16",
   "branch": "feat/bluetooth-loader-prototype",
-  "status": "Current-unit private diagnostic installed; automatic factory preflight passes; awaiting physical PLAY and Bluetooth verification",
+  "status": "Hardware verified: private SMK Pro diagnostic advertises, connects, echoes eight RAM bytes and re-advertises after disconnect",
   "build": {
     "kind": "SMK964 diagnostic candidate",
     "reference": "7e3415971c5800b4a3ad0146a7d95615883d7d96",
     "rom_capacity": 0,
     "bluetooth_role": "diagnostic peripheral, RAM echo only",
     "flash_writes": false,
-    "radio_started": false,
+    "radio_started": true,
     "app_bytes": 151704,
     "app_limit": 581564,
     "app_free": 429860,
@@ -40,7 +40,7 @@
     "limitations": [
       "Radio starts only after a fresh physical PLAY press",
       "No game playback or cartridge upload in this diagnostic",
-      "No hardware test performed; power-cycle before USB restore"
+      "Radio startup, connection and RAM echo verified on the owner-confirmed SMK Pro; game upload and post-radio USB restoration trial remain untested"
     ],
     "separate_current_unit_reference": true,
     "private_device_calibration": true,
@@ -176,8 +176,8 @@
     "audio_irqs": 0,
     "lcd_timeouts": 0,
     "lcd_failed": 0,
-    "radio_started": false,
-    "echo_verified": false,
+    "radio_started": true,
+    "echo_verified": true,
     "transport_note": "Windows MIDI host process exited during USB re-enumeration. Waiting RAM loader identity verified before programming; separate read-only diagnostic confirmed SMK-37_964 after completed transfer.",
     "physical_play_pressed": true,
     "lcd_state": "RADIO ERROR",
@@ -241,12 +241,49 @@
       "sdk_heap_high": 0,
       "sdk_alloc_fails": 0
     },
-    "current_unit_diagnostic_installed": true
+    "current_unit_diagnostic_installed": true,
+    "latest_status": {
+      "identity": "SMK-37_964",
+      "state": 3,
+      "error": 0,
+      "rf_result": 0,
+      "rf_bank": 643072,
+      "rf_record": 643093,
+      "rf_records": 14,
+      "read_result": 0,
+      "read_count": 2,
+      "read_offset": 708608,
+      "read_size": 4,
+      "sfc_con": 2157446069,
+      "bank0_header": 4294967295,
+      "bank1_header": 844125005,
+      "private_unit_match": 1,
+      "private_full_match": 1,
+      "private_first_difference": 4294967295,
+      "private_differences": 0,
+      "private_read_failed": 0,
+      "sdk_stage": 7,
+      "sdk_trim": 0,
+      "sdk_fatal": 0,
+      "sdk_heap_high": 7136,
+      "sdk_alloc_fails": 0
+    },
+    "echo_test": {
+      "device": "NESynth SMK Test",
+      "connected": true,
+      "echo_verified": true,
+      "flash_writes": false,
+      "disconnected": true
+    },
+    "echo_client": "Windows Bleak 3.0.2; tools/test_bluetooth_diagnostic.py --timeout 15",
+    "peak_heap_after_echo": 7136,
+    "allocation_failures_after_echo": 0,
+    "sdk_fatal_after_echo": 0
   },
   "remaining": [
-    "Physical PLAY, radio startup and Bluetooth echo test",
-    "Power-cycle and USB restoration trial",
-    "Persistent game storage, transfer service, browser/front loader and gameplay reboot"
+    "Post-radio power-cycle and USB restoration trial",
+    "Persistent game storage, transfer service, browser/front loader and gameplay reboot",
+    "Longer Bluetooth stability and transfer-throughput tests"
   ],
   "attempts": [
     {
@@ -286,5 +323,17 @@
       "result": "Read-only preflight: 22 factory bytes differed, including 16 usrtrim bytes; no radio started"
     }
   ],
-  "owner_confirmation": "Owner confirmed this is the same SMK-37 Pro used for the stock backup and Melodee tests"
+  "owner_confirmation": "Owner confirmed this is the same SMK-37 Pro used for the stock backup and Melodee tests",
+  "hardware_test_scope": [
+    "USB application installation and restart",
+    "Exact current factory/usrtrim preflight",
+    "SDK controller stage 7",
+    "BLE advertising, connection, eight-byte nonce echo and count increment",
+    "Disconnect followed by advertising again; USB status remains responsive"
+  ],
+  "ci": {
+    "commit": "1b8e8f92c7aaddefb14864d80a85a8a5ccfab52a",
+    "result": "success",
+    "url": "https://github.com/ChanceTheMaker/NESynth-FM1-SMK/actions/runs/38928304779"
+  }
 }

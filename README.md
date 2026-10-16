@@ -222,7 +222,11 @@ transfer throughput, task-stack sufficiency or gameplay performance on hardware.
 not a game-playing release. `--peripheral` instead measures NESynth plus this GATT
 profile with inert hooks. Default invocation remains the original central fit probe.
 [Diagnostic evidence](experiments/bluetooth/diagnostic-evidence.json) records the
-local build, calibration selection and tests. The public site remains SMK963.
+local build, calibration selection and tests. The public site remains SMK963. The owner's
+private candidate passed hardware advertising, connection, an eight-byte RAM
+echo with count increment, and re-advertising after disconnect on 2026-10-16.
+The controller reached stage 7 with no fatal or allocation errors. Game upload,
+longer stability testing and post-radio USB restoration are still pending.
 
 The validated Pro016 flash directory places VM at `0x9d000` with length `0x23000`.
 The pinned SDK `cfg_tool.a` caps sector-aligned VM at 128 KiB and divides it into
