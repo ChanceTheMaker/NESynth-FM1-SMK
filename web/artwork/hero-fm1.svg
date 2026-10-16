@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="25 45 590 350" role="img" aria-label="FM-1 NESynth illustration with homebrew gameplay">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="25 45 590 350" role="img" aria-label="FM-1 NESynth illustration with illuminated NES controls and homebrew gameplay">
 <style>
 .hero-product{color:#cdd7d4}.product-body{fill:#343b43;stroke:#687887}.product-rubber{fill:#263b40;stroke:#1118}.product-button{fill:var(--button-fill,#82aaa5);stroke:#182b30}.product-detail{opacity:.25}.product-bezel{fill:#0a111b;stroke:#000}.product-screen{fill:#090d19;stroke:#566b73}.product-labels{font-family:Arial,sans-serif;letter-spacing:.3px}.product-control-ink{color:#173631}
 </style><title id="fm1-wire-title" data-i18n="ui.wireTitle">FM-1 synthesizer wireframe</title>
@@ -38,27 +38,27 @@
 <rect class="product-button" x="382" y="185" width="29" height="27" rx="5" />
 <rect class="product-button" x="418" y="185" width="29" height="27" rx="5" />
 <rect class="product-button" x="454" y="185" width="29" height="27" rx="5" />
-<rect class="product-button" x="490" y="185" width="29" height="27" rx="5" />
-<rect class="product-button" x="526" y="185" width="29" height="27" rx="5" />
-<use class="product-control-ink" href="#fm1-product-key" x="68" y="302" />
-<use class="product-control-ink" href="#fm1-product-key" x="100" y="302" />
-<use class="product-control-ink" href="#fm1-product-key" x="132" y="302" />
-<use class="product-control-ink" href="#fm1-product-key" x="164" y="302" />
-<use class="product-control-ink" href="#fm1-product-key" x="196" y="302" />
+<rect class="product-button" x="490" y="185" width="29" height="27" rx="5" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
+<rect class="product-button" x="526" y="185" width="29" height="27" rx="5" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
+<use class="product-control-ink" href="#fm1-product-key" x="68" y="302" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
+<use class="product-control-ink" href="#fm1-product-key" x="100" y="302" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
+<use class="product-control-ink" href="#fm1-product-key" x="132" y="302" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
+<use class="product-control-ink" href="#fm1-product-key" x="164" y="302" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
+<use class="product-control-ink" href="#fm1-product-key" x="196" y="302" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
 <use class="product-control-ink" href="#fm1-product-key" x="228" y="302" />
-<use class="product-control-ink" href="#fm1-product-key" x="260" y="302" />
-<use class="product-control-ink" href="#fm1-product-key" x="292" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="260" y="302" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
+<use class="product-control-ink" href="#fm1-product-key" x="292" y="302" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
 <use class="product-control-ink" href="#fm1-product-key" x="324" y="302" />
 <use class="product-control-ink" href="#fm1-product-key" x="356" y="302" />
 <use class="product-control-ink" href="#fm1-product-key" x="388" y="302" />
 <use class="product-control-ink" href="#fm1-product-key" x="420" y="302" />
 <use class="product-control-ink" href="#fm1-product-key" x="452" y="302" />
 <use class="product-control-ink" href="#fm1-product-key" x="484" y="302" />
-<use class="product-control-ink" href="#fm1-product-key" x="516" y="302" />
-<use class="product-control-ink" href="#fm1-product-key" x="548" y="302" />
+<use class="product-control-ink" href="#fm1-product-key" x="516" y="302" style="--button-fill:#ef493c;fill:#ef493c;filter:drop-shadow(0 0 4px #ff6752)" />
+<use class="product-control-ink" href="#fm1-product-key" x="548" y="302" style="--button-fill:#ef493c;fill:#ef493c;filter:drop-shadow(0 0 4px #ff6752)" />
 <use class="product-control-ink" href="#fm1-product-key" x="84" y="248" />
-<use class="product-control-ink" href="#fm1-product-key" x="116" y="248" />
-<use class="product-control-ink" href="#fm1-product-key" x="148" y="248" />
+<use class="product-control-ink" href="#fm1-product-key" x="116" y="248" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
+<use class="product-control-ink" href="#fm1-product-key" x="148" y="248" style="--button-fill:#dbbba0;fill:#dbbba0;filter:drop-shadow(0 0 4px #ffd2a0)" />
 <use class="product-control-ink" href="#fm1-product-key" x="212" y="248" />
 <use class="product-control-ink" href="#fm1-product-key" x="244" y="248" />
 <use class="product-control-ink" href="#fm1-product-key" x="308" y="248" />
