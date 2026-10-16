@@ -2,8 +2,11 @@
 /* Included only in the generated SMK diagnostic board translation unit. */
 #include "fm1_guard.h"
 #include "fm1_ble_hal.h"
+#ifndef FL_RANGE_OK
 #define FL_RANGE_OK(off,n) 0 /* Application flash erase/program always refuse. */
+#endif
 #include "fm1_flash.h"
+extern unsigned char *np_ble_probe_workspace(void);
 extern void np_ble_diag_start(void),np_ble_diag_service(void);
 extern uint32_t np_ble_diag_state(void),np_ble_diag_error(void),np_ble_diag_writes(void);
 uint32_t core_ms(void){return ota_now_ms();}
@@ -17,7 +20,7 @@ void core_irq_attach(uint32_t n,void(*h)(void),uint32_t priority){
 void core_irq_mask(uint32_t n){if(n<128)fm1_irq_mask(n);}
 void core_irq_unmask(uint32_t n){if(n<128)fm1_irq_unmask(n);}
 uint32_t core_irq_is_masked(uint32_t n){return n<128?fm1_irq_is_masked(n):1;}
-void core_ble_stack_window(void){fm1_guard_stack_window((uint32_t)(uintptr_t)video_source,(uint32_t)(uintptr_t)_sstack_top);}
+void core_ble_stack_window(void){fm1_guard_stack_window((uint32_t)(uintptr_t)np_ble_probe_workspace(),(uint32_t)(uintptr_t)_sstack_top);}
 static uint32_t np_read_count,np_read_off,np_read_size,np_read_sfc,np_read_magic[2];
 static int np_read_result;
 static uint32_t np_private_match;
@@ -50,6 +53,9 @@ int core_private_calibration_matches(const unsigned char *expected,unsigned n){
 extern uint32_t np_ble_rf_status(unsigned),np_ble_runtime_status(unsigned);
 extern void np_ble_private_probe(void);
 static int np_ble_usb(const uint8_t *p,unsigned n){
+#ifdef NP_BLUETOOTH_LOADER
+    if(np_loader_usb(p,n))return 1;
+#endif
     /* Fixed factory region only. Private bytes go to a local paired backup;
      * radio must be off and display DMA idle. No arbitrary address access. */
     if(n==5&&p[0]==0x7d&&p[1]=='N'&&p[2]=='B'&&p[3]==4&&p[4]<128){

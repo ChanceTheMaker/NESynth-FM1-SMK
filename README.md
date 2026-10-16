@@ -6,6 +6,25 @@ The prototype fits the existing FM-1 memory map. The website plays NES/ZIP cartr
 
 Live site: **https://chancethemaker.github.io/NESynth-FM1-SMK/**
 
+## Bluetooth game loading (SMK-37 Pro, branch build 965)
+
+**Hardware verified on the owner's SMK-37 Pro (2026-10-16):** Super Mario Bros. transferred over BLE in 62.2 seconds, passed the persistent length/CRC check after restart, and ran at 60.1 emulated frames/sec with CPU1 active, no new audio underruns and no display timeouts. See `experiments/bluetooth/smk965-hardware.json` for scope and remaining checks.
+
+SMK965 combines the NES player with a Bluetooth cartridge loader. Hold **PLAY + REC** for two seconds to open loading, open `web/bluetooth.html` in Chrome or Edge through a localhost web server, connect **NESynth SMK**, and drop a `.nes` or `.zip` game. **Send and play** transfers and verifies it, restarts the SMK to install it with the radio off, and boots the game. Fader 1 and the existing GameDude-style game controls are retained. Bluetooth closes during gameplay. One cartridge up to **262,672 bytes** is stored persistently; save RAM remains volatile. USB firmware replacement clears that cartridge slot.
+
+```powershell
+python tools/build_bluetooth_probe.py --loader
+node tools/package_bluetooth_loader.mjs
+python -m http.server 8766 --bind 127.0.0.1 --directory web
+# Open http://127.0.0.1:8766/bluetooth.html
+```
+
+The build requires the pinned local Hortator/AC79 dependencies described below. This owner's unit also needs the already-verified private calibration backup options; `--loader` accepts the same `--private-calibration-backups` and `--private-unit-backups` pairs as the diagnostic. These local artifacts stay under ignored `build/bluetooth-loader/`; **PRIVATE firmware must not be published**. The generated `.fwsc`/`.smkupdate` are separate from the public SMK963 website installer.
+
+For local verification, `tools/upload_bluetooth_game.py GAME.zip` sends the game over Bluetooth, and `tools/inspect_bluetooth_loader.py` checks the installed cartridge's length/CRC over USB. `--open-loader` enters loading from the player. A successful transfer ACK is followed by separate persistent-storage and gameplay checks. The browser uploader preserves the existing bounded ZIP extraction and exact legacy-header repairs.
+
+The loader reuses inactive gameplay RAM, verifies the entire cartridge, then resets the controller before touching flash. After reset it checks the retained cartridge again; failed retention leaves the old game untouched. Writes are confined to `0x5b000..0x9cfff`, read back, and published through metadata written last. Boot code, VM/music storage and the factory region are outside this range. USB recovery from an active radio resets directly into the RAM updater. The build checks code/slot boundaries and RAM-only flash reach; tests inject every flash I/O interruption and readback corruption.
+
 ## Try it
 
 ```powershell
@@ -280,8 +299,8 @@ byte, the same record the SMK updater and Melodee use as the unit fingerprint.
 A mismatch or failed read refuses the saved RF data. The surrounding 8 KiB is
 compared separately to report changed-sector offsets without exposing bytes. This does not restore or write VM/music storage. Packages are prefixed
 `PRIVATE-`; neither the generated header nor firmware may be committed or
-published. This fallback is diagnostic-only and is not a general cartridge
-loader or calibration migration. When the owner confirms the stock RF backup belongs
+published. This fallback is device-specific, available to the diagnostic and SMK965
+loader, and is not a calibration migration. When the owner confirms the stock RF backup belongs
 to this same unit but its current factory data has changed, two current private
 reads can be collected with `tools/backup_bluetooth_factory.py --output-dir
 build/bluetooth-diagnostic/live-factory` while the radio is off. Optional
@@ -299,8 +318,9 @@ eight-byte nonce and checks its echo and counter before disconnecting. Service U
 **Power-cycle before USB restoration and leave PLAY untouched.** A USB update
 request after Bluetooth starts reboots to radio-off mode; retry the update after
 that reboot. This avoids running the RAM updater while controller tasks/IRQs remain
-active. Host tests and the target build pass, but radio startup, physical recovery,
-Bluetooth connectivity and echo throughput have not yet been validated on the SMK.
+active. The SMK964 diagnostic was physically installed and its radio startup, Bluetooth
+connection, RAM echo and re-advertising were verified on this SMK Pro; this
+section describes the earlier diagnostic, separate from the integrated SMK965 build above.
 
 Improve LCD refresh and broader game/audio compatibility, and validate physical SMK37 installation, playback and recovery before promoting its experimental installer to a hardware-validated release. More mapper support needs separate compatibility work. The original diagnostic is the included NES cartridge; GameDude's Game Boy homebrew games are not NES-compatible.
 

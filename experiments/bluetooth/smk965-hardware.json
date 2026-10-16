@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-16",
+  "board": "SMK-37 Pro",
+  "product": "SMK-37_965",
+  "scope": "Owner-confirmed same unit, private RF calibration; not a public firmware artifact",
+  "app_sha256": "268c0fad21c32279475a5a1bcc513a72fc7adb37aeaba93c4c0bbbca7a8f78c5",
+  "update_sha256": "b3a94d8e5653a6991a6da896d0d58cd8e3321495199a0610a486067fa01c39c7",
+  "app_bytes": 210956,
+  "ram_code_bytes": 22016,
+  "rom_capacity": 262672,
+  "bluetooth": {
+    "name": "NESynth SMK",
+    "service": "f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7f0",
+    "att_payload_bytes": 244,
+    "rom_data_per_write": 239,
+    "test_cartridge": "Super Mario Bros. (JU)",
+    "bytes": 40976,
+    "crc32": "3337ec46",
+    "transfer_seconds": 62.2,
+    "verified_before_reboot": true,
+    "installed_length_crc_verified_after_reboot": true
+  },
+  "gameplay": {
+    "rates": {
+      "emulation_fps": 60.115606936416185,
+      "display_fps": 19.653179190751445,
+      "cpu1_jobs_per_second": 19.983484723369116,
+      "audio_underruns_per_second": 0.0
+    },
+    "cpu1_online": 1,
+    "cpu1_faults": 0,
+    "cpu1_fallbacks": 0,
+    "lcd_timeouts": 0,
+    "lcd_failed": 0,
+    "core_error": 0,
+    "audio_underruns_at_boot": 3,
+    "new_audio_underruns_during_measurement": 0
+  },
+  "recovery": "Game-to-loader and active-radio-to-USB RAM-loader transitions exercised during SMK965 integration; final build also stops CPU1 cleanly instead of latching its fault guard",
+  "tests": [
+    "Target link and RAM reach",
+    "SMK package round-trip and protected-tail loader simulation",
+    "ASan/UBSan emulator and bounded ROM receiver",
+    "Actual flash publication fault injection at every I/O operation, readback corruption, and maximum capacity",
+    "ZIP/header normalization and archive checks",
+    "Uploader JS syntax and local HTTP endpoint"
+  ],
+  "limits": [
+    "Physical power-cycle and full-capacity radio transfer not tested this turn",
+    "Browser Bluetooth chooser/transfer not hardware-tested; CLI uses the same GATT wire protocol",
+    "One cartridge, 262672 bytes maximum",
+    "Radio active only in loader mode",
+    "Battery save RAM remains volatile",
+    "Private calibrated binary stays local"
+  ]
+}

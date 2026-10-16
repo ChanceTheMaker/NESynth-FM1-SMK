@@ -11,6 +11,7 @@ extern "C" {
 enum { GP_A=1, GP_B=2, GP_SELECT=4, GP_START=8, GP_RIGHT=16, GP_LEFT=32, GP_UP=64, GP_DOWN=128 };
 enum { GP_OK=0, GP_SHORT=1, GP_FORMAT=2, GP_ROM_SIZE=3, GP_RAM_SIZE=4,
        GP_REGION=5, GP_MAPPER=6, GP_CPU=7, GP_TIMEOUT=8 };
+int np_validate_rom(const uint8_t*,uint32_t);
 int gp_load(const uint8_t*,uint32_t);
 int gp_frame(void);
 void gp_buttons(uint32_t);

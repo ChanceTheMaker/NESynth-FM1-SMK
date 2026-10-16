@@ -33,6 +33,7 @@ jobs:
           mkdir -p build
           cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/rom_transfer.c experiments/bluetooth/rom_transfer.c -o build/rom-transfer-test
           ./build/rom-transfer-test
+          python3 tests/bluetooth_storage.py
       - name: Validate read-only calibration inspector
         run: python3 tests/ble_calibration.py
       - name: Validate read-only Bluetooth status decoder

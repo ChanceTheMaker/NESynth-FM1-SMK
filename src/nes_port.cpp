@@ -46,30 +46,34 @@ uint32_t np_rom_size(const volatile uint8_t *r,uint32_t capacity){
     return n<=capacity?n:0;
 }
 static uint32_t hash_save(){uint32_t h=2166136261u;for(unsigned i=0;i<8192;i++)h=(h^SRAM[i])*16777619u;return h;}
-int gp_load(const uint8_t *r,uint32_t n){
-    ready=0;error=0;paused=0;frames=0;write_pos=read_pos=0;buttons=0;cart=0;np_skip_pixels=0;video_frame=0;
-    if(!r||n<16)return error=GP_SHORT;
-    if(r[0]!='N'||r[1]!='E'||r[2]!='S'||r[3]!=0x1a)return error=GP_FORMAT;
-    if((r[7]&15)!=0)return error=GP_FORMAT; // iNES 1.0, standard NES only
+int np_validate_rom(const uint8_t *r,uint32_t n){
+    if(!r||n<16)return GP_SHORT;
+    if(r[0]!='N'||r[1]!='E'||r[2]!='S'||r[3]!=0x1a)return GP_FORMAT;
+    if((r[7]&15)!=0)return GP_FORMAT; // iNES 1.0, standard NES only
     unsigned mapper=(r[6]>>4)|(r[7]&0xf0);
-    if(mapper>4&&mapper!=9&&mapper!=11)return error=GP_MAPPER;
-    if(r[9]&1)return error=GP_REGION;
-    if(r[8]>1)return error=GP_RAM_SIZE;
-    for(unsigned i=10;i<16;i++)if(r[i])return error=GP_FORMAT;
-    if(np_rom_size(r,n)!=n)return error=GP_ROM_SIZE;
-    if(mapper==0&&((r[4]!=1&&r[4]!=2)||r[5]>1))return error=GP_ROM_SIZE;
-    if(mapper==2&&(r[4]<2||r[4]>16||(r[4]&(r[4]-1))||r[5]||(r[6]&8)))return error=GP_ROM_SIZE;
-    if(mapper==3&&((r[4]!=1&&r[4]!=2)||!r[5]||r[5]>4||(r[5]&(r[5]-1))||(r[6]&8)))return error=GP_ROM_SIZE;
-    if(mapper==4&&(r[4]<2||r[4]>32||(r[4]&(r[4]-1))||r[5]>32||(r[5]&&(r[5]&(r[5]-1)))))return error=GP_ROM_SIZE;
-    if(mapper==11&&(r[4]<2||r[4]>8||(r[4]&(r[4]-1))||!r[5]||r[5]>16||(r[5]&(r[5]-1))||(r[6]&8)))return error=GP_ROM_SIZE;
+    if(mapper>4&&mapper!=9&&mapper!=11)return GP_MAPPER;
+    if(r[9]&1)return GP_REGION;
+    if(r[8]>1)return GP_RAM_SIZE;
+    for(unsigned i=10;i<16;i++)if(r[i])return GP_FORMAT;
+    if(np_rom_size(r,n)!=n)return GP_ROM_SIZE;
+    if(mapper==0&&((r[4]!=1&&r[4]!=2)||r[5]>1))return GP_ROM_SIZE;
+    if(mapper==2&&(r[4]<2||r[4]>16||(r[4]&(r[4]-1))||r[5]||(r[6]&8)))return GP_ROM_SIZE;
+    if(mapper==3&&((r[4]!=1&&r[4]!=2)||!r[5]||r[5]>4||(r[5]&(r[5]-1))||(r[6]&8)))return GP_ROM_SIZE;
+    if(mapper==4&&(r[4]<2||r[4]>32||(r[4]&(r[4]-1))||r[5]>32||(r[5]&&(r[5]&(r[5]-1)))))return GP_ROM_SIZE;
+    if(mapper==11&&(r[4]<2||r[4]>8||(r[4]&(r[4]-1))||!r[5]||r[5]>16||(r[5]&(r[5]-1))||(r[6]&8)))return GP_ROM_SIZE;
     if(mapper==1){
-        if(!r[4]||r[4]>16||(r[4]&(r[4]-1))||r[5]>16||(r[5]&&(r[5]&(r[5]-1)))||(r[6]&8))return error=GP_ROM_SIZE;
+        if(!r[4]||r[4]>16||(r[4]&(r[4]-1))||r[5]>16||(r[5]&&(r[5]&(r[5]-1)))||(r[6]&8))return GP_ROM_SIZE;
     }
     // MMC2: up to 128 KiB PRG + 128 KiB CHR ROM; no CHR RAM/four-screen boards.
     if(mapper==9){
-        if(r[4]<2||r[4]>8||(r[4]&(r[4]-1))||!r[5]||r[5]>16||(r[5]&(r[5]-1)))return error=GP_ROM_SIZE;
-        if(r[6]&8)return error=GP_FORMAT;
+        if(r[4]<2||r[4]>8||(r[4]&(r[4]-1))||!r[5]||r[5]>16||(r[5]&(r[5]-1)))return GP_ROM_SIZE;
+        if(r[6]&8)return GP_FORMAT;
     }
+    return 0;
+}
+int gp_load(const uint8_t *r,uint32_t n){
+    ready=0;error=0;paused=0;frames=0;write_pos=read_pos=0;buttons=0;cart=0;np_skip_pixels=0;video_frame=0;
+    if((error=np_validate_rom(r,n)))return error;
     cart=r;cart_size=n;memcpy(&NesHeader,r,16);
     memset(SRAM,0,8192);if(r[6]&4)memcpy(SRAM+0x1000,r+16,512);
     ROM=(BYTE*)(r+16+((r[6]&4)?512:0));VROM=ROM+r[4]*16384u;

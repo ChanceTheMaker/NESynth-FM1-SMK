@@ -7,7 +7,7 @@ enum { NP_RX_OK=0, NP_RX_STATE=-1, NP_RX_RANGE=-2, NP_RX_CRC=-3, NP_RX_IO=-4, NP
 /* Offsets are relative to a cartridge slot, never physical flash addresses.
  * Backend owns staging and persistent validity. begin must invalidate staging
  * before changing bytes. publish must expose only a completely checked image.
- * This prototype has no flash backend or USB/BLE wire adapter. */
+ * loader_board.h provides the exclusive-mode BLE/RAM/flash backend. */
 typedef struct {
     void *ctx;
     int (*begin)(void *,uint32_t);
