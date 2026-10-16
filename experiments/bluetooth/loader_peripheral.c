@@ -10,6 +10,9 @@ extern unsigned np_loader_read(uint16_t,uint8_t *,uint16_t);
 extern void att_server_init(const uint8_t *,uint16_t (*)(uint16_t,uint16_t,uint16_t,uint8_t *,uint16_t),int (*)(uint16_t,uint16_t,uint16_t,uint16_t,uint8_t *,uint16_t));
 extern void att_server_register_packet_handler(btstack_packet_handler_t);
 extern void sm_set_request_security(int);
+#ifdef NP_LOADER_FM1
+extern void bt_max_pwr_set(uint8_t,uint8_t,uint8_t,uint8_t);
+#endif
 static np_diag_gatt np_gatt;
 static uint32_t np_state,np_error,np_deadline;
 static uint8_t np_advertise,np_tune_pending;
@@ -17,7 +20,7 @@ static uint32_t np_tune_due;
 /* AC79 ble_api.h: conn_update_param_t, BLE_CMD_REQ_CONN_PARAM_UPDATE=11.
  * 15-30 ms, zero peripheral latency; refusal leaves the link usable. */
 static const uint16_t np_fast_connection[4]={12,24,0,400};
-static uint8_t np_mac[6];
+/* ble_mac is shared with the SDK syscfg_read/get_chip_id callbacks. */
 static uint8_t np_att_ram[BLE_SDK_ATT_CTRL_BLOCK_SIZE+247u+512u] __attribute__((aligned(4)));
 /* State: 0 off, 1 starting, 2 advertising pending, 3 advertising,
  * 4 connected, 5 failed. Exported for USB diagnostics later. */
@@ -64,12 +67,17 @@ void np_ble_diag_start(void){
     if(np_state)return;
     if(!ble_rf_trim_load()){np_error=1;np_state=5;return;}
     uint32_t x=fm1_ticks()^0x4e53424cu;
-    for(unsigned i=0;i<6;i++){x=x*1664525u+1013904223u;np_mac[i]=(uint8_t)(x>>24);}
-    np_mac[0]|=0xc0;np_mac[5]|=0xc0; /* non-persistent local diagnostic identity */
+    for(unsigned i=0;i<6;i++){x=x*1664525u+1013904223u;ble_mac[i]=(uint8_t)(x>>24);}
+    ble_mac[0]|=0xc0;ble_mac[5]|=0xc0; /* non-persistent local diagnostic identity */
     ble_os_init(ble_heap,BLE_HEAP_BYTES);ble_delay_calibrate();ble_os_trace=&ble_diag.task;
     ble_stage(1);core_ble_stack_window();ble_stage(2);
     np_state=1;np_deadline=core_ms()+10000;ble_on=1;
-    int result=le_controller_set_mac(np_mac);
+#ifdef NP_LOADER_FM1
+    /* The SDK normally does this in cfg_file_parse(), which this port skips.
+     * Use the FM-1 peripheral reference's BLE level (SDK range 0..11). */
+    bt_max_pwr_set(8,6,6,11);
+#endif
+    int result=le_controller_set_mac(ble_mac);
     if(result){np_error=(uint32_t)result;np_state=5;return;}
     ble_stage(3);ble_os_after_run=ble_irq_check;
     if(task_create(ble_app_core,0,"app_core")){np_error=3;np_state=5;}

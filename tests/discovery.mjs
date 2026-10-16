@@ -15,9 +15,11 @@ class Port extends EventTarget{
 const input=new Port('i','Elite input','input'),output=new Port('o','Different loader output','output'),other=new Port('x','IAC','output');
 const access={inputs:new Map([['i',input]]),outputs:new Map([['x',other],['o',output]])};
 output.respond=()=>input.receive('ota-SMK-37 Elite_016');
-const up=new Updater(access,()=>{}),filter=id=>id.model==='ota-SMK-37 Elite';
+const up=new Updater(access,()=>{},/Elite|loader|USB-Midi/i),filter=id=>id.model==='ota-SMK-37 Elite';
 let dev=await up.findAny(filter,{probeMs:1});assert.equal(dev.link.input,input);assert.equal(dev.link.output,output);assert.equal(input.listeners,0);assert.equal(other.connection,'closed');await dev.link.close();assert.equal(input.connection,'closed');assert.equal(output.connection,'closed');assert.equal(input.onmidimessage,null);
 console.log('PASS differently named input/output matched by reply, identity only, ports released');
+assert.equal(other.opens,0,'Unrelated virtual output must never be opened');
+const diagnostic=new Port('diag','MIDI 2.0 Service Tests','input');diagnostic.open=()=>{throw Error('Unrelated driver accessed');};access.inputs.set('diag',diagnostic);
 output.respond=()=>input.receive('FM-1_900');assert.equal(await up.findAny(filter,{probeMs:1}),null);assert.equal(input.connection,'closed');assert.equal(input.listeners,0);
 console.log('PASS unrelated FM-1 never selected');
 const second=new Port('i2','second Elite','input');access.inputs.set('i2',second);output.respond=()=>{input.receive('ota-SMK-37 Elite_016');second.receive('ota-SMK-37 Elite_016');};

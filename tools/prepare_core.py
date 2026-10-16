@@ -43,6 +43,25 @@ def prepare():
     edit('K6502_rw.h','NesPalette[ byData ]','NesPalette[ byData & 0x3f ]')
     # Sprite path must always start at the current line, including BG-disabled cases.
     edit('InfoNES.cpp','pPoint -= ( NES_DISP_WIDTH - PPU_Scr_H_Bit );','pPoint = WorkFrame;')
+    # Hidden background pixels use $3F00, not color index 0 (gray). Keep
+    # transparency so behind-background sprites can still cover the backdrop.
+    edit('InfoNES.cpp','InfoNES_MemorySet( pPoint, 0, NES_DISP_WIDTH << 1 );',
+         'for (unsigned x=0; x<NES_DISP_WIDTH; ++x) pPoint[x]=PalTable[0]|0x8000;')
+    # Sprite masking suppresses sprite composition; clearing the finished
+    # pixels here incorrectly erases a background enabled in the left column.
+    edit('InfoNES.cpp', '''    if ( !( PPU_R1 & R1_CLIP_SP ) )
+    {
+      WORD *pPointTop;
+
+      pPointTop = WorkFrame;
+      InfoNES_MemorySet( pPointTop, 0, 8 << 1 );
+    }''', '    /* Left-edge sprite masking is applied during composition above. */')
+    edit('InfoNES.cpp','if ( nSprData  && ( nSprData & 0x80 || pPoint[ nX ] & 0x8000 ) )',
+         'if ( nSprData && (nX >= 8 || (PPU_R1 & R1_CLIP_SP)) && ( nSprData & 0x80 || pPoint[ nX ] & 0x8000 ) )')
+    edit('InfoNES.cpp','InfoNES_MemorySet( pPointTop, 0, 8 << 1 );',
+         'for (unsigned x=0; x<8; ++x) pPointTop[x]=PalTable[0]|0x8000;')
+    edit('InfoNES.cpp','InfoNES_MemorySet( pPointTop, 0, NES_DISP_WIDTH << 1 );',
+         'for (unsigned x=0; x<NES_DISP_WIDTH; ++x) pPointTop[x]=PalTable[0]|0x8000;')
     edit('InfoNES.cpp','for ( pSPRRAM = SPRRAM + ( 63 << 2 ); pSPRRAM >= SPRRAM; pSPRRAM -= 4 )',
          'for ( int sprIndex = 63; sprIndex >= 0; --sprIndex )')
     edit('InfoNES.cpp','      nY = pSPRRAM[ SPR_Y ] + 1;','      pSPRRAM = SPRRAM + sprIndex * 4;\n      nY = pSPRRAM[ SPR_Y ] + 1;')

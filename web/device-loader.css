@@ -1,0 +1,31 @@
+/* Main-page library matches the cartridge deck and shares its game picker. */
+#device-heading{font-size:30px;letter-spacing:-1px;line-height:1.15;margin:0 0 12px}
+.loader-requirement{border-left:3px solid #8b947e;padding:8px 12px;background:#e6e8dd}
+#device-loader{border-top:2px solid var(--ink);padding-top:22px}
+#device-loader p{overflow-wrap:anywhere}
+#device-connect,#device-send{width:100%;text-align:center}
+#device-connection{font:700 11px/1.6 var(--mono);color:#354833;padding:10px 0}
+#device-library{border:1px solid #b5bdab;background:#e6e8dd;padding:15px;margin:16px 0}
+.device-library-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.device-library-heading h3{font-size:17px;margin:0}.device-library-heading>span{font:9px var(--mono);color:#68705d}
+#device-space{font:11px/1.6 var(--mono)}
+#device-loader progress{display:block;width:100%;height:10px;accent-color:var(--red)}
+#device-games{list-style:none;margin:10px 0 0;padding:0}
+#device-games li{display:flex;align-items:center;gap:8px;padding:12px 0;border-top:1px solid #c1c7b8}
+#device-games li:first-child{border:0}#device-games span{flex:1;min-width:0;font-size:12px;overflow-wrap:anywhere}
+#device-games button{flex:0 0 auto;min-height:38px;padding:7px 10px;font-size:10px}
+.device-send{border-top:1px solid #c0c3b6;padding-top:20px;margin-top:8px}
+#device-name{font-weight:700;margin:0}#device-send{margin:14px 0}#device-send:disabled{background:#d9dcd1;color:#55594e;border-color:#a9ae9f;opacity:1}
+#device-loader-status{font:11px/1.7 var(--mono);min-height:38px;background:#e2e5d8;padding:12px;border:1px solid #b5bdab}
+#firmware-heading{font-size:23px;line-height:1.2;margin-top:24px}
+.firmware-note{background:#f3e7d3;border-left:3px solid #ad8141;padding:12px}
+.device-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;border-bottom:3px solid var(--ink);margin:24px 0 20px}
+.device-tabs button{border:0;border-radius:4px 4px 0 0;background:#d1d6c7;text-align:left;padding:14px 12px;font-size:14px;line-height:1.4;color:var(--ink)}
+.device-tabs button span{display:block;font:9px/1.5 var(--mono);letter-spacing:1px;margin-bottom:5px;opacity:.75}
+.device-tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+.device-tabs button:focus-visible,.tab-link:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.firmware-deck button.tab-link{display:inline;border:0;background:none;box-shadow:none;padding:0;min-height:0;font:inherit;font-weight:700;text-decoration:underline;color:inherit}
+.firmware-release{background:#e6e8dd;border-left:3px solid var(--red);padding:14px;margin:18px 0}
+#build-title,#build-details,#firmware-version{overflow-wrap:anywhere}
+#device-loader button:focus-visible,#device-transport:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+@media(max-width:420px){#device-library{padding:10px}#device-games li{gap:5px}#device-games button{padding:7px 8px}.device-library-heading>span{display:none}}

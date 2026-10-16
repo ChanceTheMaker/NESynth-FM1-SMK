@@ -71,6 +71,8 @@ jobs:
           ./build/peripheral-test
           cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/loader_peripheral.c experiments/bluetooth/diagnostic_gatt.c -o build/loader-peripheral-test
           ./build/loader-peripheral-test
+          cc -O1 -g -Wall -Wextra -Werror -DNP_LOADER_FM1=1 -fsanitize=address,undefined -fno-sanitize-recover=all tests/loader_peripheral.c experiments/bluetooth/diagnostic_gatt.c -o build/fm1-loader-peripheral-test
+          ./build/fm1-loader-peripheral-test
           cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/library_usb.c -o build/library-usb-test
           ./build/library-usb-test
       - name: Validate burst transfer and recovery

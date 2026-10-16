@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-16",
+  "product": "FM-1_969",
+  "app_sha256": "9193e1d7b62edadb0bbd69d3072ab1ecbd353f9b2e15abcbcff54814f6d08149",
+  "installed_update_sha256": "26ea462131619bf2bebacdc275cb33b9283ecf90bd7facec9f575dbf6547786a",
+  "complete_rebuild_matches_installed_app": true,
+  "fix": "Initialize bt_max_pwr_set(8,6,6,11) before FM-1 controller startup; share the controller and SDK MAC buffer.",
+  "discovery": {
+    "name": "NESynth FM1",
+    "rssi": -55,
+    "gatt_connection_verified": true,
+    "disconnected_and_reconnected_for_upload": true
+  },
+  "bluetooth_transfer": {
+    "bytes": 262160,
+    "crc32": "7a1ef6e6",
+    "data_seconds": 10.5,
+    "connection_through_verified_commit_seconds": 11.7,
+    "chunk_bytes": 239,
+    "burst": true,
+    "retries": 0,
+    "duplicate_existing_game": true
+  },
+  "post_restart": {
+    "loader_mode": 0,
+    "error": 0,
+    "installed_bytes": 262160,
+    "installed_crc32": "7a1ef6e6",
+    "radio_state": 0,
+    "library_count": 1,
+    "library_free": 102400
+  },
+  "gameplay": {
+    "emulation_fps": 60.31904287138585,
+    "cpu1_online": 1,
+    "cpu1_faults": 0,
+    "cpu1_fallbacks": 0,
+    "core_error": 0,
+    "new_audio_underruns": 0
+  },
+  "checks": [
+    "Full FM-1 build and RAM/flash boundaries",
+    "FM-1 and shared peripheral tests under ASan/UBSan",
+    "Package round trip and updater/restore simulations",
+    "Private package matched existing catalog and cartridge CRC before installation",
+    "Actual Bluetooth discovery, reconnect, transfer and post-reboot checksum"
+  ],
+  "limits": [
+    "Single FM-1 unit",
+    "Bluetooth hardware transfer used Bleak CLI; native browser chooser remains a user check",
+    "Duplicate upload preserves existing catalog; no new-entry allocation in this trial",
+    "No ROM payloads, calibration payloads or Bluetooth addresses included"
+  ]
+}

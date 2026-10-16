@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Felucca/Sloop/Doom SMK handoffs, with immutable packages and exact restart checks.
-import {Updater} from './vendor/fm1ota.js?v=20261013';
+import {Updater} from './vendor/fm1ota.js?v=973';
 import {sha256hex} from './vendor/fm1pkg.js?v=20261013';
 import {crc32,HEADER,LO,HI} from './smk-format.js';
 import {reportProgress} from './update-progress.js?v=20261013';

@@ -134,11 +134,14 @@ export class Updater {
     return null;
   }
 
-  // Probe one output at a time, listening on every input. macOS can label
-  // the loader's input and output differently. Discovery sends identity only.
+  // Probe only this instrument's port family. Windows virtual/diagnostic MIDI
+  // endpoints must not be opened as a side effect of updating a USB instrument.
+  // Matching inputs/outputs can still have different names. Identity confirms
+  // the model; the port name alone is never enough to permit an update.
   async findAny(filter, {probeMs=700, openMs=1500, deadline=Infinity}={}) {
-    const inputs=[...this.access.inputs.values()].filter(p=>p.state!=='disconnected');
-    const outputs=[...this.access.outputs.values()].filter(p=>p.state!=='disconnected');
+    const candidate=p=>{this.portPattern.lastIndex=0;return p.state!=='disconnected'&&this.portPattern.test(p.name||'');};
+    const inputs=[...this.access.inputs.values()].filter(candidate);
+    const outputs=[...this.access.outputs.values()].filter(candidate);
     const opened=new Set(), listeners=[], matches=[];
     let querying=null, selected=null;
     const bounded=(operation,ms)=>new Promise((resolve,reject)=>{
@@ -147,6 +150,7 @@ export class Updater {
     });
     const closePort=async p=>{try{await bounded(p.close(),openMs);}catch(e){this.log('Could not release MIDI port '+p.name+': '+e.message);}};
     const open=async p=>{
+      if(p.connection==='open')return true;
       let expired=false;
       try{
         if(p.connection!=='open')opened.add(p);
@@ -157,6 +161,7 @@ export class Updater {
     };
     try {
       for(const input of inputs){
+        if(Date.now()>=deadline)break;
         if(!await open(input))continue;
         const receive=ev=>{
           if(!querying)return;

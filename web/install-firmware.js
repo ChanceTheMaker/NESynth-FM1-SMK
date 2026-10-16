@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // GameDude adaptation of the Sloop/Felucca transport and MusicCoach FM-1 handoff.
-import {Updater} from './vendor/fm1ota.js?v=20261013';
+import {Updater} from './vendor/fm1ota.js?v=973';
 import {Package,logicalImage,sha256hex} from './vendor/fm1pkg.js?v=20261013';
 import {reportProgress} from './update-progress.js?v=20261013';
 const verified=new WeakMap();

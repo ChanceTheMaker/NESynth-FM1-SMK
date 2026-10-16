@@ -9,12 +9,12 @@
     {
       "path": "web/vendor/fm1ota.js",
       "source_sha256": "61da23309b1b5bc9b0e59a61e00fc2fb9003b78c5f672749197f5c7030f91f74",
-      "adapted_sha256": "61da23309b1b5bc9b0e59a61e00fc2fb9003b78c5f672749197f5c7030f91f74"
+      "adapted_sha256": "779d5e2b63bbb0e13ab3c93bc13c63da0f2a76fd8e1961f91526ffbccdf65351"
     },
     {
       "path": "web/install-firmware.js",
       "source_sha256": "97af121708cc55782327a3e57f853d626b262b7b7ce7d0b9f5eeada27ce23079",
-      "adapted_sha256": "97af121708cc55782327a3e57f853d626b262b7b7ce7d0b9f5eeada27ce23079"
+      "adapted_sha256": "6e955178c2410c3103969a7d71d67b1bc8f581b9842aa70a19c935d32b8b0c81"
     },
     {
       "path": "web/restore-firmware.js",
@@ -34,7 +34,7 @@
     {
       "path": "web/flash-ui.js",
       "source_sha256": "4cb50d65afb301b0c742841cc031d0084b9f42905a3c33f23bcf824d13c026f6",
-      "adapted_sha256": "8347acd24b861c41d1e37afc536982af149bd61d3e0e3b36a3d62f7ef4f79c41"
+      "adapted_sha256": "591eaba82d4c82dd8df17487e42a1f40788a79dc3d07b2f90c31fb6c72e38359"
     },
     {
       "path": "web/simulator.js",

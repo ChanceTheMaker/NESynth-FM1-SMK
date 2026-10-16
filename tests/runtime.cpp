@@ -15,6 +15,7 @@
 #include "mmc1.h"
 #include "extra_mappers.h"
 #include "vblank.h"
+#include "ppu_mask.h"
 static int16_t audio[4096*2];
 static void advance(unsigned count){for(unsigned i=0;i<count;i++){assert(gp_frame());assert(!gp_error());memset(audio,0,sizeof audio);gp_audio_read(audio,gp_audio_queued());}}
 static void test_mmc2(){
@@ -126,6 +127,7 @@ int main(int argc,char **argv){
     test_extra_mappers();
     test_apu_release();
     test_vblank_polling();
+    test_ppu_mask();
     FILE *report=fopen("build/host-benchmark.json","wb");assert(report);
     fprintf(report,"{\"frames\":1800,\"seconds\":%.6f,\"fps\":%.2f,\"diagnostic_frame10_fnv1a\":%u,\"hardware_fps\":null}\n",seconds,1800/seconds,frame_hash);fclose(report);
     printf("PASS: loader rejection, rendering, controller, audio, backpressure, reset, save RAM; 1800 frames in %.3fs (%.1f host fps)\n",seconds,1800/seconds);

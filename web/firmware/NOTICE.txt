@@ -16,9 +16,9 @@ NESynth's open-source firmware and retains its original vendor terms.
 
 FM-1 hardware: picture, controls, both cores and update/restart exercised.
 Full-speed emulation and smooth audio remain under development.
-SMK-37 Pro/Elite: experimental USB installer candidate; native builds, model
-packages, browser flows and protected flash simulations pass. Physical
-installation, playback and restart validation remain pending.
+SMK-37 Pro: owner-build installation, playback and restart exercised.
+Public calibration-free core: packaging, browser flows and protected flash
+simulations pass; this exact binary and Elite hardware remain unvalidated.
 
 smk37-template.bin is a raw diagnostic-only application, not an installable
 package. tools/public_smk_template.py generates it; smk37-template.json records
@@ -26,3 +26,11 @@ its hashes. The browser builds the model-specific package locally from a pinned,
 hash-verified official M-VAVE 016 file. Vendor files retain their original terms.
 The SMK RAM updater and browser packaging are adapted from Doom/Felucca/Sloop;
 source hashes, credits and GPL notices are retained in vendor/smk-updater.
+
+nesynth-fm1-969.bin and nesynth-smk37-969.bin are the NESynth library cores.
+nesynth.json pins their exact bytes; the browser packages them automatically
+with the verified model-specific official base. They contain no game library
+or owner calibration. Bluetooth adaptations retain the GPL-3.0-only Hortator
+source at 7e3415971c5800b4a3ad0146a7d95615883d7d96 and its pinned JieLi SDK
+components and notices. Build inputs and adaptations are recorded in
+tools/build_bluetooth_probe.py and experiments/bluetooth/.

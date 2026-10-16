@@ -1,13 +1,14 @@
 import './simulator.js';
 import './fullscreen.js?v=20261016-remote';
-import './flash-ui.js?v=20261016-smk-scan';
+import './flash-ui.js?v=974';
+import './main-loader.js?v=970';
 import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';
 import {fetchHomebrew} from './homebrew.js';
 import {normalizeCartridge} from './cartridge.js?v=20261016-headers';
 import {wireTv} from './tv-demos.js?v=2';
 const $=s=>document.querySelector(s), canvas=$('#screen'), ctx=canvas.getContext('2d',{alpha:false});
-let archiveEntries=[],loading=false,installBusy=false;
+let archiveEntries=[],loading=false,installBusy=false,firmwareBusy=false,deviceBusy=false;
 const errors=['','File is shorter than an iNES header.','Use a standard iNES 1.0 cartridge. NES 2.0 and special consoles are not supported.','Cartridge size is invalid for its mapper, or the file is truncated.','This cartridge requests unsupported RAM.','PAL cartridges are not supported yet.','This mapper is not supported yet. NESynth currently supports mappers 0 (NROM), 1 (MMC1), 2 (UxROM), 3 (CNROM), 4 (MMC3), 9 (MMC2) and 11 (Color Dreams).','Emulator error.','Emulator timing or audio queue limit reached.'];
 let core,loaded=false,paused=false,saveKey='',name='',last=performance.now(),clock=0,frameBase=0,fpsTime=last;
 let keys=new Set(),pointers=new Map(),externalControls=new Map();
@@ -159,7 +160,9 @@ $('#pause').onclick=()=>{paused=!paused;core.gp_pause(paused?1:0);stopAudio();re
 $('#reset').onclick=()=>{void sound();stopAudio();release();core.gp_reset();paused=false;clock=0;frameBase=0;fpsTime=performance.now();$('#pause').textContent='Pause';focusGame();};
 document.addEventListener('nesynth-control',e=>{const {source,bit,down}=e.detail;if(down){void sound();externalControls.set(source,bit);}else externalControls.delete(source);updateButtons();});
 document.addEventListener('nesynth-release',release);
-document.addEventListener('nesynth-install-busy',e=>{installBusy=e.detail;syncHomebrewButtons();for(const id of ['diagnostic','rom','archive-play','archive-entry','folder','library-play'])$('#'+id).disabled=installBusy||loading||!core;$('#pause').disabled=$('#reset').disabled=installBusy||!loaded;});
+function syncDeviceBusy(){installBusy=firmwareBusy||deviceBusy;syncHomebrewButtons();for(const id of ['diagnostic','rom','archive-play','archive-entry','folder','library-play'])$('#'+id).disabled=installBusy||loading||!core;$('#pause').disabled=$('#reset').disabled=installBusy||!loaded;}
+document.addEventListener('nesynth-install-busy',e=>{firmwareBusy=e.detail;syncDeviceBusy();});
+document.addEventListener('nesynth-device-state',e=>{deviceBusy=e.detail.busy;syncDeviceBusy();});
 document.addEventListener('nesynth-pause',()=>{if(!loaded)return;paused=true;core.gp_pause(1);stopAudio();release();save();clock=0;$('#pause').textContent='Resume';});
 window.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement||e.target instanceof HTMLButtonElement||e.target instanceof HTMLSelectElement)return;if(keyBits.has(e.code)){e.preventDefault();void sound();if(!e.repeat)keySince.set(e.code,performance.now());keys.add(e.code);updateButtons();}});
 window.addEventListener('keyup',e=>{if(keyBits.has(e.code)){e.preventDefault();const epoch=inputEpoch,stamp=keySince.get(e.code);setTimeout(()=>{if(epoch===inputEpoch&&keySince.get(e.code)===stamp){keys.delete(e.code);updateButtons();}},Math.max(0,40-(performance.now()-stamp)));}});

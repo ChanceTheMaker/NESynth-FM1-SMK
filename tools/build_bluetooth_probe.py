@@ -23,6 +23,7 @@ def main():
     p.add_argument('--reference',type=Path,default=ROOT/'build/references/hortator')
     p.add_argument('--sdk',type=Path,default=ROOT/'build/references/ac79-ble-sdk')
     p.add_argument('--toolchain',default=TC)
+    p.add_argument('--output-dir',type=Path,help='Separate build output directory; keeps existing private builds intact')
     p.add_argument('--rom-capacity',type=int,choices=[262672,393744,524816],default=262672)
     p.add_argument('--peripheral',action='store_true',help='Link the SMK diagnostic GATT profile instead of the reference central')
     p.add_argument('--loader',action='store_true',help='Build integrated Bluetooth cartridge loader and NES player')
@@ -39,7 +40,7 @@ def main():
     if a.private_calibration_backups and not installable:p.error('Private calibration requires --diagnostic or --loader')
     if a.private_unit_backups and not a.private_calibration_backups:p.error('Current unit reference requires private RF backups')
     a.peripheral=a.peripheral or installable
-    ref=a.reference.resolve();out=ROOT/('build/fm1-bluetooth-loader' if fm1 else 'build/bluetooth-loader' if a.loader else 'build/bluetooth-diagnostic' if a.diagnostic else 'build/bluetooth-peripheral-probe' if a.peripheral else 'build/bluetooth-probe');out.mkdir(parents=True,exist_ok=True)
+    ref=a.reference.resolve();out=(a.output_dir.resolve() if a.output_dir else ROOT/('build/fm1-bluetooth-loader' if fm1 else 'build/bluetooth-loader' if a.loader else 'build/bluetooth-diagnostic' if a.diagnostic else 'build/bluetooth-peripheral-probe' if a.peripheral else 'build/bluetooth-probe'));out.mkdir(parents=True,exist_ok=True)
     (out/'report.json').unlink(missing_ok=True) # A failed run must not leave a success report.
     def run(args,**kw):return subprocess.run(list(map(str,args)),cwd=ROOT,check=True,**kw)
     if a.private_calibration_backups:
@@ -113,6 +114,11 @@ static int ble_rf_trim_load(void){
         q.write_text(t)
     if a.loader:
         edit('ble/ble.c','diagnostic_peripheral.c','loader_peripheral.c')
+        if fm1:
+            edit('ble/ble_port.c','void __local_irq_disable(void) { fm1_ble_irq_off(); }',
+                 'static volatile uint32_t np_radio_irq_calls,np_radio_irq_rets,np_radio_irq_icfg;\n'
+                 'void __local_irq_disable(void) { unsigned pc,flags; __asm__ volatile("%0 = rets" : "=r"(pc)); __asm__ volatile("%0 = icfg" : "=r"(flags)); np_radio_irq_calls++; np_radio_irq_rets=pc; np_radio_irq_icfg=flags; fm1_ble_irq_off(); }')
+            q=out/'ble/ble.c';q.write_text(q.read_text()+'\n#include "loader_radio_status.h"\n')
     # Only the generated board copy exports the buffer; production source is unchanged.
     board=(ROOT/'firmware/board.c').read_text()+'\nunsigned char *np_ble_probe_workspace(void){return video_source;}\n'
     if installable:
@@ -160,7 +166,7 @@ static int ble_rf_trim_load(void){
     compile(out/'board.c',out/'board.o',['-mllvm','-pi32v2-large-program=true','-Dmemcpy=np_core_memcpy','-DGB_HARDWARE=1','-DMUSICCOACH_DUAL_CORE=1','-DGB_SMK37='+str(int(not fm1)),
         '-Isrc','-Isrc/freestanding','-Ifirmware','-Ivendor/felucca/firmware/hal','-I'+wsl(player),'-I'+wsl(player/'update'),
         '-I'+wsl(ROOT/'experiments/bluetooth'),'-I'+wsl(ref/'firmware/hal')])
-    compile(out/'ble/ble.c',out/'ble.o',['-mllvm','-pi32v2-large-program=true','-I'+wsl(out),'-I'+wsl(ref/'firmware/hal'),'-I'+wsl(ROOT/'experiments/bluetooth')])
+    compile(out/'ble/ble.c',out/'ble.o',['-mllvm','-pi32v2-large-program=true','-I'+wsl(out),'-I'+wsl(ref/'firmware/hal'),'-I'+wsl(ROOT/'experiments/bluetooth')]+(['-DNP_LOADER_FM1=1'] if fm1 else []))
     compile(ref/'firmware/hal/fm1_ctx.S',out/'ctx.o')
     if not installable:compile(ROOT/'experiments/bluetooth/probe_hooks.c',out/'hooks.o')
     compile(ROOT/'experiments/bluetooth/rom_transfer.c',out/'receiver.o',['-mllvm','-pi32v2-large-program=true'])

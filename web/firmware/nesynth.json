@@ -1,0 +1,23 @@
+{
+  "version": 969,
+  "models": {
+    "fm1": {
+      "product": "FM-1_969",
+      "file": "firmware/nesynth-fm1-969.bin",
+      "bytes": 200980,
+      "sha256": "58cecddc98b584d375f37af90c10a761ce4d383f576504e3574942c0c5a07054"
+    },
+    "smk-pro": {
+      "product": "SMK-37_969",
+      "file": "firmware/nesynth-smk37-969.bin",
+      "bytes": 207524,
+      "sha256": "9e9754a5e9235d60dc411fc4df1f0b5c038c784a02500e5a8a344b6cbba60b0d"
+    },
+    "smk-elite": {
+      "product": "SMK-37_969",
+      "file": "firmware/nesynth-smk37-969.bin",
+      "bytes": 207524,
+      "sha256": "9e9754a5e9235d60dc411fc4df1f0b5c038c784a02500e5a8a344b6cbba60b0d"
+    }
+  }
+}

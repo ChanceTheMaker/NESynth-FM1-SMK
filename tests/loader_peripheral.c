@@ -9,7 +9,7 @@ struct bt_event {uint8_t event,args[7];uint32_t value;};
 #define BLE_SDK_BT_EVENT_FROM_CON 3
 #define BLE_SDK_BT_STATUS_INIT_OK 3
 #define BLE_HEAP_BYTES 13824u
-static uint8_t ble_heap[BLE_HEAP_BYTES],ble_on;
+static uint8_t ble_heap[BLE_HEAP_BYTES],ble_on,ble_mac[6];
 static struct {uint32_t task,heap_high,alloc_fails;} ble_diag;
 static uint32_t *ble_os_trace;
 static void (*ble_os_after_run)(int);
@@ -18,11 +18,19 @@ static btstack_packet_handler_t controller_cb,att_cb;
 static int ble_rf_trim_load(void){return rf_ok;}
 static uint32_t fm1_ticks(void){return 123456;}
 static uint32_t core_ms(void){return now;}
+#ifdef NP_LOADER_FM1
+static unsigned power_inits;
+void bt_max_pwr_set(uint8_t a,uint8_t b,uint8_t c,uint8_t d){assert(a==8&&b==6&&c==6&&d==11&&!tasks);power_inits++;}
+#endif
 static void ble_os_init(uint8_t *p,unsigned n){assert(rf_ok&&p==ble_heap&&n==BLE_HEAP_BYTES);os_inits++;}
 static void ble_delay_calibrate(void){}
 static void ble_stage(unsigned n){stage=n;}
 static void core_ble_stack_window(void){}
-static int le_controller_set_mac(void *p){assert(((uint8_t *)p)[5]&0xc0);return 0;}
+static int le_controller_set_mac(void *p){assert(p==ble_mac);assert((ble_mac[0]&0xc0)==0xc0&&(ble_mac[5]&0xc0)==0xc0);
+#ifdef NP_LOADER_FM1
+assert(power_inits==1);
+#endif
+return 0;}
 static void ble_irq_check(int t){(void)t;}
 static void ble_app_core(void *p){(void)p;}
 static int task_create(void (*f)(void *),void *p,const char *name){assert(f==ble_app_core&&!p&&name);tasks++;return 0;}

@@ -146,8 +146,29 @@ unsigned np_loader_read(uint16_t off,uint8_t *p,uint16_t n){
 }
 void np_loader_connected(void){np_query=0;}
 #include "library_usb.h"
+#if !GB_SMK37
+uint32_t np_loader_radio_power(void){
+    uint32_t f=irq_save();
+    uint32_t v=fm1_p33_read(0)|((uint32_t)fm1_p33_read(1)<<8)|
+        ((uint32_t)fm1_p33_read(0x74)<<16)|((uint32_t)fm1_p33_read(0x75)<<24);
+    irq_restore(f);return v;
+}
+#endif
 static int np_loader_usb(const uint8_t *p,unsigned n){
     if(np_library_usb_frame(p,n,np_loader_mode==4))return 1;
+#if !GB_SMK37
+    /* Fixed read-only radio status pages; no arbitrary memory access. */
+    if(n==5&&p[0]==0x7d&&p[1]=='N'&&p[2]=='L'&&p[3]==5&&p[4]<8){
+        extern uint32_t np_ble_loader_status(unsigned);
+        uint8_t reply[37]={0xf0,0x7d,'N','L',5,p[4]};unsigned k=6;
+        for(unsigned i=0;i<6;i++){
+            uint32_t v=np_ble_loader_status((unsigned)p[4]*6+i);
+            for(unsigned j=0;j<5;j++)reply[k++]=(v>>(7*j))&127;
+        }
+        reply[k++]=0xf7;ota_wire_send(reply,k);return 1;
+    }
+#endif
+
     if(n!=4||p[0]!=0x7d||p[1]!='N'||p[2]!='L')return 0;
     if(p[3]==4&&!np_loader_pending&&np_loader_mode!=4){np_restart_as(NP_MODE_USB,0,0);return 1;}
     if(p[3]==1&&np_loader_mode!=1){np_restart_as(NP_MODE_LOAD,0,0);return 1;}
@@ -216,7 +237,8 @@ static __attribute__((noreturn)) void np_loader_run(void){
         np_loader_art(NP_UI,y,60,"STARTING",0,1);
         np_draw_strip(y,60,NP_UI);
     }
-    np_loader_draw();if(np_loader_mode!=4)np_ble_diag_start();uint32_t last=0,previous=~0u;
+    np_loader_draw();
+    if(np_loader_mode!=4)np_ble_diag_start();uint32_t last=0,previous=~0u;
     for(;;){
         fm1_wdt_feed();recovery_service();np_ble_diag_service();uint32_t now=core_ms();
         if(np_loader_pending&&(int32_t)(now-np_loader_due)>=0){display_stop();np_restart_as(np_loader_pending,np_loader_pending==NP_MODE_WRITE?np_loader_rx.length:np_pending_index,np_loader_pending==NP_MODE_WRITE?np_loader_rx.expected_crc:np_pending_crc);}
