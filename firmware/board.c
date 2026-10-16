@@ -39,6 +39,9 @@ volatile smk37_bootguard_t gb_bootguard __attribute__((section(".noinit")));
 #include "smk37_lights_hw.h"
 #include "smk37_game_controls.h"
 #include "smk37_game_pads.h"
+#include "smk37_volume.h"
+static volatile uint32_t smk_volume_target=64;
+static uint32_t smk_volume_current=64; /* Same 25% startup level as before. */
 static smk37_keyscan_t keys[37];
 static smk37_adc_t pad_adc;
 static smk37_controls_t panel_controls;
@@ -53,6 +56,7 @@ void gb_scan_irq(void) {
     if(!(SMK37_SCAN_CON&0x8000u))return;
     unsigned index=pad_adc.scan.index;
     int result=smk37_adc_spi_done(&pad_adc);
+    if(result>0)smk_volume_target=smk_volume_sample(smk_volume_target,index,pad_adc.scan.raw[index]);
     if(result>0)for(unsigned p=0;p<16;p++)if(index==smk37_pad_input[p])
         gb_smk37_pad_sample(&game_pads,p,pad_adc.scan.raw[index]);
     if(result<0)game_pads.held=game_pads.pressed=0;
@@ -74,7 +78,9 @@ void gb_audio_irq(void) {
     uint8_t p=smk37_audio_pending();smk37_audio_ack_aux(p);
     if(!(p&SMK37_AUDIO_HALF))return;
     unsigned h=smk37_audio_free_half();read_samples();
-    for(unsigned i=0;i<512;i++)dma[h*512+i]=(int32_t)samples[i]*256;
+    uint32_t target=smk_volume_target;
+    smk_volume_render(dma+h*512,samples,smk_volume_current,target);
+    smk_volume_current=target;
     audio_count++;smk37_audio_ack_half();
 }
 static int display_init(void){smk37_lcd_hw_init(4);return smk37_panel_init(&panel);}
@@ -213,7 +219,9 @@ void gb_cstart(const uint32_t *parameters){
         for(;;);
     }
     input_init();
-#if !GB_SMK37
+#if GB_SMK37
+    gp_volume(100); /* Fader 1 applies master gain at the audio DMA boundary. */
+#else
     master_boot();
 #endif
     splash_active=0;

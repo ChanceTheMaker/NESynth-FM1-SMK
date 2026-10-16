@@ -26,6 +26,8 @@ jobs:
           python -c "import sys; sys.path.insert(0, 'tools'); from prepare_core import prepare; prepare()"
           g++ -std=c++11 -O2 -fno-strict-aliasing -Wno-write-strings -Isrc -Ibuild/infones build/infones/InfoNES.cpp build/infones/K6502.cpp build/infones/InfoNES_pAPU.cpp src/mapper.cpp src/nes_port.cpp tests/runtime.cpp -o build/runtime-test
           ./build/runtime-test web/diagnostic.nes
+          cc -O1 -UNDEBUG -Isrc tests/smk37_game_controls.c -o build/smk37-controls
+          ./build/smk37-controls
       - name: Check shipped assets and firmware builder
         run: npm run test:site
       - name: Check SMK model packages and protected flash updater

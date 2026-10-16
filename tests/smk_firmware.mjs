@@ -11,7 +11,7 @@ fs.mkdirSync('build/smk37',{recursive:true});
 for(const [i,model] of ['SMK-37 Pro','SMK-37 Elite'].entries()){
  const stock=new Uint8Array(fs.readFileSync(fixtures[i])),before=new SMKPackage(stock);
  const built=await prepareSmkFirmware(rom,template,meta,stock,model),after=new SMKPackage(built.bytes);
- assert.equal(built.product,meta.product);assert.equal(after.product,model+'_960');
+ assert.equal(built.product,meta.product);assert.equal(after.product,model+'_'+meta.product.split('_')[1]);
  assert.deepEqual(after.flash.subarray(0,0x4000),before.flash.subarray(0,0x4000));
  assert.deepEqual(after.dec.subarray(after.appOff+meta.cartridge_offset,after.appOff+meta.cartridge_offset+rom.length),rom);
  assert(after.dec.subarray(after.appOff+meta.cartridge_offset+rom.length,after.appOff+meta.cartridge_offset+meta.cartridge_capacity).every(x=>x===255));

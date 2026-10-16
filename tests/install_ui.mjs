@@ -131,7 +131,7 @@ try{
  for(const [value,model] of [['smk-pro','SMK-37 Pro'],['smk-elite','SMK-37 Elite']]){
   await page.locator('#flash-model').selectOption(value);
   assert(await page.locator('#flash-device').isDisabled(),'Changing instruments clears prepared firmware');
-  await page.evaluate(model=>{window.testDevice=model+'_016';window.testWaits=['ota-'+model+'_016','SMK-37_960'];},model);
+  await page.evaluate(model=>{window.testDevice=model+'_016';window.testWaits=['ota-'+model+'_016','SMK-37_961'];},model);
   await page.locator('[data-install][data-homebrew="from-below"]').click();
   await page.waitForFunction(()=>document.getElementById('rom-name').textContent==='From Below'&&!document.getElementById('build-firmware').disabled);
   await page.locator('#connect-device').click();
@@ -145,8 +145,8 @@ try{
   await page.locator('#flash-device').click();
   await page.waitForFunction(()=>document.getElementById('install-state').textContent==='Verified');
   assert.equal(await page.evaluate(()=>window.midiWrites),before+1);
-  assert.match(await page.locator('#device-status').textContent(),/SMK-37_960/);
-  await page.evaluate(model=>{window.testDevice='SMK-37_960';window.testWaits=['ota-SMK-37_960',model+'_016'];},model);
+  assert.match(await page.locator('#device-status').textContent(),/SMK-37_961/);
+  await page.evaluate(model=>{window.testDevice='SMK-37_961';window.testWaits=['ota-SMK-37_961',model+'_016'];},model);
   await page.locator('#restore-device').evaluate(el=>el.closest('details').open=true);
   await page.locator('#restore-device').click();
   await page.waitForFunction(()=>document.getElementById('restore-status').textContent.includes('restored and restart verified'));

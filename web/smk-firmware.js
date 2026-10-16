@@ -21,12 +21,12 @@ async function checkStock(bytes,model){
 export async function prepareSmkFirmware(rom,template,meta,stock,model){
  rom=(await normalizeCartridge(rom)).bytes;validateHardwareRom(rom);await checkStock(stock,model);
  const offset=meta.cartridge_offset,capacity=meta.cartridge_capacity;
- if(meta.product!=='SMK-37_960'||meta.usb_updater!==true||meta.usb_protocol!=='smk37-ram-v2'||meta.bytes!==template.length||await sha256hex(template)!==meta.sha256||!Number.isInteger(offset)||offset<4||capacity!==524816||offset+capacity>template.length||!meta.mappers?.includes((rom[6]>>4)|(rom[7]&240)))throw Error('SMK template verification failed. Reload the site and retry.');
+ if(meta.product!=='SMK-37_961'||meta.usb_updater!==true||meta.usb_protocol!=='smk37-ram-v2'||meta.bytes!==template.length||await sha256hex(template)!==meta.sha256||!Number.isInteger(offset)||offset<4||capacity!==524816||offset+capacity>template.length||!meta.mappers?.includes((rom[6]>>4)|(rom[7]&240)))throw Error('SMK template verification failed. Reload the site and retry.');
  if(rom.length>capacity)throw Error('This game is too large for device firmware. The limit is 512 KiB plus header and trainer. It can still run in the browser.');
  if(await protectedAppHash(template,offset,capacity)!==meta.protected_app_sha256)throw Error('SMK updater integrity check failed.');
  const app=template.slice();app.fill(255,offset,offset+capacity);app.set(rom,offset);
  if(await protectedAppHash(app,offset,capacity)!==meta.protected_app_sha256)throw Error('ROM packing changed the SMK updater.');
- const release={public:true,product:meta.product,version:'NESYNTH SMK 960',board:model,bytes:app.length,sha256:await sha256hex(app)};
+ const release={public:true,product:meta.product,version:'NESYNTH SMK 961',board:model,bytes:app.length,sha256:await sha256hex(app)};
  const built=await buildSmkPublicPackage(stock,app,release);
  const checked=new SMKPackage(built.factory);
  if(await sha256hex(checked.dec.subarray(checked.appOff,checked.appOff+app.length))!==release.sha256)throw Error('SMK application round-trip verification failed.');

@@ -3,7 +3,7 @@ import {Updater} from './vendor/fm1ota.js?v=20261013';
 import {installFirmware,fm1Identity} from './install-firmware.js?v=20261013';
 import {restoreLatest} from './restore-firmware.js?v=20261013';
 import {createProgress} from './update-progress.js?v=20261013';
-import {SMK_MODELS,getSmkStock,prepareSmkFirmware,prepareSmkRestore} from './smk-firmware.js?v=960';
+import {SMK_MODELS,getSmkStock,prepareSmkFirmware,prepareSmkRestore} from './smk-firmware.js?v=961';
 import {installSmkFirmware,smkIdentity,SMK_PORT_PATTERN} from './smk-install.js';
 const $=id=>document.getElementById(id);
 const isFm=()=>$('flash-model').value==='fm1';
@@ -55,7 +55,7 @@ function available(){
  $('connect-heading').textContent='Connect your '+model;
  $('deck-intro').textContent='Choose a game, plug in your '+model+', and install it here. No downloads or compiler needed.';
  $('connect-copy').textContent='Turn it on and connect it directly to this computer with a USB data cable. Use Chrome or Edge and allow MIDI access.';
- $('connect-hint').textContent=fm?'Factory M-VAVE V15 works here. Disconnect the XIAO recovery adapter. Close other MIDI apps and unplug other instruments.':'First install: official M-VAVE 016. Updater-enabled Felucca, Sloop, Melodee, Doom and NESynth also work. Connect only the selected SMK model and close other MIDI apps.';
+ $('connect-hint').textContent=fm?'Factory M-VAVE V15 works here. Disconnect the XIAO recovery adapter. Close other MIDI apps and unplug other instruments.':'First install: official M-VAVE 016. Updater-enabled Felucca, Sloop, Melodee, Doom and NESynth also work. Connect only the selected SMK model and close other MIDI apps. Fader 1 controls game volume (down: mute, up: full).';
  $('prepare-copy').textContent='This makes the game ready for your '+model+' in this browser. Your instrument is changed only when you press Install.';
  $('install-copy').textContent='Installing replaces the synth application with this game. Keep power and USB connected until the restart is verified. Device game saves last until restart.';
  $('restore-copy').textContent='Restore the official M-VAVE '+(fm?'V15':'016')+' firmware for '+model+'. The file is downloaded and verified before any transfer.';

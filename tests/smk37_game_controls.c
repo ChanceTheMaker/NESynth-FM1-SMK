@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "smk37_game_controls.h"
 #include "../firmware/smk37_game_pads.h"
+#include "../firmware/smk37_volume.h"
 int main(void){
     assert(gp_smk37_keys(1u<<5,0)==GP_LEFT);
     assert(gp_smk37_keys(1u<<9,0)==GP_DOWN);
@@ -26,5 +27,31 @@ int main(void){
     for(unsigned i=0;i<4;i++)gb_smk37_pad_sample(&s,15,600);
     assert(gb_smk37_pads_take(&s)==(1u<<15)&&gb_smk37_pads_take(&s)==(1u<<15));
     gb_smk37_pad_sample(&s,15,0);assert(gb_smk37_pads_take(&s)==0);
+    uint32_t previous=0;
+    for(unsigned raw=0;raw<=1023;raw++){
+        uint32_t gain=smk_volume_sample(64,21,raw);
+        assert(gain>=previous&&gain<=256);previous=gain;
+        if(raw<=8)assert(gain==0);
+        if(raw>=1015)assert(gain==256);
+    }
+    for(unsigned input=0;input<24;input++)if(input!=21)
+        assert(smk_volume_sample(64,input,1023)==64); /* Pads/wheels/other faders cannot change volume. */
+    assert(smk_volume_sample(64,21,65535)==256);
+    int16_t pcm[512];int32_t output[514];
+    for(unsigned i=0;i<512;i++)pcm[i]=(i&1)?-32768:32767;
+    output[0]=123;output[513]=456;
+    smk_volume_render(output+1,pcm,0,256);
+    assert(output[0]==123&&output[513]==456);
+    for(unsigned i=0;i<256;i++){
+        assert(output[1+i*2]==32767*(int32_t)(i+1));
+        assert(output[2+i*2]==-32768*(int32_t)(i+1));
+    }
+    smk_volume_render(output+1,pcm,256,0);
+    assert(output[511]==0&&output[512]==0);
+    smk_volume_render(output+1,pcm,0,0);
+    for(unsigned i=1;i<=512;i++)assert(output[i]==0);
+    smk_volume_render(output+1,pcm,64,64);
+    assert(output[1]==32767*64&&output[2]==-32768*64);
+    puts("PASS: Fader 1 isolation, monotonic volume, mute/full endpoints, stereo ramp, signed 24-bit bounds and startup level.");
     puts("PASS: SMK37 white/black/high keys, pad rows, lighting mask, PLAY/REC, short taps and held/released pads.");
 }
