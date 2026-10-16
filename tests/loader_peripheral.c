@@ -49,6 +49,7 @@ static int ble_user_cmd_prepare(int cmd,int argc,...){
 }
 #define ble_op_att_send_init(h,p,n,m) ble_user_cmd_prepare(7,4,(int)(h),(p),(int)(n),(int)(m))
 #define ble_op_disconnect(h) ble_user_cmd_prepare(5,1,(int)(h))
+void np_loader_connected(void){}
 int np_loader_write(const uint8_t *p,unsigned n){(void)p;return n==1?0:13;}
 unsigned np_loader_read(uint16_t off,uint8_t *p,uint16_t n){(void)off;(void)p;(void)n;return 20;}
 #include "../experiments/bluetooth/loader_peripheral.c"

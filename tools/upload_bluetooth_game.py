@@ -1,4 +1,4 @@
-"""Send a local .nes or ZIP to the integrated NESynth SMK966 Bluetooth loader."""
+"""Send a local .nes or ZIP to the integrated NESynth SMK967 Bluetooth loader."""
 import argparse,asyncio,json,secrets,struct,sys,time,zlib
 from pathlib import Path
 from cartridge import read_cartridge
@@ -22,6 +22,16 @@ async def upload(args):
         state,error,received,capacity=decode(await client.read_gatt_char(VALUE))
         if len(rom)>capacity:raise ValueError('Cartridge exceeds device capacity')
         await client.write_gatt_char(VALUE,b'\x04',response=True)
+        try:
+            await client.write_gatt_char(VALUE,b'\x06',response=True)
+        except Exception:
+            if not client.is_connected:raise
+        else:
+            info=await client.read_gatt_char(VALUE)
+            if len(info)!=40 or info[:4]!=b'NPL2':raise RuntimeError('Invalid library response')
+            await client.write_gatt_char(VALUE,b'\x00',response=True)
+            name=args.rom.stem.encode('ascii','replace')[:31] or b'GAME'
+            await client.write_gatt_char(VALUE,b'\x05'+name,response=True)
         await client.write_gatt_char(VALUE,b'\x01'+struct.pack('<3I',session,len(rom),crc),response=True)
         characteristic=client.services.get_characteristic(VALUE)
         burst='write-without-response' in characteristic.properties and not args.acknowledged

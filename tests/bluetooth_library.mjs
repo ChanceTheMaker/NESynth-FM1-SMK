@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {decodeLibrary,decodeGame,gameNamePacket,ensureLibrarySpace,readLibrary} from '../web/bluetooth-library.js';
+import {crc32} from '../web/zip.js';
+const buf=new Uint8Array(40),v=new DataView(buf.buffer);
+[0x324c504e,2,1,356352,401408,262672,262672,32,9,0].forEach((n,i)=>v.setUint32(i*4,n,true));
+const lib=decodeLibrary(buf);assert.equal(lib.free,356352);assert.equal(lib.count,1);
+const game=new Uint8Array(44),g=new DataView(game.buffer);g.setUint32(4,40976,true);g.setUint32(8,123,true);game.set(new TextEncoder().encode('MARIO'),12);
+assert.equal(decodeGame(game,0).name,'MARIO');assert.equal(gameNamePacket('Mario.nes')[0],5);assert.equal(gameNamePacket('A'.repeat(100)).length,32);
+assert.throws(()=>decodeLibrary(new Uint8Array(40)));assert.throws(()=>decodeGame(new Uint8Array(45),0));
+const rom=new Uint8Array(100);lib.games=[];ensureLibrarySpace(lib,rom);lib.largest=0;assert.throws(()=>ensureLibrarySpace(lib,rom));lib.games=[{bytes:100,crc:crc32(rom)}];ensureLibrarySpace(lib,rom);
+let command;const channel={writeValueWithResponse:async p=>{command=p[0];},readValue:async()=>command===6?buf:game};
+const result=await readLibrary(channel);assert.equal(result.games[0].name,'MARIO');assert.equal(command,0);
+console.log('PASS: library decoding, malformed data, space preflight, duplicate game, name bound and query reset');

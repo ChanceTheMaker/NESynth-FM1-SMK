@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-16",
+  "board": "SMK-37 Pro",
+  "product": "SMK-37_967",
+  "scope": "Same owner unit, private RF calibration; binaries and cartridge payloads remain local",
+  "app_sha256": "ad7e9254b5f8ab75e71cc50dae93c441ec056fd854ff0eda762d51fd4788f813",
+  "fwsc_sha256": "05771685c6a329eb4fb7ffb9b4477471c09f5b06021e8b3d2c7b6f80c20ba387",
+  "update_sha256": "646bad743183ff6c7d3297d972f95720ff56cfde7e0055b009409dcda5a64775",
+  "footprint": {
+    "app_bytes": 216160,
+    "app_limit": 216800,
+    "app_free": 640,
+    "ram_bytes": 55932,
+    "ram_limit": 73728,
+    "pool_and_cpu1_stacks_bytes": 361952,
+    "pool_limit": 368640,
+    "ram_code_bytes": 22016,
+    "ram_code_limit": 24576,
+    "library_capacity": 401408,
+    "library_slots": 32,
+    "rom_capacity": 262672
+  },
+  "library": {
+    "count": 2,
+    "free_bytes": 221184,
+    "total_bytes": 401408,
+    "largest_available_cartridge": 221184,
+    "games": [
+      {
+        "name": "Super Pitfall (U)",
+        "bytes": 131088,
+        "crc32": "a4958020"
+      },
+      {
+        "name": "Super Mario Bros. (JU) [!]",
+        "bytes": 40976,
+        "crc32": "3337ec46"
+      }
+    ],
+    "both_entries_read_over_ble": true,
+    "persistent_count_and_space_read_over_usb": true,
+    "saved_mario_launch_verified_after_restart": true,
+    "super_pitfall_verified_playing_after_initial_upload": true,
+    "return_to_menu_verified": true,
+    "owner_confirmed_graphic_and_directional_selection": true
+  },
+  "bluetooth_uploads": [
+    {
+      "verified": true,
+      "bytes": 131088,
+      "crc32": "a4958020",
+      "seconds": 31.98,
+      "data_seconds": 28.8,
+      "burst": true,
+      "retries": 0,
+      "status": "SMK restarting to install and play; verify USB status afterward"
+    },
+    {
+      "verified": true,
+      "bytes": 40976,
+      "crc32": "3337ec46",
+      "seconds": 10.11,
+      "data_seconds": 4.94,
+      "burst": true,
+      "retries": 0,
+      "status": "SMK restarting to install and play; verify USB status afterward"
+    }
+  ],
+  "timing_scope": "CLI timing includes connection and verification, excludes discovery and subsequent installation/restart",
+  "gameplay": {
+    "emulation_fps": 60.178306092124814,
+    "cpu1_online": 1,
+    "cpu1_faults": 0,
+    "cpu1_fallbacks": 0,
+    "lcd_timeouts": 0,
+    "lcd_failed": 0,
+    "core_error": 0,
+    "new_audio_underruns": 0
+  },
+  "verification": [
+    "Target cross-build and RAM reach",
+    "SMK package round-trip and protected-tail updater simulation",
+    "Actual C artwork/menu rendered and visually reviewed under ASan/UBSan",
+    "Actual library storage backend fault-injected at every add/delete I/O, readback corruption, protected ranges, malformed catalogs, maximum entry count, duplicate detection and hole reuse",
+    "Browser transport, library decoding/space checks, actual page connection/radio-loss/reconnect handlers",
+    "Bluetooth peripheral lifecycle under ASan/UBSan"
+  ],
+  "limits": [
+    "On-device deletion test blocked by automatic approval review; deletion and interruption recovery verified in host simulation only",
+    "Full-capacity Bluetooth upload and deliberate power loss not exercised on hardware",
+    "Browser native chooser/upload not automated on hardware; actual BLE transfers used CLI with the same protocol",
+    "No automatic defragmentation; game allocation rounds to 4 KiB sectors",
+    "Individual cartridge maximum 262672 bytes; battery save RAM volatile"
+  ]
+}

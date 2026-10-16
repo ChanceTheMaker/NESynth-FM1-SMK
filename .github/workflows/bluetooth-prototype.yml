@@ -16,12 +16,16 @@ on:
       - 'tests/private_calibration_guard.c'
       - 'tests/bluetooth_status.py'
       - 'tests/rom_transfer.c'
+      - 'tests/library_store.c'
+      - 'tests/bluetooth_storage.py'
       - 'tests/ble_calibration.py'
       - 'tests/rf_calibration.c'
       - 'tests/diagnostic_gatt.c'
       - 'tests/diagnostic_peripheral.c'
       - 'tests/loader_peripheral.c'
       - 'tests/bluetooth_transfer.mjs'
+      - 'tests/bluetooth_library.mjs'
+      - 'tests/bluetooth_loader_ui.mjs'
       - 'web/bluetooth*.js'
       - '.github/workflows/bluetooth-prototype.yml'
 permissions:
@@ -59,4 +63,7 @@ jobs:
           cc -O1 -g -Wall -Wextra -Werror -fsanitize=address,undefined -fno-sanitize-recover=all tests/loader_peripheral.c experiments/bluetooth/diagnostic_gatt.c -o build/loader-peripheral-test
           ./build/loader-peripheral-test
       - name: Validate burst transfer and recovery
-        run: node tests/bluetooth_transfer.mjs
+        run: |
+          node tests/bluetooth_transfer.mjs
+          node tests/bluetooth_library.mjs
+          node tests/bluetooth_loader_ui.mjs

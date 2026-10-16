@@ -4,6 +4,7 @@
  * ATT/advertising API follows JieLi's peripheral SDK and Felucca diagnostics.
  * Cooperative CPU0 only. Callback work is bounded and never writes flash. */
 #include "diagnostic_gatt.h"
+extern void np_loader_connected(void);
 extern int np_loader_write(const uint8_t *,unsigned);
 extern unsigned np_loader_read(uint16_t,uint8_t *,uint16_t);
 extern void att_server_init(const uint8_t *,uint16_t (*)(uint16_t,uint16_t,uint16_t,uint8_t *,uint16_t),int (*)(uint16_t,uint16_t,uint16_t,uint16_t,uint8_t *,uint16_t));
@@ -32,6 +33,7 @@ static void np_packet_impl(uint8_t type,uint16_t channel,uint8_t *p,uint16_t n,i
     (void)channel;
     int event=np_diag_event(&np_gatt,type,p,n,controller);
     if(event==1){
+        np_loader_connected();
         int result=ble_op_att_send_init(np_gatt.handle,np_att_ram,sizeof np_att_ram,247);
         np_advertise=0;
         if(result){np_error=(uint32_t)result;np_state=5;ble_op_disconnect(np_gatt.handle);}else {np_state=4;np_tune_pending=0;}

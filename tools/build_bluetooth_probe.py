@@ -2,7 +2,7 @@
 
 Requires the unchanged Hortator checkout and its hash-matched AC79 SDK.
 Default profiles are measurement-only. --diagnostic builds a separate SMK964
-raw application. --loader builds SMK966 game upload and playback.
+raw application. --loader builds SMK967 game upload and playback.
 Neither mode flashes, packages, or publishes automatically.
 Generated adaptations and SDK objects stay under ignored build/.
 Credit: DEADACTIVE's Hortator BLE port (GPL-3.0-only), based on Felucca;
@@ -24,7 +24,7 @@ def main():
     p.add_argument('--toolchain',default=TC)
     p.add_argument('--rom-capacity',type=int,choices=[262672,393744,524816],default=262672)
     p.add_argument('--peripheral',action='store_true',help='Link the SMK diagnostic GATT profile instead of the reference central')
-    p.add_argument('--loader',action='store_true',help='Build integrated SMK966 Bluetooth cartridge loader and NES player')
+    p.add_argument('--loader',action='store_true',help='Build integrated SMK967 Bluetooth cartridge loader and NES player')
     p.add_argument('--diagnostic',action='store_true',help='Build local SMK964 radio diagnostic; never flashes or publishes')
     p.add_argument('--private-calibration-backups',nargs=2,type=Path,help='PRIVATE device build only: paired stock backups; exact validated usrtrim match required')
     p.add_argument('--private-unit-backups',nargs=2,type=Path,help='Optional paired current 8192-byte factory reads; only after confirming the RF backup belongs to this same unit')
@@ -61,7 +61,7 @@ def main():
     player=ROOT/'build/smk37';baseline=json.loads((player/'manifest.json').read_text())
     if installable:
         import build_smk_loader
-        build_smk_loader.PRODUCT='SMK-37_966' if a.loader else 'SMK-37_964'
+        build_smk_loader.PRODUCT='SMK-37_967' if a.loader else 'SMK-37_964'
         build_smk_loader.build(a.toolchain,player)
     shutil.copytree(ref/'firmware/src/ble',out/'ble',dirs_exist_ok=True)
     def edit(file,old,new):
@@ -125,7 +125,7 @@ static int ble_rf_trim_load(void){
         # Every transition to gameplay/flash installation passes through chip reset.
         board=board.replace('return video_source;', 'return (unsigned char *)0x01c65000u;')
         board=board.replace('static int np_ble_usb', 'static void np_loader_recover(void);\nstatic int np_loader_usb(const unsigned char *,unsigned);\nstatic int np_ble_usb',1)
-        board=board.replace('#include "diagnostic_board.h"', '#define NP_BLUETOOTH_LOADER 1\n#define FL_RANGE_OK(off,n) ((uint32_t)(off)>=0x5b000u && (uint32_t)(off)<=0x9d000u && (uint32_t)(n)<=0x9d000u-(uint32_t)(off))\n#include "diagnostic_board.h"\n#include "loader_board.h"')
+        board=board.replace('#include "diagnostic_board.h"', '#define NP_BLUETOOTH_LOADER 1\n#define FL_RANGE_OK(off,n) ((uint32_t)(off)>=0x39000u && (uint32_t)(off)<=0x9d000u && (uint32_t)(n)<=0x9d000u-(uint32_t)(off))\n#include "diagnostic_board.h"\n#include "loader_board.h"')
         board=board.replace('zero(_bss_start,_bss_end);zero(_pool_start,_pool_end);','zero(_bss_start,_bss_end);')
         board=board.replace('fm1_irq_init();fm1_mailbox_clear();','fm1_irq_init();fm1_mailbox_clear();\n    np_loader_boot(cold);zero(_pool_start,_pool_end);')
         board=board.replace('int display_ok=display_init();','int display_ok=display_init();\n    if(np_loader_mode==2){recovery_init();recovery_enter();}\n    if(np_loader_mode){input_init();recovery_init();fm1_irq_enable_all();np_loader_run();}')
@@ -196,7 +196,7 @@ static int ble_rf_trim_load(void){
         core.append(dest)
     objects=[*core,out/'board.o',out/'ble.o',out/'ctx.o',*([out/'hooks.o'] if not installable else []),out/'receiver.o',out/'lto_stubs.o',*cfg,*members,*peripheral]
     profile_roots=['np_ble_diag_start','np_ble_diag_service','np_ble_diag_state','np_ble_diag_error','np_ble_diag_writes'] if a.peripheral else ['ble_user_start','ble_service','ble_console','ble_midi_send']
-    elf=out/('nesynth-SMK966-BLUETOOTH.elf' if a.loader else 'nesynth-SMK964-BLE-DIAGNOSTIC.elf' if a.diagnostic else 'nesynth-BLE-PROBE-DO-NOT-FLASH.elf')
+    elf=out/('nesynth-SMK967-BLUETOOTH.elf' if a.loader else 'nesynth-SMK964-BLE-DIAGNOSTIC.elf' if a.diagnostic else 'nesynth-BLE-PROBE-DO-NOT-FLASH.elf')
     run(['wsl','-e',a.toolchain+'/pi32v2/bin/ld','--gc-sections','--plugin',a.toolchain+'/pi32v2/bin/LLVMgold.so',
          '--plugin-opt=mcpu=r3','--plugin-opt=-pi32v2-large-program=true','--plugin-opt=-pi32v2-always-use-itblock=false',
          '--plugin-opt=-dont-used-symbol-list='+','.join(deps.LOG_FUNCS),'--orphan-handling=error','--wrap=memcpy',
@@ -246,7 +246,7 @@ static int ble_rf_trim_load(void){
         for name in ([] if a.loader else ['fl_erase4k_ram','fl_prog_ram']):
             body=ram_dis.split(name+':\n')[1].split('\n\n')[0]
             assert re.search(r'r0 = -1\b',body) and not re.search(r'\b(call|goto)\b|\]\s*=',body),'Flash writer was not disabled'
-        binary=out/('SMK966-BLUETOOTH-RAW.bin' if a.loader else 'SMK964-BLE-DIAGNOSTIC-RAW.bin')
+        binary=out/('SMK967-BLUETOOTH-RAW.bin' if a.loader else 'SMK964-BLE-DIAGNOSTIC-RAW.bin')
         data=bytearray()
         for section,address in [('.text',0x2000120),('.ram_text',sym('_rt_load')),('.dsp_text',sym('_dsp_load')),('.data',sym('_data_load'))]:
             part=out/(section[1:]+'.bin');part.unlink(missing_ok=True)
@@ -260,7 +260,8 @@ static int ble_rf_trim_load(void){
             baseline_app_bytes=None,ble_added_bytes=None,ram_reach_check=True,application_flash_writers_disabled=True,
             limitations=['Radio starts only after a fresh physical PLAY press','No game playback or cartridge upload in this diagnostic','No hardware test performed; power-cycle before USB restore'])
     if a.loader:
-        result.update(controller_packet_bytes=251,controller_data_length_extension=True,adapted_controller_config_sha256=hashlib.sha256((out/'loader_btctrler_config.c').read_bytes()).hexdigest(),app_limit=0x5b000-0x4120,app_free=0x5b000-0x4120-size,kind='SMK966 Bluetooth loader and player',product='SMK-37_966',rom_capacity=262672,bluetooth_role='cartridge loader',flash_writes=True,application_flash_writers_disabled=False,cartridge_flash_lo=0x5b000,cartridge_flash_hi=0x9d000,shared_workspace='exclusive loader mode: ROM 0x1c1a000, LCD 0x1c5b000, BLE 0x1c65000',limitations=['Maximum cartridge size 262672 bytes','Radio active only in loader mode','Hardware validation pending'])
+        assert size<=0x39000-0x4120, 'Application overlaps game library'
+        result.update(library_capacity=0x9d000-0x3b000,library_slots=32,controller_packet_bytes=251,controller_data_length_extension=True,adapted_controller_config_sha256=hashlib.sha256((out/'loader_btctrler_config.c').read_bytes()).hexdigest(),app_limit=0x39000-0x4120,app_free=0x39000-0x4120-size,kind='SMK967 Bluetooth loader and player',product='SMK-37_967',rom_capacity=262672,bluetooth_role='cartridge loader',flash_writes=True,application_flash_writers_disabled=False,cartridge_flash_lo=0x39000,cartridge_flash_hi=0x9d000,shared_workspace='exclusive loader mode: ROM 0x1c1a000, LCD 0x1c5b000, BLE 0x1c65000',limitations=['Maximum cartridge size 262672 bytes','Radio active only in loader mode','Hardware validation pending'])
     (out/'report.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
 
 if __name__=='__main__':main()
