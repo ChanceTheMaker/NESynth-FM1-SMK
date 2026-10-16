@@ -13,6 +13,10 @@
 #define SMK37_SCAN_REG(a) (*(volatile uint32_t *)(uintptr_t)(a))
 #endif
 #define SMK37_SCAN_CON SMK37_SCAN_REG(0x11e00u)
+/* Application override; keep the stock musical-instrument default. */
+#ifndef SMK37_SCAN_BAUD
+#define SMK37_SCAN_BAUD 5u
+#endif
 static uint32_t smk37_scan_word __attribute__((aligned(4)));
 static uint32_t smk37_scan_analog_mask = UINT32_MAX;
 /* Main loop publishes one indicator (1..19); zero is off. ISR owns the
@@ -84,7 +88,7 @@ static inline void smk37_scan_init(void (*attach)(uint32_t, void (*)(void), uint
     SMK37_SCAN_REG(0x50014u) &= ~((1u<<1)|(1u<<3)|(1u<<4));
     SMK37_SCAN_REG(0x51020u) = (SMK37_SCAN_REG(0x51020u) & ~(1u<<16)) | (1u<<17);
     SMK37_SCAN_CON = 0x6020;
-    SMK37_SCAN_REG(0x11e04u) = 5;
+    SMK37_SCAN_REG(0x11e04u) = SMK37_SCAN_BAUD;
     attach(37, isr, 5);
     smk37_scan_next();
     SMK37_SCAN_CON |= 1;

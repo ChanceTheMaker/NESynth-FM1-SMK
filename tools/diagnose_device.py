@@ -18,7 +18,7 @@ def main():
     a.output=a.output or ROOT/'build'/a.board/'diagnostics.json'
     fields=FIELDS[:40] if a.version==3 else FIELDS[:]
     if a.version==5:fields+=['lcd_busy','lcd_timeouts','lcd_failed','usb_irq_ticks','clock_div','clock_sys']
-    if a.board=='smk37':wire.PORT_RE=re.compile(r'smk|sinco|usb-midi|composite|ota',re.I)
+    wire.PORT_RE=re.compile(r'nesynth|'+(r'smk|sinco|usb-midi|composite|ota' if a.board=='smk37' else wire.PORT_RE.pattern),re.I)
     model='SMK-37' if a.board=='smk37' else 'FM-1'
     up=wire.Updater(wire.MidoBackend(),port=a.port);dev=up.find(lambda i:i.model==model)
     if not dev:raise RuntimeError('No '+model+' NESynth identity response')
@@ -43,6 +43,12 @@ def main():
             n=(last['emu_measured_frames']-first['emu_measured_frames'])&0xffffffff
             result['mean_frame_ms']=((last['emu_total_ticks']-first['emu_total_ticks'])&0xffffffff)/24000/max(1,n)
             print(json.dumps({'rates':result['rates'],'mean_frame_ms':result['mean_frame_ms']}),flush=True)
+            if a.version>=4:
+                result['scan_cpu_percent']=((last['scan_irq_ticks']-first['scan_irq_ticks'])&0xffffffff)/24000000/seconds*100
+                scans=((last['scan_irqs']-first['scan_irqs'])&0xffffffff)/seconds
+                result['scan_frames_per_second']=scans
+                if a.board=='smk37':result['estimated_scan_interrupts_per_second']=scans*16
+                print(json.dumps({key:result[key] for key in ['scan_cpu_percent','scan_frames_per_second','estimated_scan_interrupts_per_second'] if key in result}),flush=True)
         if a.version>=4 and len(rows)>1:
             profile=['cpu_ticks','ppu_ticks','apu_ticks','scan_irq_ticks']+(['usb_irq_ticks'] if a.version==5 else [])
             result['profile_ms_per_frame']={field:((last[field]-first[field])&0xffffffff)/24000/max(1,n) for field in profile}

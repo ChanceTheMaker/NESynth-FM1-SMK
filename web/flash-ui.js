@@ -3,7 +3,7 @@ import {Updater} from './vendor/fm1ota.js?v=20261013';
 import {installFirmware,fm1Identity} from './install-firmware.js?v=20261013';
 import {restoreLatest} from './restore-firmware.js?v=20261013';
 import {createProgress} from './update-progress.js?v=20261013';
-import {SMK_MODELS,getSmkStock,prepareSmkFirmware,prepareSmkRestore} from './smk-firmware.js?v=962';
+import {SMK_MODELS,getSmkStock,prepareSmkFirmware,prepareSmkRestore} from './smk-firmware.js?v=963';
 import {installSmkFirmware,smkIdentity,SMK_PORT_PATTERN} from './smk-install.js';
 const $=id=>document.getElementById(id);
 const isFm=()=>$('flash-model').value==='fm1';

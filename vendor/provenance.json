@@ -480,5 +480,11 @@
       "upstream": "../arcade-fm1-smk/vendor/felucca/tools/lz4blk.py",
       "sha256": "ee7c0331d1fb99af46a9dcf4a7987a8ad168449075b53802cfd8da6546360760"
     }
+  ],
+  "local_adaptations": [
+    {
+      "path": "vendor/felucca/firmware/hal/smk37_scanner.h",
+      "change": "Parameterize SPI2 baud with SMK37_SCAN_BAUD, default 5 unchanged. NESynth supplies 95 before scanner initialization to reduce measured interrupt load. Original imported hash retained above."
+    }
   ]
 }

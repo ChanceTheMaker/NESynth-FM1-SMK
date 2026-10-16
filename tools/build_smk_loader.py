@@ -2,7 +2,7 @@
 import hashlib,json,re,subprocess
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-PRODUCT='SMK-37_962'
+PRODUCT='SMK-37_963'
 def build(tc,out):
     gen=out/'update';gen.mkdir(exist_ok=True)
     rel=lambda p:p.relative_to(ROOT).as_posix()

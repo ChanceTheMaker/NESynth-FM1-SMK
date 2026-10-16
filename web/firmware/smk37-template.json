@@ -1,8 +1,8 @@
 {
-  "product": "SMK-37_962",
+  "product": "SMK-37_963",
   "package": "smk37-template.bin",
   "bytes": 573728,
-  "sha256": "5031c3b612ec3261a9422da02e1277f838f7baf98e196efef82a90b20266a914",
+  "sha256": "a899230a8e750d4b312ee77f3051b02119d47a6d9166010892e93005c07a479e",
   "models": [
     "SMK-37 Pro",
     "SMK-37 Elite"
@@ -21,11 +21,11 @@
     9,
     11
   ],
-  "protected_app_sha256": "d5de3a74a4fe9af8c2402e54077485f939bf00f2efc53d45e8640c9dbf11d16e",
+  "protected_app_sha256": "c238496858b13c7d372acb30f838b2f06dced69121fabe57c0ed44580a203c3c",
   "loader": {
-    "product": "SMK-37_962",
+    "product": "SMK-37_963",
     "bytes": 8160,
-    "sha256": "54095e475e5542be66f03326d55fe75a04ed9322c49decb3682643c86737c19b",
+    "sha256": "a6be0eebbfd38f4885cb94b2dea2df4d2b766f27380aa0e5fb8f1eb1b29b9b13",
     "entry": "0x01c0a800",
     "write_lo": "0x4000",
     "write_hi": "0x9d000",

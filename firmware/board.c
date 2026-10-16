@@ -34,6 +34,7 @@ volatile smk37_bootguard_t gb_bootguard __attribute__((section(".noinit")));
 #include "smk37_display_dma.h"
 static smk_display_dma_t display_dma;
 #include "smk37_panel.h"
+#include "smk37_scan_config.h"
 #include "smk37_scanner.h"
 #include "smk37_contacts.h"
 #include "smk37_keyscan.h"

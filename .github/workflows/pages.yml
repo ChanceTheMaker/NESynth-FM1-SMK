@@ -31,6 +31,8 @@ jobs:
           cc -O1 -UNDEBUG tests/smk37_display.c -o build/smk37-display
           ./build/smk37-display
           python tests/diagnostics.py
+          cc -O1 -UNDEBUG tests/smk37_scan.c -o build/smk37-scan
+          ./build/smk37-scan
       - name: Check shipped assets and firmware builder
         run: npm run test:site
       - name: Check SMK model packages and protected flash updater

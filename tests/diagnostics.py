@@ -32,6 +32,7 @@ class Diagnostics(unittest.TestCase):
                 link=Link(version);model='SMK-37' if board=='smk37' else 'FM-1'
                 device=SimpleNamespace(link=link,id=SimpleNamespace(model=model,text=model+'_962'))
                 def find(want):
+                    self.assertTrue(diagnostic.wire.PORT_RE.search('NESynth 0'))
                     self.assertTrue(want(device.id))
                     self.assertFalse(want(SimpleNamespace(model='unrelated')))
                     return device
@@ -46,6 +47,7 @@ class Diagnostics(unittest.TestCase):
                 self.assertEqual(result['rates']['display_fps'],20)
                 self.assertAlmostEqual(result['mean_frame_ms'],1000/120)
                 if version>=4:self.assertAlmostEqual(result['profile_ms_per_frame']['scan_irq_ticks'],10/120)
+                if version>=4:self.assertAlmostEqual(result['scan_cpu_percent'],0.5)
                 if version==5:
                     self.assertAlmostEqual(result['profile_ms_per_frame']['usb_irq_ticks'],20/120)
                     self.assertEqual(result['samples'][0]['clock_div'],0x123)
