@@ -250,6 +250,7 @@ python tools/build_bluetooth_probe.py --diagnostic
 node tools/package_bluetooth_diagnostic.mjs build/smk37/stock-pro.fwsc
 python -m pip install --target build/bluetooth-python-deps bleak==3.0.2
 # After installing the local diagnostic and pressing PLAY:
+python tools/inspect_bluetooth_diagnostic.py  # USB status; no radio start or flash write
 python tools/test_bluetooth_diagnostic.py
 ```
 
@@ -259,6 +260,22 @@ JSON reports. The raw `.bin` is not an installer. The package round-trip verifie
 exact application bytes and protected boot; the actual update packet also passes
 the C RAM-loader simulation with a synthetic calibration fixture and preserved tail.
 No vendor firmware, device calibration or game ROM is committed or published.
+
+Hardware testing on 2026-10-16 found that the owner's live VM region had
+already been repurposed by Melodee: `0x9d000` was erased and `0xad000` held
+its `MSP2` object header. The default reader correctly reported error 1 before
+starting the controller. USB metadata is available through the inspector above;
+it contains state, parser/read results and bank markers, never RF payload bytes.
+
+For this case only, `--diagnostic --private-calibration-backups FIRST SECOND`
+accepts two identical full stock backups and validates their records with the
+same C parser. It embeds only RF/crystal/PA records and the protected 8 KiB
+factory region in an ignored local image. Before using the saved records, the
+device must match that entire factory region byte for byte. A mismatch fails
+closed. This does not restore or write VM/music storage. Packages are prefixed
+`PRIVATE-`; neither the generated header nor firmware may be committed or
+published. This fallback is diagnostic-only and is not a general cartridge
+loader or calibration migration.
 
 The test client uses [Bleak discovery](https://bleak.readthedocs.io/en/latest/api/scanner.html)
 and [GATT reads/writes](https://bleak.readthedocs.io/en/latest/api/client.html), matches

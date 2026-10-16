@@ -1,7 +1,7 @@
 {
   "date": "2026-10-16",
   "branch": "feat/bluetooth-loader-prototype",
-  "status": "Local SMK Pro diagnostic prepared; no device flashed or radio validated",
+  "status": "SMK964 private diagnostic installed; RF startup blocked by existing Melodee storage and failed full factory-region match",
   "build": {
     "kind": "SMK964 diagnostic candidate",
     "reference": "7e3415971c5800b4a3ad0146a7d95615883d7d96",
@@ -9,12 +9,12 @@
     "bluetooth_role": "diagnostic peripheral, RAM echo only",
     "flash_writes": false,
     "radio_started": false,
-    "app_bytes": 142228,
+    "app_bytes": 151068,
     "app_limit": 581564,
-    "app_free": 439336,
+    "app_free": 430496,
     "baseline_app_bytes": null,
     "ble_added_bytes": null,
-    "ram_bytes": 12236,
+    "ram_bytes": 12268,
     "ram_limit": 73728,
     "pool_and_cpu1_stacks_bytes": 177632,
     "pool_limit": 368640,
@@ -40,10 +40,11 @@
     "limitations": [
       "Radio starts only after a fresh physical PLAY press",
       "No game playback or cartridge upload in this diagnostic",
-      "No hardware test performed; power-cycle before USB restore"
+      "Installed and USB verified; saved RF fallback refused because the full factory-region comparison failed; radio never started"
     ],
+    "private_device_calibration": true,
     "product": "SMK-37_964",
-    "sha256": "2c72ea81997c0df6ae040972de0fa1531c255370bb963ad2e6fc304064e6c131",
+    "sha256": "cb26894ac74876b435c4b611b768726c4565729716a960eec6f476119705fc32",
     "hardware_validated": false,
     "ram_reach_check": true,
     "application_flash_writers_disabled": true
@@ -51,11 +52,12 @@
   "package": {
     "product": "SMK-37_964",
     "model": "SMK-37 Pro",
-    "app_sha256": "2c72ea81997c0df6ae040972de0fa1531c255370bb963ad2e6fc304064e6c131",
-    "fwsc_sha256": "25d0ecbb4a994a12cacf7cd5573d8420596c45836d59531d2e5a5b46b2ecd28a",
-    "update_sha256": "e20046d671115aa65b24fab1dcfc234bc5481c9854d0153710affc2bc752ae08",
+    "private_device_calibration": true,
+    "app_sha256": "cb26894ac74876b435c4b611b768726c4565729716a960eec6f476119705fc32",
+    "fwsc_sha256": "1cb9de3b7d5563cd34e04418ad93114ec1671565c2de9e71f43811188b6423f7",
+    "update_sha256": "2fbdcf9e6e71e7d53898a642b7e34a404e9ed3dfe3f6f6528d6744e71e30419e",
     "hardware_validated": false,
-    "flashed": false
+    "flashed": true
   },
   "calibration": {
     "method": "Pinned SDK VM bank header selection and sequential CRC-checked record traversal; no persistent SDK VM initialization",
@@ -81,7 +83,15 @@
       "cfg_tool.a vm.c.o: vm_init and vm_renew_all_index_last_updated_addr",
       "apps/common/system/init.c: cpu_in_irq and cpu_irq_disabled",
       "Felucca diagnostics: bounded SDK controller event length exception and duplicate guards"
-    ]
+    ],
+    "live_layout": {
+      "bank0_header": "0xffffffff",
+      "bank1_header": "0x3250534d (MSP2)",
+      "flash_read_result": 0,
+      "parser_result": -1,
+      "explanation": "Melodee ms_sector uses 0x9d000..0xbffff for object storage; 0xc0000..0xc1fff remains protected",
+      "vm_restored": false
+    }
   },
   "checks": [
     "RF reader ASan/UBSan: stale copies, ambiguous banks, outer/inner CRC, failed reads and missing records",
@@ -89,17 +99,95 @@
     "Peripheral ASan/UBSan: calibration gate, one startup task, advertising command order, duplicate callbacks, errors and timeout",
     "Target link: entry/region bounds, required USB recovery symbols, RAM reachability, disabled application flash writers",
     "Package: pinned Pro stock validation, exact app round-trip and protected boot",
-    "Actual diagnostic update packet through C RAM-loader simulator: 152 changed sectors, saved tail preserved"
+    "Actual diagnostic update packet through C RAM-loader simulator: 152 changed sectors, saved tail preserved",
+    "ASan/UBSan exact 8192-byte factory match: mismatches across region, last byte, failed reads, invalid size and null inputs",
+    "USB status decoder: signed errors, malformed packet and uint32 overflow"
   ],
   "hardware": {
-    "usb_identity_probe": "No SMK-37 NESynth identity response",
-    "flashed": false,
+    "usb_identity_before": "SMK-37_963",
+    "usb_identity_after": "SMK-37_964",
+    "flashed": true,
+    "transfer_finished": true,
+    "transfer_requests": 2450,
+    "restart_verified": true,
+    "diagnostic_samples": 2,
+    "core_error": 0,
+    "cpu1_online": 0,
+    "audio_irqs": 0,
+    "lcd_timeouts": 0,
+    "lcd_failed": 0,
     "radio_started": false,
-    "echo_verified": false
+    "echo_verified": false,
+    "transport_note": "Windows MIDI host process exited during USB re-enumeration. Waiting RAM loader identity verified before programming; separate read-only diagnostic confirmed SMK-37_964 after completed transfer.",
+    "physical_play_pressed": true,
+    "lcd_state": "RADIO ERROR",
+    "lcd_error": 1,
+    "ble_scan_matches": 0,
+    "usb_responsive_after_error": true,
+    "telemetry_update": {
+      "flashed": true,
+      "transfer_requests": 2450,
+      "restart_verified": true,
+      "status_query_verified": true,
+      "state_before_play": 0
+    },
+    "private_diagnostic": {
+      "flashed": true,
+      "restart_verified": true,
+      "status": {
+        "identity": "SMK-37_964",
+        "state": 5,
+        "error": 1,
+        "rf_result": -5,
+        "rf_bank": 0,
+        "rf_record": 0,
+        "rf_records": 0,
+        "read_result": 0,
+        "read_count": 2,
+        "read_offset": 708608,
+        "read_size": 4,
+        "sfc_con": 2157446069,
+        "bank0_header": 4294967295,
+        "bank1_header": 844125005,
+        "private_factory_match": 0
+      },
+      "ble_scan_matches": 0,
+      "radio_started": false,
+      "echo_verified": false
+    }
   },
   "remaining": [
-    "Physical diagnostic install/recovery trial",
+    "Reconcile backup identity and changed factory-region bytes before accepting saved RF calibration",
     "Radio startup and Bluetooth echo test",
+    "Power-cycle and USB restoration trial",
     "Persistent game storage, transfer service, browser/front loader and gameplay reboot"
+  ],
+  "attempts": [
+    {
+      "app_sha256": "2c72ea81997c0df6ae040972de0fa1531c255370bb963ad2e6fc304064e6c131",
+      "package_sha256": "e20046d671115aa65b24fab1dcfc234bc5481c9854d0153710affc2bc752ae08",
+      "result": "Installed and USB restart verified; PLAY produced RADIO ERROR 1 before controller startup; host scan found zero diagnostic advertisers"
+    },
+    {
+      "app_sha256": "7c04018a570ec12727fd72f010986b779dadedf991bd70c740b1940834108daa",
+      "package_sha256": "d370cad0e8b0bfdcd07b37166bf77d99e4be0f323d5e488a830dacdcb3e20bb5",
+      "result": "USB telemetry confirmed successful flash reads, erased bank 0 and Melodee MSP2 in bank 1; strict parser refused layout before controller startup",
+      "status": {
+        "identity": "SMK-37_964",
+        "state": 5,
+        "error": 1,
+        "rf_result": -1,
+        "rf_bank": 0,
+        "rf_record": 0,
+        "rf_records": 0,
+        "read_result": 0,
+        "read_count": 2,
+        "read_offset": 708608,
+        "read_size": 4,
+        "sfc_con": 2157446069,
+        "bank0_header": 4294967295,
+        "bank1_header": 844125005
+      }
+    }
   ]
 }

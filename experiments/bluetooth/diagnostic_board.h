@@ -18,10 +18,43 @@ void core_irq_mask(uint32_t n){if(n<128)fm1_irq_mask(n);}
 void core_irq_unmask(uint32_t n){if(n<128)fm1_irq_unmask(n);}
 uint32_t core_irq_is_masked(uint32_t n){return n<128?fm1_irq_is_masked(n):1;}
 void core_ble_stack_window(void){fm1_guard_stack_window((uint32_t)(uintptr_t)video_source,(uint32_t)(uintptr_t)_sstack_top);}
+static uint32_t np_read_count,np_read_off,np_read_size,np_read_sfc,np_read_magic[2];
+static int np_read_result;
+static uint32_t np_private_match;
 int core_flash_read(uint32_t off,void *p,uint32_t n){
+    np_read_count++;np_read_off=off;np_read_size=n;np_read_sfc=SFC_CON;
     /* Before radio only; CPU1 never starts and display DMA must be idle. */
-    if(np_ble_diag_state()||display_dma.busy||off<0x9d000u||off>=0xbd000u||!n||n>0xbd000u-off)return -1;
-    fm1_irq_off();int result=FL_FAR(fl_read_ram)(off,p,n);fm1_irq_on();return result;
+    if(np_ble_diag_state()||display_dma.busy||off<0x9d000u||off>=0xbd000u||!n||n>0xbd000u-off){np_read_result=-1;return -1;}
+    fm1_irq_off();int result=FL_FAR(fl_read_ram)(off,p,n);fm1_irq_on();
+    np_read_result=result;
+    if(!result&&n==4&&(off==0x9d000u||off==0xad000u)){
+        const uint8_t *b=p;np_read_magic[off==0xad000u]=(uint32_t)b[0]|(uint32_t)b[1]<<8|(uint32_t)b[2]<<16|(uint32_t)b[3]<<24;
+    }
+    return result;
+}
+/* Private diagnostic fallback: compare the whole preserved factory area.
+ * The backup's RF records are accepted only for this exact device image.
+ * No saved VM/music bytes are restored or modified. */
+#include "private_calibration_guard.h"
+static int np_factory_read_adapter(void *ctx,uint32_t off,uint8_t *p,uint32_t n){
+    (void)ctx;fm1_wdt_feed();fm1_irq_off();int rc=FL_FAR(fl_read_ram)(off,p,n);fm1_irq_on();return rc;
+}
+int core_private_factory_matches(const unsigned char *expected,unsigned n){
+    np_private_match=0;
+    if(np_ble_diag_state()||display_dma.busy)return 0;
+    np_private_match=np_private_factory_matches(np_factory_read_adapter,0,expected,n);
+    return (int)np_private_match;
+}
+/* Fixed read-only status query, never returns calibration payload bytes. */
+extern uint32_t np_ble_rf_status(unsigned);
+static int np_ble_usb(const uint8_t *p,unsigned n){
+    if(n!=4||p[0]!=0x7d||p[1]!='N'||p[2]!='B'||p[3]!=2)return 0;
+    uint32_t values[]={np_ble_diag_state(),np_ble_diag_error(),
+        np_ble_rf_status(0),np_ble_rf_status(1),np_ble_rf_status(2),np_ble_rf_status(3),
+        (uint32_t)np_read_result,np_read_count,np_read_off,np_read_size,np_read_sfc,np_read_magic[0],np_read_magic[1],np_private_match};
+    uint8_t response[5+sizeof(values)/sizeof(values[0])*5+1]={0xf0,0x7d,'N','B',2};unsigned k=5;
+    for(unsigned i=0;i<sizeof(values)/sizeof(values[0]);i++)for(unsigned j=0;j<5;j++)response[k++]=(values[i]>>(j*7))&127u;
+    response[k++]=0xf7;ota_wire_send(response,k);return 1;
 }
 uint32_t core_audio_late(void){return 0;}
 uint32_t core_ui_frames(void){return display_count;}
