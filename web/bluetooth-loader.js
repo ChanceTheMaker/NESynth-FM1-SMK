@@ -7,19 +7,19 @@ import {normalizeCartridge} from './cartridge.js';
 import {validateHardwareRom} from './rom-firmware.js';
 const SERVICE='f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7f0',VALUE='f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7f1';
 const $=s=>document.querySelector(s),status=s=>$('#status').textContent=s;
-let device,characteristic,rom,romName='',entries=[],busy=false,checking=false,installing=false,library=null;
+let device,characteristic,rom,romName='',entries=[],busy=false,checking=false,loading=false,dragging=false,connectionIssue=false,installing=false,library=null;
 function connectionName(){return device?.transport||($('#transport').value==='usb'?'USB':'Bluetooth');}
 function refresh(){
-    const locked=busy||checking,connected=!!characteristic&&!!device?.gatt.connected;
-    $('#send').disabled=locked||!rom||!connected;$('#connect').disabled=locked;$('#file').disabled=locked;$('#entries').disabled=locked;
+    const locked=busy||checking||loading,connected=!!characteristic&&!!device?.gatt.connected;
+    $('#send').disabled=locked||!rom||!connected;$('#connect').disabled=locked;$('#file').disabled=busy||loading;$('#entries').disabled=locked;
     $('#transport').disabled=locked||connected;
     $('#bluetooth-help').hidden=$('#transport').value==='usb';$('#usb-help').hidden=$('#transport').value!=='usb';
-    $('#connection').textContent=`${connectionName()} ${connected?'connected':'disconnected'}`;
+    $('#connection').textContent=`${connectionName()} ${connected?(connectionIssue?'connection unconfirmed':'connected'):'disconnected'}`;
     $('#connect').textContent=connected?'Disconnect SMK':'Connect SMK';
     document.querySelectorAll('#library button').forEach(b=>b.disabled=locked||!connected);
 }
 function disconnected(current){
-    if(current!==device)return;characteristic=null;library=null;$('#library').hidden=true;refresh();
+    if(current!==device)return;characteristic=null;connectionIssue=false;library=null;$('#library').hidden=true;refresh();
     if(!busy&&!installing)status(`${connectionName()} disconnected. Choose your connection and reconnect to load another game.`);
 }
 function renderLibrary(){
@@ -34,7 +34,7 @@ function renderLibrary(){
     if(!library.count){const row=document.createElement('li');row.textContent='No games installed yet.';$('#games').append(row);}refresh();
 }
 async function libraryAction(op,game){
-    if(busy||checking||!characteristic)return;
+    if(busy||loading||checking||!characteristic)return;
     if(op===8&&!confirm(`Delete ${game.name} from the SMK?`))return;
     busy=true;refresh();try{
         await characteristic.writeValueWithResponse(loaderPacket(op,game.index,game.crc));installing=true;
@@ -42,16 +42,49 @@ async function libraryAction(op,game){
         device.gatt.disconnect();disconnected(device);
     }catch(e){status(e.message);}finally{busy=false;refresh();}
 }
-async function choose(index){rom=null;refresh();const entry=entries[index],result=await normalizeCartridge(await entry.read());validateHardwareRom(result.bytes);if(result.bytes.length>262672)throw Error('This build holds individual games up to 262672 bytes. Choose a smaller game.');rom=result.bytes;romName=entry.name;$('#name').textContent=`${entry.name} / ${rom.length.toLocaleString()} bytes`;status(result.notice||'Game ready. Connect your SMK, then send and play.');refresh();}
-async function open(file){if(busy||checking||!file)return;rom=null;refresh();try{entries=await openCartridge(file);$('#entries').replaceChildren(...entries.map((e,i)=>new Option(e.name,String(i))));$('#entries').hidden=entries.length<2;await choose(0);}catch(e){status(e.message);}}
-$('#file').onchange=e=>open(e.target.files[0]);$('#entries').onchange=e=>choose(Number(e.target.value)).catch(e=>status(e.message));
-for(const event of ['dragenter','dragover'])$('#drop').addEventListener(event,e=>{e.preventDefault();$('#drop').classList.add('over');});
-for(const event of ['dragleave','drop'])$('#drop').addEventListener(event,e=>{e.preventDefault();$('#drop').classList.remove('over');if(event==='drop')open(e.dataTransfer.files[0]);});
+async function choose(index){
+    const entry=entries[index],result=await normalizeCartridge(await entry.read());
+    validateHardwareRom(result.bytes);
+    if(result.bytes.length>262672)throw Error('This build holds individual games up to 262672 bytes. Choose a smaller game.');
+    rom=result.bytes;romName=entry.name;$('#name').textContent=`${entry.name} / ${rom.length.toLocaleString()} bytes`;
+    status(result.notice||(characteristic&&device?.gatt.connected?'Game ready. Click Send and play.':'Game ready. Connect your SMK, then send and play.'));
+}
+// Importing is local work: accept files even during a connection check, but keep
+// uploads and competing imports locked until validation has finished.
+async function importGame(file,index){
+    if(busy||loading)return;
+    loading=true;rom=null;$('#name').textContent='Reading game...';refresh();
+    try{
+        if(file){
+            entries=await openCartridge(file);
+            $('#entries').replaceChildren(...entries.map((e,i)=>new Option(e.name,String(i))));
+            $('#entries').hidden=entries.length<2;$('#entries').value='0';
+        }
+        await choose(index);
+    }catch(e){$('#name').textContent='No game selected';status(e.message);}
+    finally{loading=false;refresh();}
+}
+$('#file').onchange=e=>e.target.files[0]&&importGame(e.target.files[0],0);
+$('#entries').onchange=e=>importGame(null,Number(e.target.value));
+const fileDrag=e=>Array.from(e.dataTransfer?.types||[]).includes('Files')||e.dataTransfer?.files?.length;
+// Catch file drops across the page so a miss or a child element cannot navigate
+// away and tear down the USB/Bluetooth connection. Only the box selects a game.
+for(const event of ['dragenter','dragover'])document.addEventListener(event,e=>{
+    if(!fileDrag(e))return;e.preventDefault();dragging=true;
+    $('#drop').classList.add('over');
+});
+document.addEventListener('dragleave',e=>{
+    if(e.relatedTarget)return;dragging=false;$('#drop').classList.remove('over');
+});
+document.addEventListener('drop',e=>{
+    if(!fileDrag(e))return;e.preventDefault();dragging=false;$('#drop').classList.remove('over');
+    if($('#drop').contains(e.target)&&e.dataTransfer.files[0])return importGame(e.dataTransfer.files[0],0);
+});
 $('#transport').onchange=()=>{device=null;refresh();};
 $('#connect').onclick=async()=>{
-    if(busy||checking)return;
+    if(busy||loading||checking)return;
     if(device?.gatt.connected){device.gatt.disconnect();disconnected(device);return;}
-    busy=true;installing=false;refresh();
+    busy=true;connectionIssue=false;installing=false;refresh();
     try{
         if($('#transport').value==='usb'){
             const usb=await connectUsbLibrary(status);device=usb.device;characteristic=usb.characteristic;
@@ -68,7 +101,7 @@ $('#connect').onclick=async()=>{
     finally{busy=false;refresh();}
 };
 $('#send').onclick=async()=>{
-    if(busy||checking||!characteristic)return;busy=true;refresh();const started=performance.now();
+    if(busy||loading||checking||!characteristic)return;busy=true;refresh();const started=performance.now();
     try{
         const channel=characteristic;ensureLibrarySpace(library,rom);
         if(library){await channel.writeValueWithResponse(Uint8Array.of(4));await channel.writeValueWithResponse(gameNamePacket(romName));}
@@ -80,12 +113,21 @@ $('#send').onclick=async()=>{
         device.gatt.disconnect();disconnected(device);
     }catch(e){status(e.message);}finally{busy=false;refresh();}
 };
-// Read-only heartbeat confirms the radio link, rather than trusting a stale label.
+// Native disconnect events remain authoritative. A delayed/rejected idle read
+// must not close a live connection (for example while dragging from Explorer).
 setInterval(async()=>{
-    if(busy||checking||!characteristic)return;
-    const current=device,channel=characteristic;checking=true;refresh();let timer;
-    try{await Promise.race([channel.readValue(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Game-loader connection timed out.')),5000);})]);}
-    catch(e){if(current===device){current.gatt.disconnect();disconnected(current);status(`${connectionName()} connection lost. Check your cable or Bluetooth, then reconnect.`);}}
-    finally{clearTimeout(timer);checking=false;refresh();}
+    if(busy||loading||checking||dragging||document.hidden||!document.hasFocus()||!characteristic)return;
+    const current=device,channel=characteristic;checking=true;refresh();
+    try{
+        // Keep exactly one read in flight. Racing a separate JS timeout leaves
+        // an uncancelled GATT read behind and can conflict with the next command.
+        await channel.readValue();
+        if(current===device)connectionIssue=false;
+    }catch(e){
+        if(current===device){
+            if(!current.gatt.connected)disconnected(current);
+            else connectionIssue=true;
+        }
+    }finally{checking=false;refresh();}
 },4000);
 refresh();
