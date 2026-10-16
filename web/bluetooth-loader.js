@@ -97,7 +97,7 @@ $('#connect').onclick=async()=>{
         }
         decodeLoaderStatus(await characteristic.readValue());library=await readLibrary(characteristic);renderLibrary();
         status(library?`${connectionName()} connected. Add a game or play one from your library.`:'Bluetooth connected. This older firmware stores one game at a time.');
-    }catch(e){device?.gatt.disconnect();disconnected(device);status(e.name==='NotFoundError'?'No device selected. On builds 967 and newer, hold PLAY + REC for the library, then press REC. Wait for SEND A GAME and select NESynth SMK or NESynth FM1. Check that computer Bluetooth is on.':e.message);}
+    }catch(e){device?.gatt.disconnect();disconnected(device);status(e.name==='NotFoundError'?'No device selected. Hold PLAY + REC for the library, then press PLAY (Select). Wait for SEND A GAME and select NESynth SMK or NESynth FM1. Check that computer Bluetooth is on.':e.message);}
     finally{busy=false;refresh();}
 };
 $('#send').onclick=async()=>{

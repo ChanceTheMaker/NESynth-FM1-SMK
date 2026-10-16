@@ -24,7 +24,7 @@ static uint32_t np_menu_buttons(void){
     return smk_input_frame();
 #else
     uint32_t p=gp_input_keys(key_lo,0),b=np_panel_buttons();
-    if(b&1)p|=GP_START;if(b&2)p|=GP_SELECT;return p;
+    if(b&1)p|=GP_SELECT;if(b&2)p|=GP_START;return p;
 #endif
 }
 static void np_draw_strip(unsigned y,unsigned rows,const uint16_t *pixels){
@@ -190,9 +190,9 @@ static void np_menu_draw(void){
             np_art_text(&a,14,93+row*24,name,2,0xef5c);
         }
         if(!np_library.catalog.count)np_art_center(&a,120,"NO GAMES YET",2,0xef5c);
-        np_art_center(&a,190,"KEYS SELECT  PLAY GO",2,0xef5c);
+        np_art_center(&a,190,"KEYS SELECT  REC GO",2,0xef5c);
         np_art_center(&a,205,space,2,0x45bf);
-        np_art_center(&a,224,np_loader_error?"GAME ERROR  REC TO LOAD":"REC BT  USB ON PC",2,np_loader_error?0xe9e8:0x9cf3);
+        np_art_center(&a,224,np_loader_error?"GAME ERROR PLAY TO LOAD":"PLAY BT  USB ON PC",2,np_loader_error?0xe9e8:0x9cf3);
         np_draw_strip(y,60,NP_UI);
     }
 }
@@ -221,7 +221,7 @@ static __attribute__((noreturn)) void np_loader_run(void){
         fm1_wdt_feed();recovery_service();np_ble_diag_service();uint32_t now=core_ms();
         if(np_loader_pending&&(int32_t)(now-np_loader_due)>=0){display_stop();np_restart_as(np_loader_pending,np_loader_pending==NP_MODE_WRITE?np_loader_rx.length:np_pending_index,np_loader_pending==NP_MODE_WRITE?np_loader_rx.expected_crc:np_pending_crc);}
         uint32_t buttons=np_panel_buttons(),pressed=buttons&~previous;previous=buttons;
-        if((pressed&1u)&&!np_loader_pending&&np_loader_rx.state!=NP_RX_RECEIVING)np_restart_as(NP_MODE_MENU,0,0);
+        if((pressed&2u)&&!np_loader_pending&&np_loader_rx.state!=NP_RX_RECEIVING)np_restart_as(NP_MODE_MENU,0,0);
         if(now-last>=500){last=now;np_loader_draw();}
         if(now>=30000&&scan_count>100)smk37_bootguard_healthy(&gb_bootguard);
     }

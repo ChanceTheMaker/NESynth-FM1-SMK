@@ -14,12 +14,12 @@ int main(void){
     assert(gp_smk37_keys((1u<<7)|(1u<<9),0)==(GP_LEFT|GP_DOWN));
     assert(gp_smk37_keys((1u<<11)|(1u<<9),0)==(GP_RIGHT|GP_DOWN));
     assert(gp_smk37_keys(1u<<8,0)==GP_UP&&gp_smk37_keys(1u<<10,0)==GP_UP);
-    assert(gp_smk37_keys(0,1u<<1)==GP_A&&gp_smk37_keys(0,1u<<4)==GP_B);
-    assert(gp_smk37_keys(1u<<6,1u<<3)==0);
+    assert(gp_smk37_keys(0,1u<<3)==GP_B&&gp_smk37_keys(0,1u<<4)==GP_A);
+    assert(gp_smk37_keys(1u<<6,1u<<1)==0);
     const unsigned pads[]={8,9,10,1,14,15},bits[]={GP_LEFT,GP_DOWN,GP_RIGHT,GP_UP,GP_B,GP_A};
     for(unsigned i=0;i<6;i++)assert(gp_smk37_pads(1u<<pads[i])==bits[i]);
     assert(gp_smk37_pad_lights()==0xc702);
-    assert(gp_smk37_panel(1u<<16)==GP_START&&gp_smk37_panel(1u<<17)==GP_SELECT);
+    assert(gp_smk37_panel(1u<<16)==GP_SELECT&&gp_smk37_panel(1u<<17)==GP_START);
     gb_smk37_pads_t s={0};
     gb_smk37_pad_sample(&s,8,500);gb_smk37_pad_sample(&s,8,0);
     assert(!s.held&&gb_smk37_pads_take(&s)==(1u<<8)); /* short tap survives */

@@ -49,7 +49,7 @@ static void np_loader_art(uint16_t *pixels,unsigned top,unsigned height,const ch
         np_art_box(&a,190+i*8,88+i*5,3,18-i*5,blue);
     }
     np_art_center(&a,168,"GAME LOADER",2,gray);
-    np_art_center(&a,231,"PLAY LIBRARY",1,gray);
+    np_art_center(&a,231,"REC LIBRARY",1,gray);
     /* Only this lower 64-row strip is refreshed while the radio runs. */
     uint16_t accent=state==5?red:state==4?0x5e8e:blue;
     np_art_center(&a,190,status,3,state==5?red:white);

@@ -6,9 +6,9 @@
     "bluetooth_role": "cartridge loader",
     "flash_writes": true,
     "radio_started": false,
-    "app_bytes": 200112,
+    "app_bytes": 200108,
     "app_limit": 204512,
-    "app_free": 4400,
+    "app_free": 4404,
     "baseline_app_bytes": null,
     "ble_added_bytes": null,
     "ram_bytes": 56108,
@@ -42,7 +42,7 @@
     "separate_current_unit_reference": false,
     "private_device_calibration": false,
     "product": "FM-1_969",
-    "sha256": "27beedc718cbc74d099079f2d42a5aa486347137ab010a67840b3404d5f55519",
+    "sha256": "cc91d85824f8f237dc55bc18d1d60b14466b0a94a8d1c0d95b31a48e9bfaae93",
     "hardware_validated": false,
     "ram_reach_check": true,
     "application_flash_writers_disabled": false,
@@ -74,9 +74,9 @@
     "bluetooth_role": "cartridge loader",
     "flash_writes": true,
     "radio_started": false,
-    "app_bytes": 216192,
+    "app_bytes": 216176,
     "app_limit": 216800,
-    "app_free": 608,
+    "app_free": 624,
     "baseline_app_bytes": null,
     "ble_added_bytes": null,
     "ram_bytes": 55916,
@@ -110,7 +110,7 @@
     "separate_current_unit_reference": true,
     "private_device_calibration": true,
     "product": "SMK-37_969",
-    "sha256": "82ac21f51fa5c0ee89dd560fce7334e10a049acdb426d70a21531adce1577f7a",
+    "sha256": "aa0b9f0702b3e0dd5183cb4c9b8c565af73663cc6d5beb37a0e0dcac428dfa29",
     "hardware_validated": false,
     "ram_reach_check": true,
     "application_flash_writers_disabled": false,
@@ -146,5 +146,24 @@
     "FM-1 and SMK browser USB discovery, handoff, reconnection and drag/drop",
     "Bluetooth page drag/drop and disconnect recovery",
     "USB and Bluetooth protocol transfer regression"
-  ]
+  ],
+  "controls": {
+    "left_to_right": [
+      "B",
+      "A"
+    ],
+    "fm1_white_keys": [
+      15,
+      16
+    ],
+    "smk_white_keys": [
+      21,
+      22
+    ],
+    "panel_left": "PLAY = Select",
+    "panel_right": "REC = Start",
+    "library_bluetooth": "PLAY / Select",
+    "library_launch": "REC / Start or A",
+    "loader_return": "REC / Start"
+  }
 }

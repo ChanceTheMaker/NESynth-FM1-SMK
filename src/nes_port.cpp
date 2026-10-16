@@ -175,7 +175,7 @@ uint32_t gp_input_keys(uint32_t lo,uint32_t hi){
 #if GB_SMK37
     return gp_smk37_keys(lo,hi);
 #else
-    (void)hi;static const uint8_t keys[8]={26,23,11,12,7,0,3,4};uint32_t p=0;
+    (void)hi;static const uint8_t keys[8]={26,24,11,12,7,0,3,4};uint32_t p=0;
     for(unsigned i=0;i<8;i++)if(lo&(1u<<keys[i]))p|=1u<<i;
     if(lo&(1u<<2))p|=GP_LEFT;if(lo&(1u<<6))p|=GP_RIGHT;if(lo&(1u<<5))p|=GP_UP;return p;
 #endif

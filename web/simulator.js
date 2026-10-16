@@ -2,8 +2,8 @@ const $=id=>document.getElementById(id),ns='http://www.w3.org/2000/svg';
 const names={1:'A',2:'B',4:'Select',8:'Start',16:'Right',32:'Left',64:'Up',128:'Down'};
 const symbols={1:'A',2:'B',4:'SEL',8:'START',16:'\u2192',32:'\u2190',64:'\u2191',128:'\u2193'};
 export const simulatorMappings={
- fm1:{base:5,count:27,keys:{0:32,2:32,4:128,6:16,7:16,3:64,5:64,23:2,26:1,11:4,12:8},pads:{}},
- smk37:{base:0,count:37,keys:{5:32,7:32,9:128,11:16,12:16,8:64,10:64,33:1,36:2},pads:{1:64,8:32,9:128,10:16,14:2,15:1}}
+ fm1:{base:5,count:27,keys:{0:32,2:32,4:128,6:16,7:16,3:64,5:64,24:2,26:1,11:4,12:8},pads:{}},
+ smk37:{base:0,count:37,keys:{5:32,7:32,9:128,11:16,12:16,8:64,10:64,35:2,36:1},pads:{1:64,8:32,9:128,10:16,14:2,15:1}}
 };
 let generation=0,zoomed=false;const assets=new Map();
 function send(source,bit,down){document.dispatchEvent(new CustomEvent('nesynth-control',{detail:{source,bit,down}}));}
@@ -20,11 +20,11 @@ function wire(svg,model){
  if(fm){
  const keys=[...svg.querySelectorAll('use.product-control-ink')];
  for(const [color,offset] of [['white',0],['black',16]])indices[color].forEach((key,i)=>{const el=keys[offset+i];assign(svg,el,cfg.keys[key],color+' key '+(i+1),{x:Number(el.getAttribute('x'))+12,y:Number(el.getAttribute('y'))+32,size:9});});
- for(const [x,bit,label] of [[490,8,'PLAY'],[526,4,'RECORD']])assign(svg,svg.querySelector(`rect.product-button[x="${x}"][y="185"]`),bit,label);
+ for(const [x,bit,label] of [[490,4,'PLAY'],[526,8,'RECORD']])assign(svg,svg.querySelector(`rect.product-button[x="${x}"][y="185"]`),bit,label,{x:x+14.5,y:222,size:7});
  }else{
  for(const color of ['white','black'])[...svg.querySelectorAll('.smk-'+color+'-key')].forEach((el,i)=>assign(svg,el,cfg.keys[indices[color][i]],color+' key '+(i+1),{x:Number(el.getAttribute('x'))+Number(el.getAttribute('width'))/2,y:color==='white'?363:309,size:13}));
  [...svg.querySelectorAll('.smk-pad')].forEach((el,i)=>{const col=Math.floor(i/2),bottom=i%2,bit=cfg.pads[col+(bottom?8:0)];assign(svg,el,bit,(bottom?'Bottom':'Top')+' pad '+(col+1),{x:Number(el.getAttribute('x'))+18.5,y:Number(el.getAttribute('y'))+19,size:12});});
- for(const [x,bit,label] of [[838,8,'PLAY'],[877,4,'RECORD']])assign(svg,svg.querySelector(`rect.smk-control[x="${x}"][y="197"]`),bit,label);
+ for(const [x,bit,label] of [[838,4,'PLAY'],[877,8,'RECORD']])assign(svg,svg.querySelector(`rect.smk-control[x="${x}"][y="197"]`),bit,label,{x:x+14.5,y:232,size:8});
  }
  // The brand stays behind the live display when its canvas is enlarged.
  const screen=document.createElementNS(ns,'foreignObject');const rect=fm?[200,95,103,93]:[137,80,72,65];
@@ -45,7 +45,7 @@ export async function renderSimulator(next){
  const shell=document.querySelector('.screen-frame');shell.append($('screen'));
  document.querySelector('.console').dataset.simulator=next;$('simulator-model').value=next;
  document.querySelector('.screen-frame').hidden=next!=='nes';$('hardware').hidden=next==='nes';$('zoom-screen').hidden=next==='nes';$('large-screen').hidden=true;
- if(svg){wire(svg,next);$('instrument-art').replaceChildren(svg);$('hardware-legend').textContent=next==='fm1'?'Click the lit controls. White 1 or 2: left. White 3: down. White 4 or 5: right. Black 2 or 3: up. White 14 / 16: B / A. PLAY: Start. RECORD: Select.':'Click the lit controls. White 4 or 5: left. White 6: down. White 7 or 8: right. Black 4 or 5: up. White 20 / 22: A / B. Pads: bottom 1 / 2 / 3 move, top 2 up, bottom 7 / 8 B / A. PLAY: Start. RECORD: Select.';}
+ if(svg){wire(svg,next);$('instrument-art').replaceChildren(svg);$('hardware-legend').textContent=next==='fm1'?'Click the lit controls. White 1 or 2: left. White 3: down. White 4 or 5: right. Black 2 or 3: up. White 15 / 16: B / A. PLAY (left): Select. RECORD (right): Start.':'Click the lit controls. White 4 or 5: left. White 6: down. White 7 or 8: right. Black 4 or 5: up. White 21 / 22: B / A. Pads: bottom 1 / 2 / 3 move, top 2 up, bottom 7 / 8 B / A. PLAY (left): Select. RECORD (right): Start.';}
 
  applyZoom();
  }catch(e){$('hardware-legend').textContent=e.message;}

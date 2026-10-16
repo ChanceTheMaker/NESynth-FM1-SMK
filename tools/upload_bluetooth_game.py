@@ -16,7 +16,7 @@ async def upload(args):
     if not 16<=len(rom)<=262672 or rom[:4]!=b'NES\x1a':raise ValueError('Expected an iNES cartridge no larger than 262672 bytes')
     found=await BleakScanner.discover(timeout=args.timeout,return_adv=True)
     matches=[d for d,a in found.values() if SERVICE in [s.lower() for s in a.service_uuids]]
-    if len(matches)!=1:raise RuntimeError(f'Expected one NESynth loader; found {len(matches)}. Hold PLAY + REC for the library, then press REC for Bluetooth.')
+    if len(matches)!=1:raise RuntimeError(f'Expected one NESynth loader; found {len(matches)}. Hold PLAY + REC for the library, then press PLAY (Select) for Bluetooth.')
     session=secrets.randbits(32) or 1;crc=zlib.crc32(rom);started=time.monotonic()
     async with BleakClient(matches[0],timeout=max(30,args.timeout)) as client:
         state,error,received,capacity=decode(await client.read_gatt_char(VALUE))

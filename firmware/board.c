@@ -194,8 +194,8 @@ static void piano_lights(uint32_t held_actions){
 static void input_init(void){
     fm1_input_init();
     piano_lights(0);
-    fm1_led_key(12,1); /* PLAY / Start */
-    fm1_led_key(13,1); /* REC / Select */
+    fm1_led_key(12,1); /* PLAY / NES Select (left) */
+    fm1_led_key(13,1); /* REC / NES Start (right) */
     fm1_timer5_start(gb_isr_scan,4);
 }
 static void audio_start(void){fm1_audio_init(dma,512,gb_isr_audio,3);}
@@ -263,8 +263,8 @@ void gb_cstart(const uint32_t *parameters){
         input_buttons=gp_input_keys(key_lo,key_hi);
         piano_lights(input_buttons);
         /* Measured FM-1 panel IDs: PLAY=12, REC=13. */
-        if(fm1_in.buttons&(1u<<12))input_buttons|=GP_START;
-        if(fm1_in.buttons&(1u<<13))input_buttons|=GP_SELECT;
+        if(fm1_in.buttons&(1u<<12))input_buttons|=GP_SELECT;
+        if(fm1_in.buttons&(1u<<13))input_buttons|=GP_START;
         input_seen|=input_buttons;gp_buttons(input_buttons);
         master_poll();
 #endif
