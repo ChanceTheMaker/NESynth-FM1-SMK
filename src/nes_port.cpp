@@ -51,13 +51,14 @@ int np_validate_rom(const uint8_t *r,uint32_t n){
     if(r[0]!='N'||r[1]!='E'||r[2]!='S'||r[3]!=0x1a)return GP_FORMAT;
     if((r[7]&15)!=0)return GP_FORMAT; // iNES 1.0, standard NES only
     unsigned mapper=(r[6]>>4)|(r[7]&0xf0);
-    if(mapper>4&&mapper!=9&&mapper!=11)return GP_MAPPER;
+    if(mapper>4&&mapper!=7&&mapper!=9&&mapper!=11)return GP_MAPPER;
     if(r[9]&1)return GP_REGION;
     if(r[8]>1)return GP_RAM_SIZE;
     for(unsigned i=10;i<16;i++)if(r[i])return GP_FORMAT;
     if(np_rom_size(r,n)!=n)return GP_ROM_SIZE;
     if(mapper==0&&((r[4]!=1&&r[4]!=2)||r[5]>1))return GP_ROM_SIZE;
     if(mapper==2&&(r[4]<2||r[4]>16||(r[4]&(r[4]-1))||r[5]||(r[6]&8)))return GP_ROM_SIZE;
+    if(mapper==7&&(r[4]<2||r[4]>16||(r[4]&(r[4]-1))||r[5]||(r[6]&8)))return GP_ROM_SIZE;
     if(mapper==3&&((r[4]!=1&&r[4]!=2)||!r[5]||r[5]>4||(r[5]&(r[5]-1))||(r[6]&8)))return GP_ROM_SIZE;
     if(mapper==4&&(r[4]<2||r[4]>32||(r[4]&(r[4]-1))||r[5]>32||(r[5]&&(r[5]&(r[5]-1)))))return GP_ROM_SIZE;
     if(mapper==11&&(r[4]<2||r[4]>8||(r[4]&(r[4]-1))||!r[5]||r[5]>16||(r[5]&(r[5]-1))||(r[6]&8)))return GP_ROM_SIZE;
@@ -119,7 +120,7 @@ uint32_t gp_audio_queued(void){uint32_t w=write_pos;BARRIER();return w-read_pos;
 uint32_t np_audio_samples(void){return total_samples;}
 uint32_t gp_error(void){return error;}
 uint32_t gp_frame_count(void){return frames;}
-const char *gp_title(void){return ready&&MapperNo==9?"NES / MMC2":ready&&MapperNo==4?"NES / MMC3":ready&&MapperNo==3?"NES / CNROM":ready&&MapperNo==1?"NES / MMC1":"NES / NROM";}
+const char *gp_title(void){return ready&&MapperNo==7?"NES / AxROM":ready&&MapperNo==9?"NES / MMC2":ready&&MapperNo==4?"NES / MMC3":ready&&MapperNo==3?"NES / CNROM":ready&&MapperNo==1?"NES / MMC1":"NES / NROM";}
 void gp_audio_read(int16_t *out,uint32_t n){
     uint32_t r=read_pos,w=write_pos;BARRIER();
     for(unsigned i=0;i<n;i++){

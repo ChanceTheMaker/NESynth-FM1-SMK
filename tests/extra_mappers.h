@@ -13,6 +13,24 @@ static void test_extra_mappers(){
         assert(ROMBANK2[0]==30&&ROMBANK3[0]==31);
     }
     gp_reset();assert(ROMBANK0[0]==0&&ROMBANK2[0]==30);
+    for(unsigned prg: {2u,4u,8u,16u}){
+        auto ax=bank_cart(7,prg,0);assert(!gp_load(ax.data(),ax.size()));
+        assert(!np_prg_ram_enabled&&!np_prg_ram_writable);
+        for(unsigned i=0;i<8;i++)PPUBANK[i][0]=0x80+i;
+        PPURAM[0x2000]=0x35;PPURAM[0x2400]=0x79;
+        for(unsigned v=0;v<256;v++){
+            MapperWrite(v&1?0x8000:0xffff,v);
+            const unsigned bank=(v&7)&(prg/2-1);
+            assert(ROMBANK0[0]==bank*4&&ROMBANK1[0]==bank*4+1&&ROMBANK2[0]==bank*4+2&&ROMBANK3[0]==bank*4+3);
+            for(unsigned i=8;i<12;i++){assert(PPUBANK[i]==PPURAM+((v&16)?0x2400:0x2000));assert(PPUBANK[i][0]==((v&16)?0x79:0x35));}
+            for(unsigned i=0;i<8;i++)assert(PPUBANK[i]==PPURAM+i*1024&&PPUBANK[i][0]==0x80+i);
+        }
+        gp_reset();assert(ROMBANK0[0]==0&&ROMBANK3[0]==3&&PPUBANK[8]==PPURAM+0x2000);
+        assert(!np_prg_ram_enabled&&!np_prg_ram_writable);
+    }
+    for(unsigned prg: {1u,3u,32u}){auto ax=bank_cart(7,prg,0);assert(gp_load(ax.data(),ax.size())==GP_ROM_SIZE);}
+    auto ax=bank_cart(7,2,1);assert(gp_load(ax.data(),ax.size())==GP_ROM_SIZE);
+    ax=bank_cart(7,2,0);ax[6]|=8;assert(gp_load(ax.data(),ax.size())==GP_ROM_SIZE);
     auto cn=bank_cart(3,2,4);assert(!gp_load(cn.data(),cn.size()));
     for(unsigned v=0;v<256;v++){
         MapperWrite(0xffff,v);
@@ -74,5 +92,5 @@ static void test_extra_mappers(){
     auto bad=bank_cart(2,2,1);assert(gp_load(bad.data(),bad.size())==GP_ROM_SIZE);
     bad=bank_cart(3,2,0);assert(gp_load(bad.data(),bad.size())==GP_ROM_SIZE);
     bad=bank_cart(4,3,1);assert(gp_load(bad.data(),bad.size())==GP_ROM_SIZE);
-    puts("PASS: UxROM/CNROM/MMC3/Color Dreams banking, bank bounds, CHR RAM, mirroring, RAM protection, IRQ reload/ack/disable, reset and invalid boards.");
+    puts("PASS: UxROM/CNROM/MMC3/AxROM/Color Dreams banking, bank bounds, CHR RAM, mirroring, RAM protection, IRQ reload/ack/disable, reset and invalid boards.");
 }

@@ -39,6 +39,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Validate shared mapper core
+        run: |
+          python3 -c "import sys; sys.path.insert(0, 'tools'); from prepare_core import prepare; prepare()"
+          g++ -std=c++11 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=all -fno-strict-aliasing -Wno-write-strings -Isrc -Ibuild/infones build/infones/InfoNES.cpp build/infones/K6502.cpp build/infones/InfoNES_pAPU.cpp src/mapper.cpp src/nes_port.cpp tests/runtime.cpp -o build/runtime-test
+          ./build/runtime-test web/diagnostic.nes
       - name: Validate bounded cartridge receiver
         run: |
           mkdir -p build

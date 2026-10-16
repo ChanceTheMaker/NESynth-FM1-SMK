@@ -1,4 +1,4 @@
-"""Upload a cartridge to the same SMK968 library over USB MIDI; no firmware flash."""
+"""Upload a cartridge to the same SMK968+ library over USB MIDI; no firmware flash."""
 import argparse,json,os,re,secrets,struct,subprocess,sys,time,zlib
 from pathlib import Path
 from cartridge import read_cartridge
@@ -50,8 +50,8 @@ def main():
     if not a.prepare:
         subprocess.run([sys.executable,__file__,'--prepare'],check=True);time.sleep(1)
     wire.PORT_RE=re.compile(r'smk|nesynth|ota|composite|sinco|usb-midi',re.I)
-    up=wire.Updater(wire.MidoBackend());dev=up.wait_for(lambda i:i.text=='SMK-37_968',20)
-    if not dev:raise RuntimeError('NESynth SMK968 not found over USB')
+    up=wire.Updater(wire.MidoBackend());dev=up.wait_for(lambda i:i.text in ('SMK-37_968','SMK-37_969'),20)
+    if not dev:raise RuntimeError('NESynth SMK968 or newer not found over USB')
     link=dev.link
     try:
         state=status(link)

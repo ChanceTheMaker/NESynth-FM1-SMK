@@ -4,7 +4,7 @@ import {openCartridge} from './zip.js';
 import {decodeLoaderStatus,transferCartridge,loaderPacket} from './bluetooth-transfer.js';
 import {readLibrary,gameNamePacket,ensureLibrarySpace} from './bluetooth-library.js';
 import {normalizeCartridge} from './cartridge.js';
-import {validateHardwareRom} from './rom-firmware.js';
+import {validateHardwareRom} from './rom-firmware.js?v=969';
 const SERVICE='f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7f0',VALUE='f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7f1';
 const $=s=>document.querySelector(s),status=s=>$('#status').textContent=s;
 let device,characteristic,rom,romName='',entries=[],busy=false,checking=false,loading=false,dragging=false,connectionIssue=false,installing=false,library=null;

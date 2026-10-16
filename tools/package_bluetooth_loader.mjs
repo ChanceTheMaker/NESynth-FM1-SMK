@@ -6,17 +6,17 @@ import {createHash} from 'node:crypto';
 import {SMKPackage,buildSmkPublicPackage} from '../web/vendor/smk37-package.js';
 const folder='build/bluetooth-loader';
 const report=JSON.parse(fs.readFileSync(`${folder}/report.json`));
-assert.equal(report.kind,'SMK968 Bluetooth loader and player');
-assert.equal(report.product,'SMK-37_968');
+assert.equal(report.kind,'SMK969 Bluetooth loader and player');
+assert.equal(report.product,'SMK-37_969');
 assert(report.ram_reach_check&&report.cartridge_flash_lo===0x39000&&report.cartridge_flash_hi===0x9d000);
-const label=report.private_device_calibration?'PRIVATE-NESynth-SMK-Pro-968-Bluetooth':'NESynth-SMK-Pro-968-Bluetooth';
-const app=new Uint8Array(fs.readFileSync(`${folder}/SMK968-BLUETOOTH-RAW.bin`));
+const label=report.private_device_calibration?'PRIVATE-NESynth-SMK-Pro-969-Bluetooth':'NESynth-SMK-Pro-969-Bluetooth';
+const app=new Uint8Array(fs.readFileSync(`${folder}/SMK969-BLUETOOTH-RAW.bin`));
 assert.equal(createHash('sha256').update(app).digest('hex'),report.sha256);
 const stock=new Uint8Array(fs.readFileSync(process.argv[2]||'build/smk37/stock-pro.fwsc'));
 // "public" is the existing package validator's calibration-free-app schema;
 // this script only writes ignored local outputs, never the website or releases.
 const built=await buildSmkPublicPackage(stock,app,{public:true,board:'SMK-37 Pro',product:report.product,
-    version:'NESYNTH SMK 968',bytes:app.length,sha256:report.sha256});
+    version:'NESYNTH SMK 969',bytes:app.length,sha256:report.sha256});
 const before=new SMKPackage(stock),after=new SMKPackage(built.factory);
 assert.deepEqual(after.dec.subarray(after.appOff,after.appOff+app.length),app);
 assert.deepEqual(after.flash.subarray(0,0x4000),before.flash.subarray(0,0x4000));

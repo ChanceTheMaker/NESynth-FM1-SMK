@@ -1,0 +1,38 @@
+{
+  "product": "SMK-37_969",
+  "date": "2026-10-16",
+  "mapper": 7,
+  "board": "SMK-37 Pro",
+  "app_bytes": 216004,
+  "app_limit": 216800,
+  "app_free": 796,
+  "library_bytes": 401408,
+  "ram_bytes": 55916,
+  "pool_and_cpu1_stacks_bytes": 361952,
+  "ram_code_bytes": 22016,
+  "installed": true,
+  "restart_identity_verified": true,
+  "preserved_catalog_entries": 3,
+  "preserved_catalog_generation": 9,
+  "free_bytes_after": 77824,
+  "catalog_offsets_names_lengths_and_crcs_match": true,
+  "update_loader_simulation_passed": true,
+  "axrom_hardware_gameplay_tested": false,
+  "local_rom_test": {
+    "name": "Who Framed Roger Rabbit (U) [!]",
+    "frames": 3600,
+    "audio": true,
+    "gameplay_image_inspected": true,
+    "render_cadences_match": [
+      1,
+      2,
+      3,
+      6,
+      "adaptive"
+    ]
+  },
+  "limitations": [
+    "Roger Rabbit needs a 132 KiB flash allocation; current library has 76 KiB free. No saved game was deleted.",
+    "Browser drag-and-drop hardware confirmation pending."
+  ]
+}
