@@ -1,11 +1,11 @@
 import './simulator.js';
-import './fullscreen.js?v=20261016';
+import './fullscreen.js?v=20261016-remote';
 import './flash-ui.js?v=20261016-smk-volume';
 import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';
 import {fetchHomebrew} from './homebrew.js';
 import {normalizeCartridge} from './cartridge.js?v=20261016-headers';
-import {wireTv} from './tv-demos.js?v=1';
+import {wireTv} from './tv-demos.js?v=2';
 const $=s=>document.querySelector(s), canvas=$('#screen'), ctx=canvas.getContext('2d',{alpha:false});
 let archiveEntries=[],loading=false,installBusy=false;
 const errors=['','File is shorter than an iNES header.','Use a standard iNES 1.0 cartridge. NES 2.0 and special consoles are not supported.','Cartridge size is invalid for its mapper, or the file is truncated.','This cartridge requests unsupported RAM.','PAL cartridges are not supported yet.','This mapper is not supported yet. NESynth currently supports mappers 0 (NROM), 1 (MMC1), 2 (UxROM), 3 (CNROM), 4 (MMC3), 9 (MMC2) and 11 (Color Dreams).','Emulator error.','Emulator timing or audio queue limit reached.'];

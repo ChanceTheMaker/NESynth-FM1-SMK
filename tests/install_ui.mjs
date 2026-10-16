@@ -81,6 +81,11 @@ try{
  await knob.press('Home');assert.equal(await page.locator('#volume').inputValue(),'0');
  await page.locator('#volume').evaluate(el=>{el.value='25';el.dispatchEvent(new Event('input',{bubbles:true}));});
  assert.equal(await knob.getAttribute('aria-valuenow'),'25','Browser slider updates TV knob');
+ await knob.click({position:{x:5,y:12}});assert.equal(await page.locator('#volume').inputValue(),'20');
+ await knob.click({position:{x:25,y:12}});assert.equal(await page.locator('#volume').inputValue(),'25');
+ const tuner=page.locator('.tv-dial:not(.small)');
+ await tuner.click({position:{x:35,y:20}});assert.equal(await channel.getAttribute('aria-valuenow'),'4');
+ await tuner.click({position:{x:5,y:20}});assert.equal(await channel.getAttribute('aria-valuenow'),'3');
  await page.locator('#pause').click();
  for(const model of ['smk-pro','fm1','nes']){
   await page.locator('#simulator-model').selectOption(model);
@@ -94,11 +99,30 @@ try{
  await page.waitForFunction(()=>document.fullscreenElement===document.querySelector('.retro-rig'));
  assert.equal(await page.locator('#fullscreen').getAttribute('aria-pressed'),'true');
  assert(await page.locator('#screen').isVisible());
+ const remote=page.locator('#tv-remote');assert(await remote.isVisible(),'Fullscreen opens the clicker');
+ await page.getByRole('button',{name:'Channel up',exact:true}).click();
+ assert.equal(await page.locator('#remote-channel').textContent(),'04');
+ assert.equal(await channel.getAttribute('aria-valuenow'),'4');
+ await page.getByRole('button',{name:'Channel down',exact:true}).click();
+ assert.equal(await page.locator('#remote-channel').textContent(),'03');
+ await page.getByRole('button',{name:'Volume up',exact:true}).click();
+ assert.equal(await page.locator('#volume').inputValue(),'30');
+ assert.equal(await page.locator('#remote-volume').textContent(),'30');
+ await page.getByRole('button',{name:'Volume down',exact:true}).click();
+ assert.equal(await page.locator('#volume').inputValue(),'25');
+ const grip=page.locator('.remote-grip'),beforeRemote=await remote.boundingBox(),gripBox=await grip.boundingBox();
+ await page.mouse.move(gripBox.x+20,gripBox.y+10);await page.mouse.down();await page.mouse.move(gripBox.x-80,gripBox.y-70,{steps:5});await page.mouse.up();
+ const afterRemote=await remote.boundingBox();assert(afterRemote.x<beforeRemote.x-90&&afterRemote.y<beforeRemote.y-70,'Clicker can be moved');
+ await page.getByRole('button',{name:'Close remote',exact:true}).click();assert(await remote.isHidden());
+ await page.locator('#show-remote').click();assert(await remote.isVisible(),'Clicker can be reopened');
+ await page.getByRole('button',{name:'Channel up',exact:true}).click();
+ await page.locator('[data-remote="game"]').click();assert.equal(await page.locator('#remote-channel').textContent(),'03');
  await fs.mkdir('build/install-ui',{recursive:true});
  await page.screenshot({path:'build/install-ui/fullscreen.png'});
  await page.locator('#fullscreen').click();
  await page.waitForFunction(()=>!document.fullscreenElement);
  assert.equal(await page.locator('#fullscreen').getAttribute('aria-pressed'),'false');
+ assert(await remote.isHidden());assert(await page.locator('#show-remote').isHidden());
  assert.equal(await page.locator('#dropzone').count(),1);
  assert.equal(await page.locator('#step-game #rom').count(),1,'The only cartridge picker belongs to step 1');
  assert.equal(await page.locator('.cartridge-panel,#install-choose-game').count(),0,'No duplicate cartridge flow');
@@ -233,7 +257,21 @@ try{
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'No horizontal page overflow at '+width);
   await page.locator('#flash-panel').scrollIntoViewIfNeeded();
   await page.screenshot({path:`build/install-ui/mobile-${width}.png`,fullPage:true});
+  if(width===390){
+   await page.locator('#fullscreen').click();await page.waitForFunction(()=>!!document.fullscreenElement);
+   assert(await remote.isVisible());
+   const bounds=await remote.boundingBox();assert(bounds.x>=0&&bounds.y>=0&&bounds.x+bounds.width<=390&&bounds.y+bounds.height<=900,'Clicker stays on a small screen');
+   await page.screenshot({path:'build/install-ui/remote-mobile.png'});
+   await page.locator('#fullscreen').click();await page.waitForFunction(()=>!document.fullscreenElement);
+  }
  }
+ await page.locator('.retro-rig').evaluate(el=>Object.defineProperty(el,'requestFullscreen',{value:undefined,configurable:true}));
+ await page.locator('#fullscreen').click();
+ assert(await page.locator('.fullscreen-fallback').isVisible());assert(await remote.isVisible(),'Fallback fullscreen also opens the clicker');
+ await page.getByRole('button',{name:'Close remote',exact:true}).click();assert(await remote.isHidden());
+ await page.locator('#show-remote').click();assert(await remote.isVisible());
+ await page.locator('#fullscreen').click();assert(await remote.isHidden());
+ await page.locator('.retro-rig').evaluate(el=>delete el.requestFullscreen);
  const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));assert.equal(ids.length,new Set(ids).size,'No duplicate IDs');
  assert.deepEqual(errors,[]);
  console.log('PASS: 12 animated demo channels, drag tuning, preserved game, synced TV volume, single picker, NES/ZIP drops, responsive layout, fullscreen, blocked MIDI, FM-1/SMK install and restore, model isolation and exact restart checks.');

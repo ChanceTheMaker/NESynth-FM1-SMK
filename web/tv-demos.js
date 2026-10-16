@@ -1,4 +1,5 @@
 // Original procedural demoscene effects. No cartridge data or device access.
+import {wireRemote} from './tv-remote.js?v=1';
 const names=['STARFIELD','PLASMA','TEXTURE TUNNEL','COPPER BARS','ROTOZOOM','FIRE','METABALLS','DOT SPHERE','WIRE CUBE','SYNTHWAVE','SINE SCROLLER','BOING BALL'];
 const wrap=n=>((n%13)+13)%13;
 export function wireTv(canvas,onChannelChange){
@@ -7,7 +8,7 @@ export function wireTv(canvas,onChannelChange){
  const slider=document.getElementById('volume'),ctx=canvas.getContext('2d');
  const buffer=document.createElement('canvas');buffer.width=128;buffer.height=120;
  const pixelCtx=buffer.getContext('2d'),pixels=pixelCtx.createImageData(128,120);
- let selected=0,started=performance.now(),last=-Infinity;
+ let selected=0,started=performance.now(),last=-Infinity,remote;
  const api={get active(){return selected!==0;},reset:()=>select(0),draw};
  function select(next){
   next=wrap(next);if(next===selected)return;
@@ -19,39 +20,46 @@ export function wireTv(canvas,onChannelChange){
   channel.setAttribute('aria-valuetext',selected?number+' '+names[selected-1]:'03 Game');
   tuning.style.setProperty('--dial-turn',(selected*27+30)+'deg');
   canvas.dataset.tvChannel=number;
+  remote?.channel(number,selected?names[selected-1]:'Game');
  }
- function drag(el,get,set,step){
-  let pointer=null,x=0,y=0,value=0;
+ function drag(el,get,set,step,clickStep=0){
+  let pointer=null,x=0,y=0,value=0,moved=false;
   el.addEventListener('pointerdown',e=>{
    if(e.button!==0)return;e.preventDefault();e.stopPropagation();
-   pointer=e.pointerId;x=e.clientX;y=e.clientY;value=get();el.setPointerCapture(pointer);
+   pointer=e.pointerId;x=e.clientX;y=e.clientY;value=get();moved=false;el.setPointerCapture(pointer);
    if(el.tabIndex>=0)el.focus({preventScroll:true});
   });
   el.addEventListener('pointermove',e=>{
    if(e.pointerId!==pointer)return;
+   if(Math.abs(e.clientX-x)+Math.abs(e.clientY-y)>4)moved=true;
    const change=Math.trunc(((e.clientX-x)-(e.clientY-y))/step);set(value+change);
   });
-  const finish=e=>{if(e.pointerId===pointer)pointer=null;};
+  const finish=e=>{
+   if(e.pointerId!==pointer)return;
+   if(e.type==='pointerup'&&!moved&&clickStep){const box=el.getBoundingClientRect();set(get()+(e.clientX<box.x+box.width/2?-clickStep:clickStep));}
+   pointer=null;
+  };
   for(const event of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(event,finish);
  }
  channel.setAttribute('role','slider');channel.tabIndex=0;
  channel.setAttribute('aria-label','TV channel');channel.setAttribute('aria-valuemin','3');channel.setAttribute('aria-valuemax','15');
  channel.title='Drag up or right to tune. Channel 03 returns to your game.';
- tuning.title=channel.title;
- for(const el of [channel,tuning])drag(el,()=>selected,select,22);
+ tuning.title='Click left for channel down, right for channel up. Or drag to tune.';
+ for(const el of [channel,tuning])drag(el,()=>selected,select,22,el===tuning?1:0);
  channel.addEventListener('keydown',e=>{
   if(!['ArrowUp','ArrowRight','ArrowDown','ArrowLeft','Home','End'].includes(e.key))return;
   e.preventDefault();e.stopPropagation();select(e.key==='Home'?0:e.key==='End'?12:selected+(['ArrowUp','ArrowRight'].includes(e.key)?1:-1));
  });
  function setVolume(value){slider.value=String(Math.max(0,Math.min(100,value)));slider.dispatchEvent(new Event('input',{bubbles:true}));}
- function syncVolume(){const value=Number(slider.value);volume.setAttribute('aria-valuenow',String(value));volume.setAttribute('aria-valuetext',value+' percent');volume.style.setProperty('--dial-turn',(-130+value*2.6)+'deg');}
+ function syncVolume(){const value=Number(slider.value);volume.setAttribute('aria-valuenow',String(value));volume.setAttribute('aria-valuetext',value+' percent');volume.style.setProperty('--dial-turn',(-130+value*2.6)+'deg');remote?.volume(value);}
  volume.setAttribute('role','slider');volume.tabIndex=0;volume.setAttribute('aria-label','TV volume');
- volume.setAttribute('aria-valuemin','0');volume.setAttribute('aria-valuemax','100');volume.title='Drag up or right for volume. Synced with the browser volume slider.';
- drag(volume,()=>Number(slider.value),setVolume,2);
+ volume.setAttribute('aria-valuemin','0');volume.setAttribute('aria-valuemax','100');volume.title='Click left for volume down, right for volume up. Or drag. Synced with the browser slider.';
+ drag(volume,()=>Number(slider.value),setVolume,2,5);
  volume.addEventListener('keydown',e=>{
   if(!['ArrowUp','ArrowRight','ArrowDown','ArrowLeft','Home','End'].includes(e.key))return;
   e.preventDefault();e.stopPropagation();setVolume(e.key==='Home'?0:e.key==='End'?100:Number(slider.value)+(['ArrowUp','ArrowRight'].includes(e.key)?5:-5));
  });
+ remote=wireRemote({stepChannel:delta=>select(selected+delta),stepVolume:delta=>setVolume(Number(slider.value)+delta),game:()=>select(0)});
  slider.addEventListener('input',syncVolume);syncVolume();sync();
  document.getElementById('simulator-model').addEventListener('change',()=>api.reset());
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&api.active)api.reset();});

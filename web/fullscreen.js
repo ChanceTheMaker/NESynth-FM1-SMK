@@ -3,7 +3,7 @@ const rig=document.querySelector('.retro-rig'),button=document.getElementById('f
 if(rig&&button){
  let pending=false;
  const active=()=>document.fullscreenElement===rig||rig.classList.contains('fullscreen-fallback');
- function sync(){const on=active();button.setAttribute('aria-pressed',String(on));button.textContent=on?'Exit full screen':'Full screen';}
+ function sync(){const on=active();button.setAttribute('aria-pressed',String(on));button.textContent=on?'Exit full screen':'Full screen';document.dispatchEvent(new CustomEvent('nesynth-fullscreen',{detail:on}));}
  async function toggle(){
   if(pending)return;pending=true;
   try{

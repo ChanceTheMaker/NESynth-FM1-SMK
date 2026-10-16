@@ -1,4 +1,18 @@
 /* A playable TV, console and controller, built around the existing canvas. */
+#show-remote{padding:7px 9px;border:1px solid #909689;background:#e8eadf;border-radius:3px;font:700 9px var(--mono)}
+.tv-remote{position:fixed;right:24px;bottom:24px;z-index:50;width:160px;max-height:calc(100dvh - 16px);overflow:auto;box-sizing:border-box;padding:12px 13px 16px;border:1px solid #898477;border-radius:12px 12px 24px 24px;background:linear-gradient(100deg,#a6a291,#eeead8 9%,#d8d3c0 85%,#aaa591);box-shadow:inset 0 2px 1px #fff7,inset -3px -4px 2px #847f70,0 6px 0 #666258,0 12px 25px #0008;color:#282923}
+.remote-top{display:flex;align-items:start;gap:5px}
+.remote-grip{flex:1;min-width:0;text-align:left;background:none;border:0;padding:2px 0 7px;color:#a6382c;font:bold 15px Arial,sans-serif;letter-spacing:-.8px;cursor:grab;touch-action:none;user-select:none}
+.remote-grip:active{cursor:grabbing}.remote-grip small{display:block;margin-top:4px;font:6px var(--mono);letter-spacing:.7px;color:#55594e}
+.remote-close{flex-shrink:0;width:23px;height:23px;border-radius:50%;border:1px solid #6b2421;background:linear-gradient(#d76b52,#a23a30);color:#ffe8d6;font:18px/18px Arial;box-shadow:0 2px 0 #692823;padding:0}
+.remote-window{height:13px;background:linear-gradient(#211d1c,#39312e);border:2px solid #8e8a7a;border-radius:3px;margin:3px 0 9px;box-shadow:inset 0 2px 3px #0008}.remote-window i{display:block;width:4px;height:4px;margin:3px 8px;background:#ce4e35;border-radius:50%}
+.remote-display{display:flex;justify-content:space-between;padding:7px 6px;background:#313b2a;color:#cbd8a7;border:2px solid #959780;box-shadow:inset 0 2px 3px #0007;font:7px var(--mono)}.remote-display b{font-size:13px;font-weight:normal}
+.remote-rockers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.remote-rockers>div{display:flex;flex-direction:column;align-items:stretch;gap:4px}.remote-rockers>div>span{text-align:center;font:700 7px var(--mono);letter-spacing:.4px;margin-bottom:4px}
+.remote-rockers button{min-height:38px;border:1px solid #151914;border-bottom:3px solid #11150f;background:linear-gradient(#4f5549,#292e26);color:#e1e5d5;border-radius:6px 6px 3px 3px;box-shadow:inset 0 1px 0 #858a7a,0 2px 2px #6668;font:bold 16px Arial}.remote-rockers button:last-child{border-radius:3px 3px 6px 6px}
+.remote-rockers button:active,.remote-game:active{transform:translateY(2px);box-shadow:none}
+.remote-game{display:block;width:100%;margin-top:13px;padding:7px;border:1px solid #66685a;border-bottom:3px solid #6c6d5f;background:#b8bca5;color:#30372a;border-radius:4px;font:bold 9px var(--mono)}.remote-game span{font-size:7px;margin-left:12px}
+.remote-ridges{height:14px;margin:13px 7px 0;background:repeating-linear-gradient(0deg,transparent 0 3px,#9b9987 3px 4px,#e7e4d3 4px 5px);border-radius:2px}
+@media(max-width:520px){.tv-remote{right:10px;bottom:12px;width:148px;padding:10px 11px 13px}.remote-rockers{gap:10px;margin-top:10px}.remote-ridges{height:8px;margin-top:9px}}
 .retro-rig .tv-channel,.retro-rig .tv-dial{touch-action:none;user-select:none;cursor:ns-resize}
 .retro-rig .tv-channel:focus-visible,.retro-rig .tv-dial:focus-visible{outline:2px solid #b7ffb1;outline-offset:3px}
 .retro-rig .tv-dial[style]:after{transform:rotate(var(--dial-turn))}
