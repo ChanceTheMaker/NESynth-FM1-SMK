@@ -4,9 +4,13 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "rom_transfer.h"
+#ifndef NP_LIBRARY_META
 #define NP_LIBRARY_META 0x39000u
+#endif
 #define NP_LIBRARY_DATA (NP_LIBRARY_META+8192u)
+#ifndef NP_LIBRARY_END
 #define NP_LIBRARY_END 0x9d000u
+#endif
 #define NP_LIBRARY_BYTES (NP_LIBRARY_END-NP_LIBRARY_DATA)
 #define NP_LIBRARY_MAX 32u
 #define NP_CART_LIMIT 262672u

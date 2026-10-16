@@ -15,7 +15,7 @@ function refresh(){
     $('#transport').disabled=locked||connected;
     $('#bluetooth-help').hidden=$('#transport').value==='usb';$('#usb-help').hidden=$('#transport').value!=='usb';
     $('#connection').textContent=`${connectionName()} ${connected?(connectionIssue?'connection unconfirmed':'connected'):'disconnected'}`;
-    $('#connect').textContent=connected?'Disconnect SMK':'Connect SMK';
+    $('#connect').textContent=connected?'Disconnect device':'Connect device';
     document.querySelectorAll('#library button').forEach(b=>b.disabled=locked||!connected);
 }
 function disconnected(current){
@@ -35,10 +35,10 @@ function renderLibrary(){
 }
 async function libraryAction(op,game){
     if(busy||loading||checking||!characteristic)return;
-    if(op===8&&!confirm(`Delete ${game.name} from the SMK?`))return;
+    if(op===8&&!confirm(`Delete ${game.name} from the device?`))return;
     busy=true;refresh();try{
         await characteristic.writeValueWithResponse(loaderPacket(op,game.index,game.crc));installing=true;
-        status(op===8?'SMK is restarting to delete the game. Reconnect when SEND A GAME appears.':'SMK is restarting to play your game.');
+        status(op===8?'Device is restarting to delete the game. Reconnect when SEND A GAME appears.':'Device is restarting to play your game.');
         device.gatt.disconnect();disconnected(device);
     }catch(e){status(e.message);}finally{busy=false;refresh();}
 }
@@ -47,7 +47,7 @@ async function choose(index){
     validateHardwareRom(result.bytes);
     if(result.bytes.length>262672)throw Error('This build holds individual games up to 262672 bytes. Choose a smaller game.');
     rom=result.bytes;romName=entry.name;$('#name').textContent=`${entry.name} / ${rom.length.toLocaleString()} bytes`;
-    status(result.notice||(characteristic&&device?.gatt.connected?'Game ready. Click Send and play.':'Game ready. Connect your SMK, then send and play.'));
+    status(result.notice||(characteristic&&device?.gatt.connected?'Game ready. Click Send and play.':'Game ready. Connect your device, then send and play.'));
 }
 // Importing is local work: accept files even during a connection check, but keep
 // uploads and competing imports locked until validation has finished.
@@ -97,7 +97,7 @@ $('#connect').onclick=async()=>{
         }
         decodeLoaderStatus(await characteristic.readValue());library=await readLibrary(characteristic);renderLibrary();
         status(library?`${connectionName()} connected. Add a game or play one from your library.`:'Bluetooth connected. This older firmware stores one game at a time.');
-    }catch(e){device?.gatt.disconnect();disconnected(device);status(e.name==='NotFoundError'?'No SMK selected. On builds 967 and newer, hold PLAY + REC for the library, then press REC. Wait for SEND A GAME and select NESynth SMK. Check that computer Bluetooth is on.':e.message);}
+    }catch(e){device?.gatt.disconnect();disconnected(device);status(e.name==='NotFoundError'?'No device selected. On builds 967 and newer, hold PLAY + REC for the library, then press REC. Wait for SEND A GAME and select NESynth SMK or NESynth FM1. Check that computer Bluetooth is on.':e.message);}
     finally{busy=false;refresh();}
 };
 $('#send').onclick=async()=>{
@@ -109,7 +109,7 @@ $('#send').onclick=async()=>{
         await transferCartridge({rom,session,burst:!!channel.properties.writeWithoutResponse,read:async()=>decodeLoaderStatus(await channel.readValue()),
             write:(bytes,response)=>response?channel.writeValueWithResponse(bytes):channel.writeValueWithoutResponse(bytes),
             onProgress:(sent,total)=>{$('#progress').value=sent/total;status(`Sending game... ${Math.floor(sent*100/total)}%`);}});
-        installing=true;status(`Game verified in ${((performance.now()-started)/1000).toFixed(1)} seconds. SMK is restarting to save and play. Keep it powered.`);
+        installing=true;status(`Game verified in ${((performance.now()-started)/1000).toFixed(1)} seconds. Device is restarting to save and play. Keep it powered.`);
         device.gatt.disconnect();disconnected(device);
     }catch(e){status(e.message);}finally{busy=false;refresh();}
 };

@@ -109,6 +109,9 @@ static void input_init(void){
     SMK37_LIGHT_REG(0x50080u)&=~(1u<<10);
     SMK37_LIGHT_REG(0x50088u)&=~(1u<<10);
     smk37_scan_set_analog(smk37_analog_mask(&pad_adc.scan));
+    /* Transport LEDs: PLAY green (output 17), record red (output 19).
+       Output 18 is PLAY's alternate red LED, not the REC input ID. */
+    smk37_scan_indicator_bits=(1u<<16)|(1u<<18);
     smk37_scan_init(fm1_irq_attach,gb_isr_scan);
     uint32_t rgb[16]={0};
     for(unsigned p=0;p<16;p++)if(gp_smk37_pad_lights()&(1u<<p))

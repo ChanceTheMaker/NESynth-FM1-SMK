@@ -12,4 +12,6 @@ typedef struct {
  * defrag, erase, fallback to stale records, or arbitrary byte scanning.
  * Only one committed bank plus an erased/invalidated peer is accepted.
  * Output is cleared on failure. Call before starting the radio. */
+/* FM-1: preserved stock VM snapshot in sector 0xe8000, validated end-to-end. */
+int np_rf_load_fm1(np_rf_read read,void *ctx,np_rf_calibration *out);
 int np_rf_load_smk(np_rf_read read,void *ctx,np_rf_calibration *out);

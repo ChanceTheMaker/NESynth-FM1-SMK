@@ -9,7 +9,7 @@ export function usbRequest(sequence,kind,bytes=new Uint8Array()){
 export function usbReply(packet,sequence){
     if(!packet||packet.length<8||!PREFIX.every((b,i)=>packet[i]===b)||packet[4]!== (sequence&127)||packet[5]!==sequence>>>7)return null;
     if(packet.length>96||packet.at(-1)!==0xf7||(packet.length-8)%2||packet.slice(1,-1).some(b=>b>127))throw Error('Malformed USB library reply.');
-    if(packet[6])throw Error(packet[6]===2?'SMK is not in USB loading mode. Reconnect using USB.':packet[6]===1?'SMK rejected the game command. Check available space and reconnect.':'Malformed USB game command.');
+    if(packet[6])throw Error(packet[6]===2?'Device is not in USB loading mode. Reconnect using USB.':packet[6]===1?'Device rejected the game command. Check available space and reconnect.':'Malformed USB game command.');
     const out=new Uint8Array((packet.length-8)/2);
     for(let i=0;i<out.length;i++){if(packet[8+i*2]>1)throw Error('Malformed USB library byte.');out[i]=packet[7+i*2]|packet[8+i*2]<<7;}return out;
 }
@@ -31,23 +31,24 @@ export function createUsbChannel(link){
 async function mode(link){
     const prefix=[0xf0,0x7d,78,76,0];link.drain();if(!link.send([...prefix,0xf7]))throw Error('USB disconnected.');const end=Date.now()+2500;
     while(Date.now()<end){const p=await link.read(200);if(!p||!prefix.every((b,i)=>p[i]===b))continue;
-        if(p.length!==36||p[35]!==0xf7||p.slice(1,-1).some(b=>b>127)||p[9]>15)throw Error('Malformed SMK mode reply.');
+        if(p.length!==36||p[35]!==0xf7||p.slice(1,-1).some(b=>b>127)||p[9]>15)throw Error('Malformed device mode reply.');
         return p[5]|p[6]<<7|p[7]<<14|p[8]<<21|p[9]<<28;
-    }throw Error('SMK did not answer the USB library query.');
+    }throw Error('Device did not answer the USB library query.');
 }
 export async function connectUsbLibrary(status=()=>{}){
     if(!navigator.requestMIDIAccess)throw Error('Use Chrome or Edge with a USB data cable for USB loading.');
     const access=await navigator.requestMIDIAccess({sysex:true});if(access.sysexEnabled===false)throw Error('Allow MIDI/SysEx access to upload games over USB.');
-    const updater=new Updater(access,()=>{},/smk|nesynth|ota|composite|sinco|usb-midi/i);let dev;
+    const updater=new Updater(access,()=>{},/fm-?1|smk|nesynth|ota|composite|sinco|usb-midi/i);let dev;
     try{
-        dev=await updater.findAny(id=>id.model==='SMK-37');if(!dev)throw Error('SMK not found over USB. Check the data cable and close other MIDI installers.');
-        if(dev.id.version<968)throw Error('USB game loading requires NESynth SMK968 or newer.');
+        dev=await updater.findAny(id=>['FM-1','SMK-37'].includes(id.model));if(!dev)throw Error('FM-1 or SMK not found over USB. Check the data cable and close other MIDI installers.');
+        const model=dev.id.model,minimum=model==='FM-1'?969:968;
+        if(dev.id.version<minimum)throw Error(`USB game loading requires NESynth ${model} build ${minimum} or newer.`);
         if(await mode(dev.link)!==4){
-            status('Opening USB game loading on your SMK...');
+            status(`Opening USB game loading on your ${model}...`);
             if(!dev.link.send([0xf0,0x7d,78,76,4,0xf7]))throw Error('USB disconnected.');
             await new Promise(r=>setTimeout(r,400));await dev.link.close();dev=null;
-            dev=await updater.waitForAny(id=>id.model==='SMK-37'&&id.version>=968,25000);
-            if(!dev||await mode(dev.link)!==4)throw Error('SMK did not reopen in USB loading mode. Reconnect and try again.');
+            dev=await updater.waitForAny(id=>id.model===model&&id.version>=minimum,25000);
+            if(!dev||await mode(dev.link)!==4)throw Error('Device did not reopen in USB loading mode. Reconnect and try again.');
         }
         const result=createUsbChannel(dev.link);
         const changed=()=>{if(dev.link.lost){result.device.gatt.disconnect();access.removeEventListener?.('statechange',changed);}};

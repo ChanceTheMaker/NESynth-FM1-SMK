@@ -1,4 +1,4 @@
-"""List, play, or delete an SMK967 library entry over Bluetooth."""
+"""List, play, or delete a NESynth library entry over Bluetooth."""
 import argparse,asyncio,json,struct,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'build/bluetooth-python-deps'))
@@ -7,11 +7,11 @@ async def main(a):
     from bleak import BleakScanner,BleakClient
     found=await BleakScanner.discover(timeout=a.timeout,return_adv=True)
     matches=[d for d,v in found.values() if SERVICE in [s.lower() for s in v.service_uuids]]
-    if len(matches)!=1:raise RuntimeError('Expected one advertising NESynth SMK')
+    if len(matches)!=1:raise RuntimeError('Expected one advertising NESynth device')
     async with BleakClient(matches[0],timeout=30) as c:
         await c.write_gatt_char(VALUE,b'\x06',response=True)
         summary=await c.read_gatt_char(VALUE)
-        if len(summary)!=40 or summary[:4]!=b'NPL2':raise RuntimeError('SMK967 library required')
+        if len(summary)!=40 or summary[:4]!=b'NPL2':raise RuntimeError('NESynth multi-game library required')
         v=struct.unpack('<10I',summary)
         if v[2]>32:raise RuntimeError('Invalid game count')
         result=dict(zip(['count','free','total','largest','game_limit','slots','generation'],v[2:9]));result['games']=[]

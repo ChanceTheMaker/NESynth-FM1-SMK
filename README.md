@@ -41,6 +41,21 @@ Uploads retain the SMK966 speed improvements: bounded bursts of eight packets, c
 
 For local verification, `tools/upload_usb_game.py GAME.zip` uploads over USB; omit the game to list the shared library. `tools/upload_bluetooth_game.py GAME.zip` uploads over Bluetooth. `tools/manage_bluetooth_library.py` lists entries; `--play INDEX` or `--delete INDEX` acts on a freshly read entry. `tools/inspect_bluetooth_loader.py --library` reads count/free space over USB; `--open-menu`, `--open-loader` (Bluetooth) or `--open-usb` changes modes. The new storage tests inject failure at every flash I/O during addition and deletion, verify protected boundaries and readback corruption, and exercise duplicate detection, hole reuse, full catalogs and malformed metadata. Actual page handlers are tested for radio loss and reconnect without using hardware.
 
+## FM-1 library candidate and transport lights
+
+The feature branch now also builds FM1969 with the same game menu, USB/Bluetooth uploads, eight supported mappers and dual-core player. The FM-1 library has 360 KiB across up to 32 entries, with the same 262,672-byte individual cartridge limit. FM-1 uses its own flash layout and original two-stage USB updater; SMK packages are not interchangeable.
+
+```sh
+python tools/build_bluetooth_probe.py --board fm1 --loader
+python tools/package_fm1.py --bluetooth-loader --label library
+```
+
+The local candidate is `build/fm1-bluetooth-loader/nesynth-fm1-969-library.fwsc`. It reads the preserved FM-1 RF calibration snapshot at `0xe8000` and refuses invalid records; it never embeds the SMK calibration fallback. Host update/restore simulation, calibration parsing, storage fault injection and the shared browser USB flow pass. **FM-1 radio, transfers and gameplay still require hardware validation; this build has not been installed.**
+
+Both models use PLAY as NES Start and REC as NES Select, including the PLAY + REC library shortcut. FM-1 retains its existing illuminated PLAY/REC keys. SMK now lights the green PLAY and red record indicators through the existing scanner, using outputs 17 and 19 (output 18 is PLAY's alternate red light). The scanner test verifies unchanged keyboard/analog sampling with these lights enabled; physical light placement still needs checking on the new build. The lights stay on in gameplay, library and upload modes.
+
+The shared `bluetooth.html` uploader and USB command-line tools accept both models. Select `NESynth FM1` in the Bluetooth chooser for FM-1. FM-1 volume uses its master knob; SMK uses Fader 1. Before a firmware update, use USB loading to stop Bluetooth; a firmware-upgrade request while the radio is active first reboots to radio-off USB mode and must be retried. Firmware replacement clears the game library unless a separately verified preservation package is used. Game uploads and power cycles retain the catalog.
+
 ## Try it
 
 ```powershell

@@ -1,4 +1,4 @@
-"""Upload a cartridge to the same SMK968+ library over USB MIDI; no firmware flash."""
+"""Upload a cartridge to the same FM-1/SMK library over USB MIDI; no firmware flash."""
 import argparse,json,os,re,secrets,struct,subprocess,sys,time,zlib
 from pathlib import Path
 from cartridge import read_cartridge
@@ -12,7 +12,7 @@ def packet(sequence,kind,data=b''):
 def reply(data,sequence):
     if not data or len(data)<8 or data[:4]!=PREFIX or data[4:6]!=bytes([sequence&127,sequence>>7]):return None
     if len(data)>96 or data[-1]!=0xf7 or (len(data)-8)%2 or any(b>127 for b in data[1:-1]):raise ValueError('Malformed USB reply')
-    if data[6]:raise RuntimeError(f'SMK rejected USB library command (status {data[6]})')
+    if data[6]:raise RuntimeError(f'Device rejected USB library command (status {data[6]})')
     if any(data[i]>1 for i in range(8,len(data)-1,2)):raise ValueError('Malformed USB byte')
     return bytes(data[i]|data[i+1]<<7 for i in range(7,len(data)-1,2))
 class Channel:
@@ -32,7 +32,7 @@ def status(link):
     while time.monotonic()<end:
         p=link.read(.2)
         if p and p.startswith(prefix) and len(p)==36:return [sum(p[5+i*5+j]<<(7*j) for j in range(5)) for i in range(6)]
-    raise RuntimeError('SMK did not answer USB mode query')
+    raise RuntimeError('Device did not answer USB mode query')
 def library(c):
     c.write(b'\x06');data=c.read()
     if len(data)!=40 or data[:4]!=b'NPL2':raise RuntimeError('Invalid library response')
@@ -49,9 +49,9 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('rom',type=Path,nargs='?');p.add_argument('--rom-entry');p.add_argument('--prepare',action='store_true',help=argparse.SUPPRESS);a=p.parse_args()
     if not a.prepare:
         subprocess.run([sys.executable,__file__,'--prepare'],check=True);time.sleep(1)
-    wire.PORT_RE=re.compile(r'smk|nesynth|ota|composite|sinco|usb-midi',re.I)
-    up=wire.Updater(wire.MidoBackend());dev=up.wait_for(lambda i:i.text in ('SMK-37_968','SMK-37_969'),20)
-    if not dev:raise RuntimeError('NESynth SMK968 or newer not found over USB')
+    wire.PORT_RE=re.compile(r'fm-?1|smk|nesynth|ota|composite|sinco|usb-midi',re.I)
+    up=wire.Updater(wire.MidoBackend());dev=up.wait_for(lambda i:i.text in ('SMK-37_968','SMK-37_969','FM-1_969'),20)
+    if not dev:raise RuntimeError('NESynth SMK968/969 or FM1969 not found over USB')
     link=dev.link
     try:
         state=status(link)

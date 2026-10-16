@@ -79,4 +79,5 @@ jobs:
           node tests/bluetooth_library.mjs
           node tests/usb_library.mjs
           node tests/usb_loader_ui.mjs
+          node tests/usb_loader_ui.mjs --fm1
           node tests/bluetooth_loader_ui.mjs

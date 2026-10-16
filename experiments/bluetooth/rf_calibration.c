@@ -8,20 +8,13 @@ static uint16_t crc(uint16_t c,const uint8_t *p,uint32_t n){
     while(n--){c^=(uint16_t)*p++<<8;for(unsigned k=0;k<8;k++)c=(uint16_t)((c&0x8000)?(c<<1)^0x1021:c<<1);}
     return c;
 }
-int np_rf_load_smk(np_rf_read read,void *ctx,np_rf_calibration *out){
-    np_rf_calibration next={0};uint8_t head[4],buffer[68];uint32_t magic[2],seen=0;
+static int load_bank(np_rf_read read,void *ctx,np_rf_calibration *out,uint32_t bank,uint32_t size){
+    np_rf_calibration next={0};uint8_t head[4],buffer[68];uint32_t seen=0;
     *out=next;
     if(!read)return NP_RF_IO;
-    for(unsigned i=0;i<2;i++){
-        if(read(ctx,0x9d000u+i*0x10000u,head,4))return NP_RF_IO;
-        magic[i]=word(head);
-    }
-    unsigned active;
-    if(magic[0]==0x55aaaa55u&&(magic[1]==0xffffffffu||magic[1]==0))active=0;
-    else if(magic[1]==0x55aaaa55u&&(magic[0]==0xffffffffu||magic[0]==0))active=1;
-    else return NP_RF_LAYOUT;
-    next.bank=0x9d000u+active*0x10000u;
-    uint32_t pos=next.bank+4,end=next.bank+0x10000u;
+    if(read(ctx,bank,head,4))return NP_RF_IO;
+    if(word(head)!=0x55aaaa55u)return NP_RF_LAYOUT;
+    next.bank=bank;uint32_t pos=bank+4,end=bank+size;
     for(;;){
         if(end-pos<4)return NP_RF_CORRUPT;
         if(read(ctx,pos,head,4))return NP_RF_IO;
@@ -52,4 +45,16 @@ int np_rf_load_smk(np_rf_read read,void *ctx,np_rf_calibration *out){
     }
     if(seen!=7)return NP_RF_MISSING;
     *out=next;return NP_RF_OK;
+}
+
+int np_rf_load_smk(np_rf_read read,void *ctx,np_rf_calibration *out){
+    uint8_t head[4];uint32_t magic[2];*out=(np_rf_calibration){0};
+    if(!read)return NP_RF_IO;
+    for(unsigned i=0;i<2;i++){if(read(ctx,0x9d000u+i*0x10000u,head,4))return NP_RF_IO;magic[i]=word(head);}
+    if(magic[0]==0x55aaaa55u&&(magic[1]==0xffffffffu||magic[1]==0))return load_bank(read,ctx,out,0x9d000u,0x10000u);
+    if(magic[1]==0x55aaaa55u&&(magic[0]==0xffffffffu||magic[0]==0))return load_bank(read,ctx,out,0xad000u,0x10000u);
+    return NP_RF_LAYOUT;
+}
+int np_rf_load_fm1(np_rf_read read,void *ctx,np_rf_calibration *out){
+    return load_bank(read,ctx,out,0xe8000u,0x1000u);
 }

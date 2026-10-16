@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import {pack7} from '../web/vendor/fm1ota.js';
 import {setupDom,dropChecks,fileEvent} from './loader_ui_helpers.mjs';
 setupDom();
+const fm1=process.argv.includes('--fm1'),model=fm1?'FM-1':'SMK-37',minimum=fm1?969:968;
 let beat;globalThis.setInterval=f=>{beat=f;};globalThis.confirm=()=>true;
-const listeners=new Set();let mode=0,command=0,requests=0,handoffs=0,version=968,timeout=false,gameCommands=0;
-const input={name:'SMK MIDI',state:'connected',connection:'closed',open:async()=>{input.connection='open';},close:async()=>{input.connection='closed';},addEventListener:(t,f)=>listeners.add(f),removeEventListener:(t,f)=>listeners.delete(f)};
+const listeners=new Set();let mode=0,command=0,requests=0,handoffs=0,version=minimum,timeout=false,gameCommands=0;
+const input={name:model+' MIDI',state:'connected',connection:'closed',open:async()=>{input.connection='open';},close:async()=>{input.connection='closed';},addEventListener:(t,f)=>listeners.add(f),removeEventListener:(t,f)=>listeners.delete(f)};
 function emit(data){queueMicrotask(()=>{const ev={data:new Uint8Array(data)};listeners.forEach(f=>f(ev));input.onmidimessage?.(ev);});}
-const output={name:'SMK MIDI',state:'connected',connection:'closed',open:async()=>{output.connection='open';},close:async()=>{output.connection='closed';},send:p=>{
+const output={name:model+' MIDI',state:'connected',connection:'closed',open:async()=>{output.connection='open';},close:async()=>{output.connection='closed';},send:p=>{
  assert.notDeepEqual(Array.from(p),[0xf0,0x22,0x24,0x35,0x7f,0xf7],'Never start a firmware update');
- if(p[1]===0){const id=new Uint8Array(34);id.set([0,0x59,0x11]);id.set(new TextEncoder().encode('SMK-37_'+version),6);emit([0xf0,...pack7(id),0xf7]);return;}
+ if(p[1]===0){const id=new Uint8Array(34);id.set([0,0x59,0x11]);id.set(new TextEncoder().encode(model+'_'+version),6);emit([0xf0,...pack7(id),0xf7]);return;}
  if(p[3]===76){if(p[4]===4){mode=4;handoffs++;return;}emit([0xf0,0x7d,78,76,0,mode,...new Array(29).fill(0),0xf7]);return;}
  assert.equal(p[3],85);if(timeout)return;let raw=[];
  if(p[6]===1){command=p[7]|p[8]<<7;if([1,2,3,8,9].includes(command))gameCommands++;}
@@ -28,5 +29,5 @@ await pending;assert.equal(document.querySelector('#connection').textContent,'US
 timeout=false;await beat();assert.equal(document.querySelector('#connection').textContent,'USB connected');assert(!document.querySelector('#send').disabled);
 await document.querySelector('#connect').onclick();assert.equal(document.querySelector('#connection').textContent,'USB disconnected');
 await document.querySelector('#connect').onclick();assert.equal(document.querySelector('#connection').textContent,'USB connected');assert.equal(handoffs,1,'Already in USB mode: no extra reboot');
-await document.querySelector('#connect').onclick();version=967;await document.querySelector('#connect').onclick();assert.match(document.querySelector('#status').textContent,/968/);assert.equal(handoffs,1);
+await document.querySelector('#connect').onclick();version=minimum-1;await document.querySelector('#connect').onclick();assert.match(document.querySelector('#status').textContent,new RegExp(String(minimum)));assert.equal(handoffs,1);
 console.log('PASS: real USB page handlers, MIDI permission, identity/mode discovery, radio-off handoff, shared library, reconnect and old-firmware rejection with Bluetooth absent');

@@ -27,26 +27,31 @@ def wrap(image):
 def main():
  p=argparse.ArgumentParser(description=__doc__)
  p.add_argument('--sdk',type=Path,default=ROOT.parent/'Felucca/Felucca-review/.build-deps/ac79-sdk')
+ p.add_argument('--bluetooth-loader',action='store_true',help='Package the separate FM-1 Bluetooth/library build')
  p.add_argument('--label',default='diagnostic');p.add_argument('--toolchain',default=DEFAULT_TC);p.add_argument('--zig',default=str(DEFAULT_ZIG));a=p.parse_args()
  for rel,digest in SDK_HASHES.items():
   assert sha((a.sdk/'cpu/wl82/tools'/rel).read_bytes())==digest,rel+' SDK revision mismatch'
- out=ROOT/'build/fm1';out.mkdir(parents=True,exist_ok=True)
+ folder='build/fm1-bluetooth-loader' if a.bluetooth_loader else 'build/fm1'
+ out=ROOT/folder;out.mkdir(parents=True,exist_ok=True)
  def tc(tool,*args):return run(['wsl','-e',a.toolchain+'/'+tool,*args])
  fw='vendor/felucca/firmware'
  flags=['-target','pi32v2','-Os','-ffunction-sections','-fno-builtin','-Wall','-Wno-unused-function','-I'+fw+'/hal','-I'+fw+'/src']
  for stem in ['crt0_ldr','loader']:
-  tc('pi32v2/bin/clang',*flags,'-c',fw+'/loader/'+stem+('.S' if stem=='crt0_ldr' else '.c'),'-o','build/fm1/'+stem+'.o')
- tc('pi32v2/bin/ld','--gc-sections','-e','_start','-T',fw+'/loader/loader.ld','build/fm1/crt0_ldr.o','build/fm1/loader.o','-o','build/fm1/loader.elf')
- sections=tc('common/bin/objdump','-h','build/fm1/loader.elf')
+  tc('pi32v2/bin/clang',*flags,'-c',fw+'/loader/'+stem+('.S' if stem=='crt0_ldr' else '.c'),'-o',folder+'/'+stem+'.o')
+ tc('pi32v2/bin/ld','--gc-sections','-e','_start','-T',fw+'/loader/loader.ld',folder+'/crt0_ldr.o',folder+'/loader.o','-o',folder+'/loader.elf')
+ sections=tc('common/bin/objdump','-h',folder+'/loader.elf')
  for line in sections.splitlines():
   parts=line.split()
   if len(parts)>4 and parts[1].startswith('.') and int(parts[2],16):assert 0x1c00000<=int(parts[3],16)<0x1c80000,line
- tc('common/bin/objcopy','-O','binary','-j','.text','build/fm1/loader.elf','build/fm1/loader.bin')
+ tc('common/bin/objcopy','-O','binary','-j','.text',folder+'/loader.elf',folder+'/loader.bin')
  loader=wrap((out/'loader.bin').read_bytes());assert len(loader)<=0x4f00
  (out/'ota.bin').write_bytes(loader)
- app=(out/'nes-NOT-FOR-INSTALL.bin').read_bytes()
- manifest=json.loads((out/'manifest.json').read_text());assert manifest['sha256']==sha(app)
- product=re.search(r'#define FELUCCA_ID "(FM-1_\d+)"',(ROOT/'firmware/fm1_recovery.h').read_text())[1]
+ app=(out/('FM1969-BLUETOOTH-RAW.bin' if a.bluetooth_loader else 'nes-NOT-FOR-INSTALL.bin')).read_bytes()
+ manifest=json.loads((out/('report.json' if a.bluetooth_loader else 'manifest.json')).read_text());assert manifest['sha256']==sha(app)
+ product=manifest['product'] if a.bluetooth_loader else re.search(r'#define FELUCCA_ID "(FM-1_\d+)"',(ROOT/'firmware/fm1_recovery.h').read_text())[1]
+ if a.bluetooth_loader:
+  assert manifest['board']=='fm1' and manifest['ram_reach_check']
+  assert manifest['cartridge_flash_hi']==0x92000 and len(app)+0x4120<=manifest['cartridge_flash_lo']
  assert manifest['usb_updater'] and product.encode() in app
  assert manifest.get('dual_core') is True
  pkg.SDK=a.sdk;flash=pkg.flash_image(app,pkg.KEY);raw=pkg.ufw(flash,loader,product)
@@ -72,8 +77,8 @@ def main():
  report={'project':'nesynth','product':product,'package':output.name,'sha256':sha(raw),
   'bytes':len(raw),'app_sha256':sha(app),'loader_sha256':sha(loader),'sdk_hashes':SDK_HASHES,
   'restore_package':str(restore),'restore_sha256':sha(restore.read_bytes()),
-  'dual_core':True,'cartridge':a.label,'private_cartridge':a.label not in ['diagnostic','diagnostic-sram','template'],'hardware_validated':False,'installed':False,
+  'dual_core':True,'cartridge':a.label,'private_cartridge':a.label not in ['diagnostic','diagnostic-sram','template','library'],'hardware_validated':False,'installed':False,
   'validation':['SDK hashes','loader RAM placement','LZ4 round trip','encrypted app round trip','OTA simulated flash tests','loader simulated flash tests'],
-  'note':'Private NESynth trial. Package writes app sectors; game save RAM is volatile. No public distribution.'}
+  'library_capacity':manifest.get('library_capacity',0),'note':'Private NESynth trial. Package writes app sectors; game save RAM is volatile. No public distribution.'}
  (out/('trial-'+a.label+'.json')).write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 if __name__=='__main__':main()

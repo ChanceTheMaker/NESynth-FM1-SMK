@@ -1,4 +1,4 @@
-"""Inspect SMK965/966/967/968/969 cartridge/loader state over USB; optionally open Bluetooth loading."""
+"""Inspect FM1969 or SMK965/966/967/968/969 cartridge/loader state over USB; optionally open Bluetooth loading."""
 import argparse,json,os,re,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
@@ -7,9 +7,9 @@ import fm1_install as wire
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--open-loader',action='store_true');p.add_argument('--open-usb',action='store_true');p.add_argument('--library',action='store_true');p.add_argument('--open-menu',action='store_true');a=p.parse_args()
-    wire.PORT_RE=re.compile(r'smk|nesynth|ota|composite|sinco|usb-midi',re.I)
-    up=wire.Updater(wire.MidoBackend());d=up.find(lambda i:i.text in ('SMK-37_965','SMK-37_966','SMK-37_967','SMK-37_968','SMK-37_969'))
-    if not d:raise RuntimeError('SMK-37_965/966/967/968/969 not found')
+    wire.PORT_RE=re.compile(r'fm-?1|smk|nesynth|ota|composite|sinco|usb-midi',re.I)
+    up=wire.Updater(wire.MidoBackend());d=up.find(lambda i:i.text in ('SMK-37_965','SMK-37_966','SMK-37_967','SMK-37_968','SMK-37_969','FM-1_969'))
+    if not d:raise RuntimeError('NESynth FM1969 or SMK965/966/967/968/969 not found')
     prefix=b'\xf0\x7dNL'+bytes([2 if a.library else 0]);d.link.drain();d.link.send(prefix+b'\xf7');end=time.monotonic()+4
     while time.monotonic()<end:
         packet=d.link.read(.2)

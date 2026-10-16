@@ -1,4 +1,4 @@
-"""Send a local .nes or ZIP to the integrated NESynth SMK967 Bluetooth loader."""
+"""Send a local .nes or ZIP to the integrated NESynth FM-1/SMK Bluetooth loader."""
 import argparse,asyncio,json,secrets,struct,sys,time,zlib
 from pathlib import Path
 from cartridge import read_cartridge
@@ -16,7 +16,7 @@ async def upload(args):
     if not 16<=len(rom)<=262672 or rom[:4]!=b'NES\x1a':raise ValueError('Expected an iNES cartridge no larger than 262672 bytes')
     found=await BleakScanner.discover(timeout=args.timeout,return_adv=True)
     matches=[d for d,a in found.values() if SERVICE in [s.lower() for s in a.service_uuids]]
-    if len(matches)!=1:raise RuntimeError(f'Expected one NESynth SMK loader; found {len(matches)}. Hold PLAY + REC for two seconds to open it.')
+    if len(matches)!=1:raise RuntimeError(f'Expected one NESynth loader; found {len(matches)}. Hold PLAY + REC for the library, then press REC for Bluetooth.')
     session=secrets.randbits(32) or 1;crc=zlib.crc32(rom);started=time.monotonic()
     async with BleakClient(matches[0],timeout=max(30,args.timeout)) as client:
         state,error,received,capacity=decode(await client.read_gatt_char(VALUE))
@@ -52,7 +52,7 @@ async def upload(args):
                     if error:raise RuntimeError(f'Transfer error: {error}')
                     break
                 retries+=1;retries_total+=1
-                if retries>3:raise RuntimeError('Bluetooth transfer stalled; move the SMK closer and retry')
+                if retries>3:raise RuntimeError('Bluetooth transfer stalled; move the device closer and retry')
             if time.monotonic()-last>=3:
                 last=time.monotonic();print(json.dumps({'received':off,'total':len(rom),'chunk':chunk,'burst':burst}),flush=True)
         data_seconds=time.monotonic()-transfer_started

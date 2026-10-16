@@ -12,6 +12,28 @@
 #define NP_MODE_WRITE 0x5742504eu
 #define NP_MODE_PLAY 0x5042504eu
 #define NP_MODE_DELETE 0x4442504eu
+static uint32_t np_panel_buttons(void){
+#if GB_SMK37
+    return smk_buttons>>16;
+#else
+    return fm1_in.buttons>>12;
+#endif
+}
+static uint32_t np_menu_buttons(void){
+#if GB_SMK37
+    return smk_input_frame();
+#else
+    uint32_t p=gp_input_keys(key_lo,0),b=np_panel_buttons();
+    if(b&1)p|=GP_START;if(b&2)p|=GP_SELECT;return p;
+#endif
+}
+static void np_draw_strip(unsigned y,unsigned rows,const uint16_t *pixels){
+#if GB_SMK37
+    smk37_panel_window(&panel,0,y,240,rows);lcd_data(pixels,240*rows*2);
+#else
+    lcd_blit(0,y,240,rows,pixels);lcd_sync(); /* Workspace may be reused immediately. */
+#endif
+}
 #define NP_STAGE ((uint8_t *)0x01c1a000u)
 #define NP_UI ((uint16_t *)0x01c5b000u)
 #define NP_BLE_WORK ((uint8_t *)0x01c65000u)
@@ -36,8 +58,16 @@ static int np_store_read_flash(void *ctx,uint32_t off,void *p,uint32_t n){
     (void)ctx;fm1_wdt_feed();if(off<NP_LIBRARY_META||off>NP_LIBRARY_END||n>NP_LIBRARY_END-off)return -1;
     return FL_FAR(fl_read_ram)(off,p,n);
 }
-static int np_store_erase_flash(void *ctx,uint32_t off){(void)ctx;uint32_t took;fm1_wdt_feed();return FL_FAR(fl_erase4k_ram)(off,&took);}
-static int np_store_write_flash(void *ctx,uint32_t off,const void *p,uint32_t n){(void)ctx;uint32_t took;fm1_wdt_feed();return FL_FAR(fl_prog_ram)(off,p,n,&took);}
+static int np_store_erase_flash(void *ctx,uint32_t off){
+    (void)ctx;uint32_t took;fm1_wdt_feed();
+    if(off<NP_LIBRARY_META||off>NP_LIBRARY_END||4096u>NP_LIBRARY_END-off||(off&4095u))return -1;
+    return FL_FAR(fl_erase4k_ram)(off,&took);
+}
+static int np_store_write_flash(void *ctx,uint32_t off,const void *p,uint32_t n){
+    (void)ctx;uint32_t took;fm1_wdt_feed();
+    if(off<NP_LIBRARY_META||off>NP_LIBRARY_END||n>NP_LIBRARY_END-off)return -1;
+    return FL_FAR(fl_prog_ram)(off,p,n,&took);
+}
 static void np_loader_boot(uint32_t cold){
     uint32_t mode=np_restart.magic,n=np_restart.length,crc=np_restart.crc,check=np_restart.check;
     for(unsigned i=0;i<32;i++)np_upload_name[i]=np_restart.name[i];
@@ -131,7 +161,7 @@ static int np_loader_usb(const uint8_t *p,unsigned n){
 }
 static void np_loader_controls(void){
     static uint32_t pressed;
-    if((smk_buttons&(3u<<16))!=(3u<<16)){pressed=0;return;}
+    if((np_panel_buttons()&3u)!=3u){pressed=0;return;}
     uint32_t now=core_ms();if(!pressed)pressed=now;
     if(now-pressed>=1200){display_stop();video_stop();audio_stop();np_restart_as(NP_MODE_MENU,0,0);}
 }
@@ -143,7 +173,7 @@ static void np_loader_draw(void){
     if(np_loader_error){label="UPLOAD ERROR";state=5;}
     unsigned percent=np_loader_rx.length?100u*np_loader_rx.received/np_loader_rx.length:0;
     np_loader_art(NP_UI,176,64,label,percent,state);
-    smk37_panel_window(&panel,0,176,240,64);lcd_data(NP_UI,240*64*2);
+    np_draw_strip(176,64,NP_UI);
 }
 static char *np_dec(char *p,unsigned n){char b[10];unsigned k=0;do{b[k++]=(char)('0'+n%10);n/=10;}while(n);while(k)*p++=b[--k];*p=0;return p;}
 static void np_menu_draw(void){
@@ -160,16 +190,16 @@ static void np_menu_draw(void){
             np_art_text(&a,14,93+row*24,name,2,0xef5c);
         }
         if(!np_library.catalog.count)np_art_center(&a,120,"NO GAMES YET",2,0xef5c);
-        np_art_center(&a,190,"PADS SELECT  PLAY GO",2,0xef5c);
+        np_art_center(&a,190,"KEYS SELECT  PLAY GO",2,0xef5c);
         np_art_center(&a,205,space,2,0x45bf);
         np_art_center(&a,224,np_loader_error?"GAME ERROR  REC TO LOAD":"REC BT  USB ON PC",2,np_loader_error?0xe9e8:0x9cf3);
-        smk37_panel_window(&panel,0,y,240,60);lcd_data(NP_UI,240*60*2);
+        np_draw_strip(y,60,NP_UI);
     }
 }
 static void np_menu_run(void){
     uint32_t previous=~0u,last=0;np_menu_draw();
     for(;;){fm1_wdt_feed();recovery_service();uint32_t now=core_ms();if(now-last<25)continue;last=now;
-        uint32_t buttons=smk_input_frame(),pressed=buttons&~previous;previous=buttons;
+        uint32_t buttons=np_menu_buttons(),pressed=buttons&~previous;previous=buttons;
         if(pressed&GP_SELECT){np_loader_mode=1;return;}
         unsigned count=np_library.catalog.count;
         if(count&&(pressed&(GP_UP|GP_LEFT|GP_DOWN|GP_RIGHT))){np_menu_index=(np_menu_index+((pressed&(GP_UP|GP_LEFT))?count-1:1))%count;np_menu_draw();}
@@ -184,14 +214,14 @@ static __attribute__((noreturn)) void np_loader_run(void){
     /* No gameplay buffers/CPU1/audio may run in this mode. */
     for(unsigned y=0;y<240;y+=60){
         np_loader_art(NP_UI,y,60,"STARTING",0,1);
-        smk37_panel_window(&panel,0,y,240,60);lcd_data(NP_UI,240*60*2);
+        np_draw_strip(y,60,NP_UI);
     }
     np_loader_draw();if(np_loader_mode!=4)np_ble_diag_start();uint32_t last=0,previous=~0u;
     for(;;){
         fm1_wdt_feed();recovery_service();np_ble_diag_service();uint32_t now=core_ms();
         if(np_loader_pending&&(int32_t)(now-np_loader_due)>=0){display_stop();np_restart_as(np_loader_pending,np_loader_pending==NP_MODE_WRITE?np_loader_rx.length:np_pending_index,np_loader_pending==NP_MODE_WRITE?np_loader_rx.expected_crc:np_pending_crc);}
-        uint32_t buttons=smk_buttons,pressed=buttons&~previous;previous=buttons;
-        if((pressed&(1u<<16))&&!np_loader_pending&&np_loader_rx.state!=NP_RX_RECEIVING)np_restart_as(NP_MODE_MENU,0,0);
+        uint32_t buttons=np_panel_buttons(),pressed=buttons&~previous;previous=buttons;
+        if((pressed&1u)&&!np_loader_pending&&np_loader_rx.state!=NP_RX_RECEIVING)np_restart_as(NP_MODE_MENU,0,0);
         if(now-last>=500){last=now;np_loader_draw();}
         if(now>=30000&&scan_count>100)smk37_bootguard_healthy(&gb_bootguard);
     }

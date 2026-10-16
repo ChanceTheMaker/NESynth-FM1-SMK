@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* Included only in the generated SMK diagnostic board translation unit. */
+/* Included only in the generated diagnostic/loader board translation unit. */
 #include "fm1_guard.h"
 #include "fm1_ble_hal.h"
 #ifndef FL_RANGE_OK
@@ -21,13 +21,22 @@ void core_irq_mask(uint32_t n){if(n<128)fm1_irq_mask(n);}
 void core_irq_unmask(uint32_t n){if(n<128)fm1_irq_unmask(n);}
 uint32_t core_irq_is_masked(uint32_t n){return n<128?fm1_irq_is_masked(n):1;}
 void core_ble_stack_window(void){fm1_guard_stack_window((uint32_t)(uintptr_t)np_ble_probe_workspace(),(uint32_t)(uintptr_t)_sstack_top);}
+#if GB_SMK37
+#define NP_RF_LO 0x9d000u
+#define NP_RF_HI 0xbd000u
+#define NP_DISPLAY_BUSY display_dma.busy
+#else
+#define NP_RF_LO 0xe8000u
+#define NP_RF_HI 0xe9000u
+#define NP_DISPLAY_BUSY lcd_busy
+#endif
 static uint32_t np_read_count,np_read_off,np_read_size,np_read_sfc,np_read_magic[2];
 static int np_read_result;
 static uint32_t np_private_match;
 int core_flash_read(uint32_t off,void *p,uint32_t n){
     np_read_count++;np_read_off=off;np_read_size=n;np_read_sfc=SFC_CON;
     /* Before radio only; CPU1 never starts and display DMA must be idle. */
-    if(np_ble_diag_state()||display_dma.busy||off<0x9d000u||off>=0xbd000u||!n||n>0xbd000u-off){np_read_result=-1;return -1;}
+    if(np_ble_diag_state()||NP_DISPLAY_BUSY||off<NP_RF_LO||off>=NP_RF_HI||!n||n>NP_RF_HI-off){np_read_result=-1;return -1;}
     fm1_irq_off();int result=FL_FAR(fl_read_ram)(off,p,n);fm1_irq_on();
     np_read_result=result;
     if(!result&&n==4&&(off==0x9d000u||off==0xad000u)){
@@ -38,6 +47,7 @@ int core_flash_read(uint32_t off,void *p,uint32_t n){
 /* Private diagnostic: validate and exactly match the updater's usrtrim
  * identity record. Compare surrounding bytes only to explain layout changes.
  * No saved VM/music bytes are restored or modified. */
+#if GB_SMK37
 #include "private_calibration_guard.h"
 static np_factory_report np_factory_check;
 static int np_factory_read_adapter(void *ctx,uint32_t off,uint8_t *p,uint32_t n){
@@ -45,10 +55,11 @@ static int np_factory_read_adapter(void *ctx,uint32_t off,uint8_t *p,uint32_t n)
 }
 int core_private_calibration_matches(const unsigned char *expected,unsigned n){
     np_private_match=0;
-    if(np_ble_diag_state()||display_dma.busy)return 0;
+    if(np_ble_diag_state()||NP_DISPLAY_BUSY)return 0;
     np_private_match=np_private_unit_matches(np_factory_read_adapter,0,expected,n,&np_factory_check);
     return (int)np_private_match;
 }
+#endif
 /* Fixed read-only status query, never returns calibration payload bytes. */
 extern uint32_t np_ble_rf_status(unsigned),np_ble_runtime_status(unsigned);
 extern void np_ble_private_probe(void);
@@ -94,6 +105,7 @@ static const uint8_t np_font[][5]={
  {7,5,7,4,4},{7,5,5,7,1},{6,5,6,5,5},{7,4,7,1,7},{7,2,2,2,2},
  {5,5,5,5,7},{5,5,5,5,2},{5,5,7,7,5},{5,5,2,5,5},{5,5,2,2,2},{7,1,2,4,7}
 };
+#ifndef NP_BLUETOOTH_LOADER
 static void np_text(unsigned y,const char *s){
     for(unsigned x=12;*s&&x+9<240;s++,x+=12){
         unsigned ch=(unsigned char)*s,idx=ch>='0'&&ch<='9'?ch-'0':ch>='A'&&ch<='Z'?ch-'A'+10:99;
@@ -134,3 +146,5 @@ static __attribute__((noreturn)) void np_diag_run(void){
         }
     }
 }
+
+#endif
