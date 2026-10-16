@@ -25,6 +25,9 @@ _start:
 .endm
 GB_ISR gb_isr_audio, gb_audio_irq
 GB_ISR gb_isr_scan, gb_scan_irq
+#if GB_SMK37
+GB_ISR gb_isr_usb, gb_usb_irq
+#endif
 
 /* Private IRQ-disabled second-core worker, matching the AC79 reset ABI. */
 .section .text.core1,"ax",@progbits

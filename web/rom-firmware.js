@@ -1,6 +1,6 @@
 import {Package,sha256hex,logicalImage} from './vendor/fm1pkg.js?v=20261013';
 import {prepareInstall} from './install-firmware.js?v=20261013';
-import {normalizeCartridge} from './cartridge.js';
+import {normalizeCartridge} from './cartridge.js?v=20261016-headers';
 export async function protectedAppHash(app,offset,capacity){
  const code=new Uint8Array(app.length-capacity);code.set(app.subarray(0,offset));code.set(app.subarray(offset+capacity),offset);return sha256hex(code);
 }
@@ -8,7 +8,7 @@ export function validateHardwareRom(rom){
  if(!(rom instanceof Uint8Array)||rom.length<16)throw Error('File is shorter than an iNES header.');
  if(rom[0]!==78||rom[1]!==69||rom[2]!==83||rom[3]!==26||(rom[7]&15)||rom.slice(10,16).some(x=>x))throw Error('Use a standard iNES 1.0 cartridge.');
  const mapper=(rom[6]>>4)|(rom[7]&240);
- if(![0,1,2,3,4,9].includes(mapper))throw Error('Unsupported mapper '+mapper+'. NESynth supports mappers 0 (NROM), 1 (MMC1), 2 (UxROM), 3 (CNROM), 4 (MMC3) and 9 (MMC2).');
+ if(![0,1,2,3,4,9,11].includes(mapper))throw Error('Unsupported mapper '+mapper+'. NESynth supports mappers 0 (NROM), 1 (MMC1), 2 (UxROM), 3 (CNROM), 4 (MMC3), 9 (MMC2) and 11 (Color Dreams).');
  if(rom[9]&1)throw Error('PAL cartridges are not supported yet.');
  if(rom[8]>1)throw Error('Cartridge requests unsupported RAM.');
  if(rom.length!==16+((rom[6]&4)?512:0)+rom[4]*16384+rom[5]*8192)throw Error('Cartridge size does not match its header.');
@@ -16,6 +16,7 @@ export function validateHardwareRom(rom){
  if(mapper===2&&(![2,4,8,16].includes(rom[4])||rom[5]||(rom[6]&8)))throw Error('Unsupported UxROM cartridge size or mirroring.');
  if(mapper===3&&(![1,2].includes(rom[4])||![1,2,4].includes(rom[5])||(rom[6]&8)))throw Error('Unsupported CNROM cartridge size or mirroring.');
  if(mapper===4&&(![2,4,8,16,32].includes(rom[4])||![0,1,2,4,8,16,32].includes(rom[5])))throw Error('Unsupported MMC3 cartridge size.');
+ if(mapper===11&&(![2,4,8].includes(rom[4])||![1,2,4,8,16].includes(rom[5])||(rom[6]&8)))throw Error('Unsupported Color Dreams cartridge size or mirroring.');
  if(mapper===1&&(![1,2,4,8,16].includes(rom[4])||![0,1,2,4,8,16].includes(rom[5])||(rom[6]&8)))throw Error('Unsupported MMC1 cartridge size or mirroring.');
  if(mapper===9&&(![2,4,8].includes(rom[4])||![1,2,4,8,16].includes(rom[5])||(rom[6]&8)))throw Error('Unsupported MMC2 cartridge size or mirroring.');
 }

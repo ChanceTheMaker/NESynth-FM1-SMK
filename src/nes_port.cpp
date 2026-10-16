@@ -52,7 +52,7 @@ int gp_load(const uint8_t *r,uint32_t n){
     if(r[0]!='N'||r[1]!='E'||r[2]!='S'||r[3]!=0x1a)return error=GP_FORMAT;
     if((r[7]&15)!=0)return error=GP_FORMAT; // iNES 1.0, standard NES only
     unsigned mapper=(r[6]>>4)|(r[7]&0xf0);
-    if(mapper>4&&mapper!=9)return error=GP_MAPPER;
+    if(mapper>4&&mapper!=9&&mapper!=11)return error=GP_MAPPER;
     if(r[9]&1)return error=GP_REGION;
     if(r[8]>1)return error=GP_RAM_SIZE;
     for(unsigned i=10;i<16;i++)if(r[i])return error=GP_FORMAT;
@@ -61,6 +61,7 @@ int gp_load(const uint8_t *r,uint32_t n){
     if(mapper==2&&(r[4]<2||r[4]>16||(r[4]&(r[4]-1))||r[5]||(r[6]&8)))return error=GP_ROM_SIZE;
     if(mapper==3&&((r[4]!=1&&r[4]!=2)||!r[5]||r[5]>4||(r[5]&(r[5]-1))||(r[6]&8)))return error=GP_ROM_SIZE;
     if(mapper==4&&(r[4]<2||r[4]>32||(r[4]&(r[4]-1))||r[5]>32||(r[5]&&(r[5]&(r[5]-1)))))return error=GP_ROM_SIZE;
+    if(mapper==11&&(r[4]<2||r[4]>8||(r[4]&(r[4]-1))||!r[5]||r[5]>16||(r[5]&(r[5]-1))||(r[6]&8)))return error=GP_ROM_SIZE;
     if(mapper==1){
         if(!r[4]||r[4]>16||(r[4]&(r[4]-1))||r[5]>16||(r[5]&&(r[5]&(r[5]-1)))||(r[6]&8))return error=GP_ROM_SIZE;
     }

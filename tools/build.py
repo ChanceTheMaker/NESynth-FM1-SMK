@@ -26,6 +26,10 @@ def main():
     native=a.target in ['fm1','smk37'];out=ROOT/'build'/a.target;out.mkdir(exist_ok=True)
     sources=CPP+['src/libc.c']
     if native:
+        if a.target=='smk37':
+            from build_smk_loader import build as build_loader
+            gen,loader=build_loader(a.toolchain,out)
+            common+=['-I'+gen.relative_to(ROOT).as_posix()]
         rom=read_cartridge(a.rom,a.rom_entry) if a.rom else make_rom()
         if a.rom_capacity<len(rom) or a.rom_capacity>524816:raise ValueError('Invalid ROM capacity')
         storage=rom+b'\xff'*(a.rom_capacity-len(rom))
@@ -43,7 +47,7 @@ def main():
         run([*compiler,*flags,*opts,'-c',src,'-o',obj])
     if not native:
         run([a.zig,'cc','-target','wasm32-freestanding','-nostdlib','-Wl,--no-entry','-Wl,-z,stack-size=0x10000','-Wl,--initial-memory=0x400000','-Wl,--max-memory=0x400000',*['-Wl,--export='+x for x in EXPORTS],*objs,'-o','web/nes.wasm'])
-        (ROOT/'web/diagnostic.nes').write_bytes(make_rom());blob=(ROOT/'web/nes.wasm').read_bytes();result={'bytes':len(blob),'sha256':hashlib.sha256(blob).hexdigest(),'mappers':[0,1,2,3,4,9],'region':'NTSC','core':'InfoNES'};(ROOT/'web/build.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result));return
+        (ROOT/'web/diagnostic.nes').write_bytes(make_rom());blob=(ROOT/'web/nes.wasm').read_bytes();result={'bytes':len(blob),'sha256':hashlib.sha256(blob).hexdigest(),'mappers':[0,1,2,3,4,9,11],'region':'NTSC','core':'InfoNES'};(ROOT/'web/build.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result));return
     elf=(out/'nes.elf').relative_to(ROOT).as_posix()
     run(['wsl','-e',a.toolchain+'/pi32v2/bin/ld','--gc-sections','-T','vendor/felucca/firmware/app.ld',*objs,'-o',elf])
     def capture(*args):return subprocess.check_output(['wsl','-e',a.toolchain+'/common/bin/objdump',*args],cwd=ROOT,text=True)
@@ -61,8 +65,12 @@ def main():
     assert sym('_cpu1_stacks_hi')-sym('_cpu1_stacks_lo')>=8192,'Missing CPU1 stack reservation'
     if a.target=='fm1':
         for required in ['usb_start','ota_session.parm']:assert re.search(r'\s'+re.escape(required)+r'$',syms,re.M),'Missing USB updater'
+    else:
+        for required in ['usb_start','gb_isr_usb','np_loader_image']:
+            assert re.search(r'\s'+re.escape(required)+r'$',syms,re.M),'Missing SMK updater: '+required
     (out/'nes-NOT-FOR-INSTALL.bin').write_bytes(image)
-    result={'board':a.target,'installable':False,'hardware_validated':False,'app_bytes':len(image),'app_limit':0x8dfbc,'rom_capacity':a.rom_capacity,'rom_bytes':len(rom),'ram_bytes':sym('_bss_end')-0x1c08000,'ram_budget':73728,'pool_bytes':sym('_pool_end')-0x1c1a000,'cpu1_stack_bytes':sym('_cpu1_stacks_hi')-sym('_cpu1_stacks_lo'),'pool_budget':368640,'sha256':hashlib.sha256(image).hexdigest(),'dual_core':True,'cpu0_role':'NES CPU/PPU/APU, audio, input, USB, LCD DMA','cpu1_role':'immutable frame scaling and RGB565 conversion','usb_updater':a.target=='fm1','display_target_fps':20,'mappers':[0,1,2,3,4,9],'hardware_fps':None}
+    result={'board':a.target,'installable':False,'hardware_validated':False,'app_bytes':len(image),'app_limit':0x8dfbc,'rom_capacity':a.rom_capacity,'rom_bytes':len(rom),'ram_bytes':sym('_bss_end')-0x1c08000,'ram_budget':73728,'pool_bytes':sym('_pool_end')-0x1c1a000,'cpu1_stack_bytes':sym('_cpu1_stacks_hi')-sym('_cpu1_stacks_lo'),'pool_budget':368640,'sha256':hashlib.sha256(image).hexdigest(),'dual_core':True,'cpu0_role':'NES CPU/PPU/APU, audio, input, USB, LCD DMA','cpu1_role':'immutable frame scaling and RGB565 conversion','usb_updater':a.target=='fm1','display_target_fps':20,'mappers':[0,1,2,3,4,9,11],'hardware_fps':None}
     result.update(cartridge_offset=sym('cartridge')-0x2000120,cartridge_capacity=a.rom_capacity)
+    if a.target=='smk37':result.update(usb_updater=True,usb_protocol='smk37-ram-v2',product=loader['product'],loader=loader)
     (out/'manifest.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
 if __name__=='__main__':main()

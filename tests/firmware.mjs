@@ -14,7 +14,8 @@ const {cartridge_offset:offset,cartridge_capacity:capacity}=metadata;
 const uxrom=new Uint8Array(16+256*1024);uxrom.set([78,69,83,26,16,0,0x20]);
 const cnrom=new Uint8Array(16+64*1024);cnrom.set([78,69,83,26,2,4,0x30]);
 const mmc3=new Uint8Array(524816);mmc3.set([78,69,83,26,16,32,0x44]);mmc3.fill(0x43,16);
-const cartridges=[diagnostic,mmc1,mmc2,uxrom,cnrom,mmc3];
+const colorDreams=new Uint8Array(16+256*1024);colorDreams.set([78,69,83,26,8,16,0xb0]);
+const cartridges=[diagnostic,mmc1,mmc2,uxrom,cnrom,mmc3,colorDreams];
 if(process.argv[2]){
  const input=process.argv[2],entries=await openCartridge(new File([await fs.readFile(input)],path.basename(input)));
  assert.equal(entries.length,1);cartridges.push(await entries[0].read());
@@ -39,4 +40,4 @@ const damaged=template.slice();damaged[2000]^=1;await assert.rejects(prepareFirm
 const oversized=new Uint8Array(16+512*1024+256*1024);oversized.set([78,69,83,26,32,32,0x40]);
 validateHardwareRom(oversized);await assert.rejects(prepareFirmware(oversized,template,metadata),/too large/);
 await assert.rejects(prepareFirmware(mmc3,template,{...metadata,mappers:[0,1,9]}),/does not support/);
-console.log('PASS: all six mappers, maximum 512 KiB cartridge packing, exact bytes, updater retention, oversized device ROM and stale template rejection.');
+console.log('PASS: all seven mappers, maximum 512 KiB cartridge packing, exact bytes, updater retention, oversized device ROM and stale template rejection.');

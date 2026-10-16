@@ -221,8 +221,8 @@ static const BYTE *np_row_source[4096] NES_POOL;''')
     t=t.replace('MapperRenderScreen( 1 );','/* Mappers 0/9: no rendering-mode callback. */').replace('MapperRenderScreen( 0 );','/* Mappers 0/9: no rendering-mode callback. */')
     p.write_text(t)
     # MMC1 shares the fetched-row path, including banked CHR RAM (uncached).
-    edit('InfoNES.cpp','if (MapperNo != 9) return;','if (MapperNo != 9 && MapperNo != 1 && MapperNo != 3 && MapperNo != 4) return;')
-    edit('InfoNES.cpp','if (MapperNo == 9) return;','if (MapperNo == 9 || MapperNo == 1 || MapperNo == 3 || MapperNo == 4) return;')
+    edit('InfoNES.cpp','if (MapperNo != 9) return;','if (MapperNo != 9 && MapperNo != 1 && MapperNo != 3 && MapperNo != 4 && MapperNo != 11) return;')
+    edit('InfoNES.cpp','if (MapperNo == 9) return;','if (MapperNo == 9 || MapperNo == 1 || MapperNo == 3 || MapperNo == 4 || MapperNo == 11) return;')
     edit('InfoNES.cpp','  if(np_row_source[offset/8]==source)return;\n  np_row_source[offset/8]=source;',
          '  if(NesHeader.byVRomSize){\n    if(np_row_source[offset/8]==source)return;\n    np_row_source[offset/8]=source;\n  }')
     edit('K6502_rw.h','#include "InfoNES_pAPU.h"','#include "InfoNES_pAPU.h"\nextern BYTE np_prg_ram_enabled,np_prg_ram_writable,np_mapper_irq_pending;')

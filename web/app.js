@@ -1,13 +1,13 @@
 import './simulator.js';
 import './fullscreen.js?v=20261016';
-import './flash-ui.js?v=20261016-mappers';
+import './flash-ui.js?v=20261016-realistic';
 import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';
 import {fetchHomebrew} from './homebrew.js';
-import {normalizeCartridge} from './cartridge.js';
+import {normalizeCartridge} from './cartridge.js?v=20261016-headers';
 const $=s=>document.querySelector(s), canvas=$('#screen'), ctx=canvas.getContext('2d',{alpha:false});
 let archiveEntries=[],loading=false,installBusy=false;
-const errors=['','File is shorter than an iNES header.','Use a standard iNES 1.0 cartridge. NES 2.0 and special consoles are not supported.','Cartridge size is invalid for its mapper, or the file is truncated.','This cartridge requests unsupported RAM.','PAL cartridges are not supported yet.','This mapper is not supported yet. NESynth currently supports mappers 0 (NROM), 1 (MMC1), 2 (UxROM), 3 (CNROM), 4 (MMC3) and 9 (MMC2).','Emulator error.','Emulator timing or audio queue limit reached.'];
+const errors=['','File is shorter than an iNES header.','Use a standard iNES 1.0 cartridge. NES 2.0 and special consoles are not supported.','Cartridge size is invalid for its mapper, or the file is truncated.','This cartridge requests unsupported RAM.','PAL cartridges are not supported yet.','This mapper is not supported yet. NESynth currently supports mappers 0 (NROM), 1 (MMC1), 2 (UxROM), 3 (CNROM), 4 (MMC3), 9 (MMC2) and 11 (Color Dreams).','Emulator error.','Emulator timing or audio queue limit reached.'];
 let core,loaded=false,paused=false,saveKey='',name='',last=performance.now(),clock=0,frameBase=0,fpsTime=last;
 let keys=new Set(),pointers=new Map(),externalControls=new Map();
 const audio=new BrowserAudio(running=>{
@@ -41,7 +41,7 @@ async function load(bytes,title){
     $('#pause').disabled=$('#reset').disabled=false;$('#pause').textContent='Pause';$('#power').classList.add('on');$('#title').textContent=title;
     document.dispatchEvent(new CustomEvent('nesynth-rom',{detail:{bytes,name:title,title}}));
     const mapper=(bytes[6]>>4)|(bytes[7]&240);
-    $('#export').disabled=$('#save').disabled=!core.gp_save_size();status('Running locally · NTSC / mapper '+mapper+' ('+(({0:'NROM',1:'MMC1',2:'UxROM',3:'CNROM',4:'MMC3',9:'MMC2'})[mapper])+')');
+    $('#export').disabled=$('#save').disabled=!core.gp_save_size();status('Running locally · NTSC / mapper '+mapper+' ('+(({0:'NROM',1:'MMC1',2:'UxROM',3:'CNROM',4:'MMC3',9:'MMC2',11:'Color Dreams'})[mapper])+')');
     if(normalized.notice){const note=document.createElement('p');note.id='cartridge-repair';note.className='hint';note.textContent=normalized.notice;$('#status').after(note);}
 }
 async function sound(){
@@ -158,4 +158,4 @@ document.querySelectorAll('[data-bit]').forEach(el=>{el.onpointerdown=e=>{e.prev
 $('#export').onclick=()=>{const data=new Uint8Array(core.memory.buffer,core.gp_save_data(),core.gp_save_size()).slice(),url=URL.createObjectURL(new Blob([data]));const a=document.createElement('a');a.href=url;a.download=name.replace(/\.nes$/i,'')+'.sav';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('#save').onchange=async e=>{const f=e.target.files[0];if(!f)return;const data=new Uint8Array(await f.arrayBuffer());if(!loaded||data.length!==core.gp_save_size()){status('Save size does not match this cartridge.',true);return;}new Uint8Array(core.memory.buffer,core.gp_save_data(),data.length).set(data);save();status('Battery RAM imported. Reset the cartridge if needed.');e.target.value='';};
 setInterval(save,2000);window.addEventListener('pagehide',save);
-try{const res=await fetch('nes.wasm?v=960');if(!res.ok)throw new Error('Build the WebAssembly core first.');core=(await WebAssembly.instantiate(await res.arrayBuffer(),{})).instance.exports;for(const id of ['diagnostic','rom','sound'])$('#'+id).disabled=false;await load(new Uint8Array(await(await fetch('diagnostic.nes')).arrayBuffer()),'Original diagnostic');syncHomebrewButtons();}catch(e){status(e.message,true);}
+try{const res=await fetch('nes.wasm?v=961');if(!res.ok)throw new Error('Build the WebAssembly core first.');core=(await WebAssembly.instantiate(await res.arrayBuffer(),{})).instance.exports;for(const id of ['diagnostic','rom','sound'])$('#'+id).disabled=false;await load(new Uint8Array(await(await fetch('diagnostic.nes')).arrayBuffer()),'Original diagnostic');syncHomebrewButtons();}catch(e){status(e.message,true);}

@@ -1,0 +1,58 @@
+{
+  "repository": "https://github.com/ChanceTheMaker/doom-fm1-smk.git",
+  "revision": "44315112d4a9855070488ea1b45604ec56491e3e",
+  "source_sha256": {
+    "src/native/update/smk37_loader.c": "c030d9eaa0be0be655804c4ec8fd981e4e9f185b2014576ac745bda7f256f1eb",
+    "src/native/update/smk37_update_core.c": "44b6821e160573b5063a62ee7d12454e50c9a296695ac2866ee615bbbae29032",
+    "src/native/update/usb.c": "e9d102d95b5493ecee517e60bb8cd1ec9d4d9c8d614470f3254fb5558edbd1e7",
+    "src/native/update/ota.c": "61e53d00615e167f37e9fd762466fbdb54bfb2f965f5ff63f5dbf6cafd2be37e",
+    "src/native/update/libc.c": "344b09afe33da826feefeb1ea2a1a7c50732f91c133fee30174819645edc131a",
+    "src/native/update/crt0_ldr.S": "61c70491990652b2650fe586c3489904ac114bd9d019fe91ca3fced2c80846a7",
+    "src/native/update/loader.ld": "d86c2697d4ca83b61f15dc88fdd08a6e2bc46fe82bce450e777d5d9aefe25ce3",
+    "src/native/hal/smk37_public_profile.h": "bf788056218fadebb046bf379e8cece67601be313554bdc207b352bd5e5ddb78",
+    "src/native/hal/smk37_update_format.h": "8eddd8fe0daa2362698f1277d58d7a33ecfc59ad59428a103f04c7cea59ce55d",
+    "src/native/hal/smk37_trim.h": "8dcaba3528156c6da7265fca8450d763c66883098dd11563aba176ae6e04d0ef",
+    "src/native/hal/fm1_flash.h": "b5d63acad1951bab0236991e56762c95c6eaf0ad94d1ea058cb9f0281059b693",
+    "src/native/hal/fm1_xip.h": "dcba6ddb9cd2403e1d97c4db49d836110ef2805d2369db7ed323e3fbe26c56ed",
+    "src/native/hal/fm1_usb.h": "12b9b31bde0dbb15fa15379a215eaec11e882bd33c18f4b250fa9e3a47c202f0",
+    "tests/usb_smk37_update_test.c": "7209bc36ff4cadc89b2449af967dab3969068862d22cfba285db61dfd9e36a7a"
+  },
+  "upstream": {
+    "repository": "https://github.com/ChanceTheMaker/sloop-smk",
+    "revision": "090588d112a4a6230fe71d2f3263bdcca2203820",
+    "source_sha256": {
+      "firmware/src/usb.c": "e5158a3a01bb0781816808ee426598c0facdf7db150789372a5e457e60a32714",
+      "firmware/src/ota.c": "84e32b66a7364478baa5352e74e82c979ff83bb221adb2d9eb82a19bedce2ccb",
+      "firmware/src/libc.c": "cf5f101bf8495630589b2e56b7284a29c2c49456b863dbcac26bd1ec1f313c81",
+      "firmware/loader/smk37_update_core.c": "08b4fb9136864c058932386bc58200259416e28f2242f4e426875d366605038c",
+      "firmware/loader/smk37_loader.c": "b6b06cd2e47820028099ad2d7626f1c597b636baf6c57e8bf31d1f402202490b",
+      "firmware/loader/loader.c": "4f32c78ebfb50d656d9eb191577a6f4b8349968c8512dc31a73748736b2dd7ac",
+      "firmware/loader/ldr_core.c": "de187f0758b3d08631807f11b6db404364d5d12a3540a3b5602a173cfc49e1d5",
+      "firmware/loader/crt0_ldr.S": "61c70491990652b2650fe586c3489904ac114bd9d019fe91ca3fced2c80846a7",
+      "firmware/loader/loader.ld": "4d30093ec428acea9bc9f397371c226f297d67d691032e7918de04eb0e42755f",
+      "firmware/hal/smk37_public_profile.h": "bf788056218fadebb046bf379e8cece67601be313554bdc207b352bd5e5ddb78",
+      "firmware/hal/smk37_trim.h": "6eea6c0532034ea1a8d7d14bd1f450e3d676e9429c11db6563009268f6183587",
+      "firmware/hal/smk37_update_format.h": "9fd736431f00015fbf418b9c56a1e566a1902b72614a2eaf6bf9e29b169d620a",
+      "firmware/hal/fm1_flash.h": "232ae3507c31a899e9b1b4ec0e510ec24d433b89a2522b052dd9e9863ff07676",
+      "firmware/hal/fm1_xip.h": "48e0ee6ab2ff94ba58fc7f636533baf9f6bc8f9896e15d3e550f5f204271f73b",
+      "firmware/hal/fm1_timer.h": "90beea888ed1389bffe4d937781f8c8f752bd270848c203612b87ff4b8e2a845",
+      "firmware/hal/fm1_usb.h": "d585e9ca4ada4db1efbf126fbb0fbbbc5fc27a9d149b104014cd678dd2bedad8",
+      "tests/smk37_update_test.c": "22e67db207672b328008b51a79101c0463c773fc3e2ff107ea01abf80be1e81e",
+      "tests/ldr_test.c": "637084da4cc2142e0c49de4673a8dfb8a58c215ab7f79402cfe23998cf53e8f0",
+      "tests/usb_desc_test.c": "633c01a5370360fd4b7c58866a6026d20da80fc5d3ec05db2b76c86c320e60f6",
+      "tests/usb_desc_v10.h": "4ecbe840d64ce584647898bc5cdc49cc2b23fad47e237cb3a93f20b3269cf98c"
+    },
+    "adaptations": [
+      "Relative includes adjusted for repository layout.",
+      "Doom USB names and distinct application/loader identities.",
+      "FM-1 direct loader write policy limited to application; flash update-record cleanup removed.",
+      "Loader .pool included in zeroed BSS.",
+      "Host tests adapted for preserved FM-1 tail and new source paths."
+    ]
+  },
+  "adaptations": [
+    "NESynth USB string descriptors and generated identity header.",
+    "Host-test include path.",
+    "App-only SMK flash boundaries and all calibration checks retained."
+  ]
+}

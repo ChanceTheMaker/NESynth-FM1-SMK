@@ -103,6 +103,7 @@ static uint32_t smk_input_frame(void){
 }
 static void audio_start(void){(void)smk37_audio_init(dma,512,gb_isr_audio,3,&audio_hooks);}
 static void audio_stop(void){smk37_audio_stop();}
+#include "smk37_recovery.h"
 #else
 #include "fm1_timer.h"
 #include "fm1_input.h"
@@ -221,9 +222,7 @@ void gb_cstart(const uint32_t *parameters){
     np_render_stride(0); // Audio-first: adapt raster work to queued audio.
     for(unsigned i=0;i<4;i++)gp_frame();
     splash_active=0;
-#if !GB_SMK37
     recovery_init();
-#endif
     video_start(cold);
     uint32_t drawn=0,last=fm1_ticks(),elapsed=0,seconds=0;
     for(;;){
@@ -238,8 +237,8 @@ void gb_cstart(const uint32_t *parameters){
         if(fm1_in.buttons&(1u<<13))input_buttons|=GP_SELECT;
         input_seen|=input_buttons;gp_buttons(input_buttons);
         master_poll();
-        recovery_service();
 #endif
+        recovery_service();
         if(gp_audio_queued()<2955){
 #if GB_SMK37
             input_buttons=smk_input_frame();input_seen|=input_buttons;gp_buttons(input_buttons);

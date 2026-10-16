@@ -20,6 +20,15 @@ static void test_extra_mappers(){
         assert(ROMBANK0[0]==0&&ROMBANK3[0]==3);
     }
     gp_reset();assert(PPUBANK[0][0]==0);
+    auto cd=bank_cart(11,8,16);assert(!gp_load(cd.data(),cd.size()));
+    for(unsigned v=0;v<256;v++){
+        MapperWrite(0x8000,v);
+        assert(ROMBANK0[0]==(v&3)*4&&ROMBANK3[0]==(v&3)*4+3);
+        for(unsigned i=0;i<8;i++)assert(PPUBANK[i][0]==(v>>4)*8+i);
+    }
+    gp_reset();assert(ROMBANK0[0]==0&&PPUBANK[0][0]==0);
+    cd=bank_cart(11,2,1);assert(!gp_load(cd.data(),cd.size()));
+    MapperWrite(0xffff,255);assert(ROMBANK0[0]==0&&ROMBANK3[0]==3&&PPUBANK[7][0]==7);
     auto mm=bank_cart(4,32,32);assert(!gp_load(mm.data(),mm.size()));
     assert(ROMBANK0[0]==0&&ROMBANK1[0]==1&&ROMBANK2[0]==62&&ROMBANK3[0]==63);
     MapperWrite(0x8000,6);MapperWrite(0x8001,5);
@@ -65,5 +74,5 @@ static void test_extra_mappers(){
     auto bad=bank_cart(2,2,1);assert(gp_load(bad.data(),bad.size())==GP_ROM_SIZE);
     bad=bank_cart(3,2,0);assert(gp_load(bad.data(),bad.size())==GP_ROM_SIZE);
     bad=bank_cart(4,3,1);assert(gp_load(bad.data(),bad.size())==GP_ROM_SIZE);
-    puts("PASS: UxROM/CNROM/MMC3 banking, bank bounds, CHR RAM, mirroring, RAM protection, IRQ reload/ack/disable, reset and invalid boards.");
+    puts("PASS: UxROM/CNROM/MMC3/Color Dreams banking, bank bounds, CHR RAM, mirroring, RAM protection, IRQ reload/ack/disable, reset and invalid boards.");
 }

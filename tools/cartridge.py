@@ -15,6 +15,10 @@ def normalize_cartridge(data):
     CHR SHA1 d96321e997d4ab1fdb4c3ad23830f4c2689f4760; NROM, horizontal.
     The checksum below identifies the entire known overdump, not a filename.
     """
+    if (len(data) == 262160 and data[:16] == bytes.fromhex('4e45531a081011000000006173746572') and
+        hashlib.sha256(data[16:]).hexdigest() == '346fd8061a0b09c057855536012b146256bfbe386e304ef950ad93603048933c'):
+        result = bytearray(data);result[11:16] = bytes(5)
+        return bytes(result)
     if len(data) < 16 or data[:4] != b'NES\x1a' or data[7:16] != b'DiskDude!':
         return data
     repair_overdump = (len(data) == 65552 and data[4:7] == bytes([2, 4, 1]) and

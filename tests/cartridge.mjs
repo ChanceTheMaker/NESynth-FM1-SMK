@@ -17,6 +17,9 @@ assert.deepEqual(repaired.bytes,diagnostic);assert.match(repaired.notice,/DiskDu
 assert.deepEqual(dirty,original,'Do not mutate the caller\'s cartridge');
 assert.equal((await normalizeCartridge(diagnostic)).bytes,diagnostic);
 assert.equal((await normalizeCartridge(repaired.bytes)).notice,'');
+const unknownLegacy=new Uint8Array(262160);unknownLegacy.set([78,69,83,26,8,16,17,0,0,0,0,97,115,116,101,114]);
+assert.equal((await normalizeCartridge(unknownLegacy)).bytes,unknownLegacy,'An unknown payload with the Simpsons header tag must stay rejected');
+assert.throws(()=>validateHardwareRom(unknownLegacy),/iNES/);
 for(const bad of [diagnostic.slice(0,10),(()=>{const b=dirty.slice();b[15]=0;return b;})(),(()=>{const b=diagnostic.slice();b[7]=8;return b;})(),(()=>{const b=diagnostic.slice();b[7]=1;return b;})()]){
     assert.equal((await normalizeCartridge(bad)).bytes,bad,'Unknown formats must stay unchanged');
     assert.throws(()=>validateHardwareRom(bad));
