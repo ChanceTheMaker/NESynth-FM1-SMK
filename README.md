@@ -96,11 +96,16 @@ The full browser template reserves 393,744 bytes for maximum standard MMC1 plus 
 
 ## Website firmware workflow
 
-1. Load a `.nes` or `.zip`, or use the included diagnostic. **Browse your ROM folder** selects a folder locally and filters its NES/ZIP files without uploading them.
-2. Choose FM-1 in the firmware deck and click **Build firmware**. A pinned, precompiled dual-core template is patched locally with the cartridge; hashes verify the cartridge, executable code and retained updater. This prepares a `.fwsc` without a compiler on the user's computer. **Download .fwsc** saves it separately.
-3. In Chrome/Edge on localhost or HTTPS, click **Connect FM-1** and allow MIDI/SysEx access. Connect only the target instrument.
-4. Click **Install / resume**. Emulation pauses, cartridge changes are locked, progress tracks unique transferred bytes, and completion requires the expected restart identity. Failed operations offer log export and explicit retry; no write is retried automatically.
-5. **Restore original FM-1 firmware** verifies and installs the included unmodified M-VAVE V15 image. Generic `ota-FM-1` loaders require physical-model confirmation because some SMK loaders use that identity.
+The **Install on your FM-1** panel sits beside the browser player (above it on small screens). Its four steps keep the selected game, connection status and final install action visible together.
+
+1. **Choose your game:** use a free homebrew button or choose a `.nes` / `.zip` directly in the installer. The same game previews in the browser. ZIPs with multiple cartridges open a picker; choosing a new file clears any previously prepared firmware.
+2. **Connect your FM-1:** turn it on and connect it directly to the computer with a USB data cable. Disconnect the recovery adapter, close other MIDI apps and unplug other instruments. Factory M-VAVE V15 is supported. Use Chrome/Edge on HTTPS or localhost and allow MIDI/SysEx access.
+3. **Prepare your game:** the browser patches and verifies a pinned template locally. Preparation does not write the device. Saving a `.fwsc` is optional; no download or compiler is needed to install from this page.
+4. **Install and play:** the always-visible install button becomes available after preparation. It checks the device again, pauses emulation, locks cartridge changes and requires the expected restart identity before reporting success. Keep power and USB connected. Interrupted transfers offer log export and an explicit retry; no write is retried automatically.
+
+Connection help, transfer details and **Return to the original M-VAVE synth** are expandable below the steps. Restoration verifies the included M-VAVE V15 image. Generic `ota-FM-1` loaders still require physical-model confirmation because some SMK loaders use that identity.
+
+Run `npm run test:ui` with Playwright and Chrome available for isolated desktop/mobile UI checks. `PLAYWRIGHT_MODULE` may point to an existing Playwright module. These tests simulate MIDI and never access a device. The existing `npm run test:site` checks firmware packaging and transport behavior.
 
 The FM-1/SMK-37 Pro/SMK-37 Elite simulator views use the shared key/pad mappings. Click highlighted controls or enlarge the live screen. The classic NES controller remains available. Selecting SMK37 in the firmware deck disables FM-1 build/install/restore operations; it does not claim a validated SMK flasher.
 

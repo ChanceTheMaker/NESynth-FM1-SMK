@@ -1,0 +1,47 @@
+/* Keep playing and installation together, with an explicit next action. */
+header nav{display:flex;gap:22px;font:700 11px var(--mono)}
+header nav a{color:var(--ink);text-underline-offset:5px}
+header nav a[href="#flash-panel"]{color:var(--red)}
+.launch-hero{min-height:350px;padding:36px 0}
+.hero-art{height:310px}
+.hero-smk{top:20px}.hero-fm1{top:120px}
+.workspace{grid-template-columns:minmax(0,1.15fr) minmax(360px,1fr);gap:30px}
+.play-column{min-width:0}
+#browser-player{scroll-margin-top:24px}
+.workflow-heading,#firmware-heading{font-size:30px;letter-spacing:-1px;line-height:1.15;margin:0 0 12px}
+.workflow-intro{font-size:13px;line-height:1.7;margin:0 0 24px;color:#62635e}
+.player-tools{margin-top:32px}.player-tools .panel:first-child{padding-top:24px;border-top:2px solid #babcb3}
+.firmware-deck{margin:0;padding:26px;scroll-margin-top:20px;border-top:5px solid var(--red);background:#f0f0e9}
+.firmware-deck>.eyebrow{margin-bottom:10px}
+.deck-intro{font-size:13px;margin:0 0 22px;color:#50534b}
+.firmware-deck p{font-size:12px;line-height:1.65;color:#55594e}
+.firmware-deck .hint{font-size:11px;margin:10px 0}
+.firmware-deck button{font-size:12px;line-height:1.45;min-height:42px}
+.install-step{border-top:1px solid #c0c3b6;padding:21px 0}
+.step-heading{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.step-heading h3{font-size:17px;margin:0;letter-spacing:-.3px}
+.step-number{display:grid;place-items:center;width:26px;height:26px;flex:0 0 26px;background:var(--ink);color:white;font:700 12px var(--mono)}
+.step-state{margin-left:auto;font:10px/1.4 var(--mono);color:#65695c}
+.install-step[data-complete="true"] .step-number{background:#3c6542}
+.install-step[data-complete="true"] .step-state{color:#315838}
+.install-step[data-current="true"] .step-number{background:var(--red)}
+.choose-game,#connect-device,#build-firmware{width:100%;text-align:center}
+.install-homebrew{display:flex;gap:6px;flex-wrap:wrap}
+.install-homebrew button{flex:1;min-width:95px;font-size:10px;padding:8px 6px;background:#e6e7dc}
+#rom-summary{margin:15px 0 0;background:#e6e8dd;padding:12px;border-left-width:3px}
+#rom-summary .deck-label{font-size:9px;margin-bottom:6px}
+#build-review{margin:15px 0 0;padding:14px}
+#build-details{font-size:11px}
+.firmware-deck .download-option{margin-top:12px;padding:12px 0 0}
+.firmware-deck .download-option summary{font-size:10px}
+#step-install{padding-bottom:4px}
+#flash-device{justify-content:center;text-align:center;margin-top:14px}
+#flash-device:disabled{background:#d9dcd1;color:#55594e;border-color:#a9ae9f;opacity:1}
+#flash-status{font:700 12px/1.7 var(--mono);padding:14px;background:#e2e5d8;border:1px solid #b5bdab}
+#flash-status.error{color:#a32119;background:#f6e6de;border-color:#b45a4d}
+.firmware-deck>details{margin-top:0;padding:15px 0}
+.firmware-deck>details:last-child{padding-bottom:0}
+.homebrew-shelf{margin-top:44px}
+@media(max-width:1000px){header .header-label{display:none}.workspace{gap:22px;grid-template-columns:minmax(0,1fr) minmax(340px,1fr)}.firmware-deck{padding:21px}.console{padding-left:14px;padding-right:14px}.controller{gap:8px;padding-left:10px;padding-right:10px}.middle{min-width:90px}.actions{gap:6px}.actions button{width:30px;height:30px}.dpad{grid-template-columns:25px 25px 25px;grid-template-rows:25px 25px 25px}.console-wordmark small{display:none}}
+@media(max-width:800px){.workspace{grid-template-columns:1fr}.firmware-deck{grid-row:1;margin-bottom:10px}.play-column{grid-row:2}.hero-art{height:290px}header nav{gap:14px;font-size:10px}.firmware-deck{padding:22px}.controller{gap:15px;padding-left:17px;padding-right:17px}.actions button{width:36px;height:36px}.middle{min-width:100px}.dpad{grid-template-columns:30px 30px 30px;grid-template-rows:30px 30px 30px}.console-wordmark small{display:block}}
+@media(max-width:420px){header nav{gap:10px;font-size:9px}header nav a:last-child{display:none}.firmware-deck{padding:18px}.step-heading{gap:8px}.step-heading h3{font-size:16px}.step-state{font-size:9px}.controller{gap:9px;padding-left:10px;padding-right:10px}.middle{min-width:87px}.actions button{width:30px;height:30px}.dpad{grid-template-columns:25px 25px 25px;grid-template-rows:25px 25px 25px}}

@@ -1,11 +1,11 @@
 import './simulator.js';
-import './flash-ui.js?v=959';
+import './flash-ui.js?v=20261016-install';
 import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';
 import {fetchHomebrew} from './homebrew.js';
 import {normalizeCartridge} from './cartridge.js';
 const $=s=>document.querySelector(s), canvas=$('#screen'), ctx=canvas.getContext('2d',{alpha:false});
-let archiveEntries=[],loading=false,installBusy=false;
+let archiveEntries=[],loading=false,installBusy=false,installIntent=false;
 const errors=['','File is shorter than an iNES header.','Use a standard iNES 1.0 cartridge. NES 2.0 and special consoles are not supported.','Cartridge size is invalid for its mapper, or the file is truncated.','This cartridge requests unsupported RAM.','PAL cartridges are not supported yet.','This mapper is not supported yet. NESynth currently supports mapper 0 (NROM), mapper 1 (MMC1) and mapper 9 (MMC2).','Emulator error.','Emulator timing or audio queue limit reached.'];
 let core,loaded=false,paused=false,saveKey='',name='',last=performance.now(),clock=0,frameBase=0,fpsTime=last;
 let keys=new Set(),pointers=new Map(),externalControls=new Map();
@@ -68,25 +68,32 @@ function draw(now){
 }requestAnimationFrame(draw);
 async function fileAction(action){
     if(loading||installBusy)return;loading=true;document.dispatchEvent(new CustomEvent('nesynth-loading',{detail:true}));
+    document.dispatchEvent(new Event('nesynth-rom-clear'));
     syncHomebrewButtons();
     for(const id of ['diagnostic','rom','archive-play','archive-entry','folder','library-play'])$('#'+id).disabled=true;
-    try{await action();}catch(e){status(e.message,true);}
+    try{await action();}catch(e){status(e.message,true);document.dispatchEvent(new CustomEvent('nesynth-load-error',{detail:e.message}));}
     finally{loading=false;syncHomebrewButtons();document.dispatchEvent(new CustomEvent('nesynth-loading',{detail:false}));for(const id of ['diagnostic','rom','archive-play','archive-entry','folder','library-play'])$('#'+id).disabled=installBusy;}
 }
 function syncHomebrewButtons(){document.querySelectorAll('[data-homebrew]').forEach(button=>{button.disabled=!core||loading||installBusy;});}
+function finishSelection(){
+    if(installIntent){$('#flash-panel').scrollIntoView({block:'start'});installIntent=false;}
+    else focusGame();
+}
+$('#install-choose-game').onclick=()=>{if(!core||loading||installBusy)return;installIntent=true;$('#rom').click();};
+$('#dropzone').addEventListener('click',()=>{installIntent=false;});
 document.querySelectorAll('[data-homebrew]').forEach(button=>button.addEventListener('click',()=>{
     if(!core||loading||installBusy)return;
-    void sound();
+    installIntent=button.hasAttribute('data-install');if(!installIntent)void sound();
     void fileAction(async()=>{
         status('Opening homebrew cartridge…');
         const {game,bytes}=await fetchHomebrew(button.dataset.homebrew);
         clearArchive();await load(bytes,game.title);
         const guide=document.createElement('p');guide.id='game-guide';guide.className='hint game-guide';guide.textContent=game.controls;
-        $('#status').after(guide);$('#player').scrollIntoView({block:'start'});focusGame();
+        $('#status').after(guide);if(!installIntent)$('#browser-player').scrollIntoView({block:'start'});finishSelection();
     });
 }));
 function clearArchive(){archiveEntries=[];$('#archive-picker').hidden=true;$('#archive-entry').replaceChildren();}
-async function playEntry(entry){status('Opening '+entry.name+'…');await load(await entry.read(),entry.name.replaceAll('\\','/').split('/').pop());focusGame();}
+async function playEntry(entry){status('Opening '+entry.name+'…');await load(await entry.read(),entry.name.replaceAll('\\','/').split('/').pop());finishSelection();}
 $('#diagnostic').onclick=()=>{void sound();return fileAction(async()=>{clearArchive();await load(new Uint8Array(await(await fetch('diagnostic.nes')).arrayBuffer()),'Original diagnostic');focusGame();});};
 async function loadCartridgeFiles(files){
     if(!files.length)return;
@@ -94,7 +101,7 @@ async function loadCartridgeFiles(files){
     if(files.length!==1){status('Choose one .nes or .zip file at a time.',true);return;}
     const f=files[0];
     if(!/\.(nes|zip)$/i.test(f.name)){status('Choose a .nes cartridge or a .zip archive.',true);return;}
-    void sound();
+    if(!installIntent)void sound();
     await fileAction(async()=>{
         clearArchive();status('Opening '+f.name+'…');archiveEntries=await openCartridge(f);
         if(archiveEntries.length===1){await playEntry(archiveEntries[0]);archiveEntries=[];}
@@ -104,7 +111,7 @@ async function loadCartridgeFiles(files){
             status(archiveEntries.length+' cartridges found. Choose one, then press Load cartridge.');
         }
     });
-    if(!$('#archive-picker').hidden)$('#archive-entry').focus();
+    if(!$('#archive-picker').hidden){$('#archive-picker').scrollIntoView({block:'center'});$('#archive-entry').focus();}
 }
 let localLibrary=[];
 function showLibrary(){
