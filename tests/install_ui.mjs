@@ -47,6 +47,41 @@ try{
  assert.equal(await page.locator('.crt-tv #screen').count(),1,'NES canvas belongs inside the CRT');
  assert.equal(await page.locator('.rig-logo').textContent(),'NESynth');
  assert.equal(await page.locator('.controller button[data-bit]').count(),8);
+ await page.locator('#pause').click();
+ await page.waitForFunction(()=>document.getElementById('pause').textContent==='Resume');
+ const gameImage=await page.locator('#screen').evaluate(el=>el.toDataURL());
+ const channel=page.locator('.tv-channel');await channel.scrollIntoViewIfNeeded();
+ const channelBox=await channel.boundingBox();
+ await page.mouse.move(channelBox.x+channelBox.width/2,channelBox.y+channelBox.height/2);
+ await page.mouse.down();await page.mouse.move(channelBox.x+channelBox.width/2+24,channelBox.y+channelBox.height/2,{steps:4});await page.mouse.up();
+ assert.equal(await channel.getAttribute('aria-valuenow'),'4','Dragging the channel tunes a demo');
+ const scenes=[];
+ for(let i=0;i<12;i++){
+  assert.equal(await channel.getAttribute('aria-valuenow'),String(i+4));
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  scenes.push({name:await channel.getAttribute('aria-valuetext'),url:await page.locator('#screen').evaluate(el=>el.toDataURL())});
+  await page.waitForFunction(previous=>document.getElementById('screen').toDataURL()!==previous,scenes.at(-1).url,{timeout:3000});
+  assert.equal(await page.locator('#rom-name').textContent(),'Original diagnostic','Demos do not replace the selected cartridge');
+  if(i<11)await channel.press('ArrowRight');
+ }
+ assert.equal(new Set(scenes.map(s=>s.url)).size,12,'Twelve distinct rendered demo scenes');
+ await fs.mkdir('build/install-ui',{recursive:true});
+ const gallery=await browser.newPage({viewport:{width:1120,height:880}});
+ await gallery.setContent('<body style="margin:16px;background:#15151c;color:white;font:12px monospace;display:grid;grid-template-columns:repeat(4,256px);gap:16px">'+scenes.map(s=>`<div>${s.name}<img width="256" height="240" src="${s.url}"></div>`).join(''));
+ await gallery.screenshot({path:'build/install-ui/demo-scenes.png',fullPage:true});await gallery.close();
+ await channel.press('Home');
+ await page.waitForFunction(expected=>document.getElementById('screen').toDataURL()===expected,gameImage);
+ assert.equal(await page.locator('#pause').textContent(),'Resume','Channel 03 preserves the paused game exactly');
+ const knob=page.locator('.tv-dial.small'),knobBox=await knob.boundingBox();
+ await page.mouse.move(knobBox.x+knobBox.width/2,knobBox.y+knobBox.height/2);
+ await page.mouse.down();await page.mouse.move(knobBox.x+knobBox.width/2,knobBox.y+knobBox.height/2-40,{steps:4});await page.mouse.up();
+ assert.equal(await page.locator('#volume').inputValue(),'45','TV knob updates browser volume');
+ assert.equal(await page.locator('#level').textContent(),'45%');
+ await knob.press('End');assert.equal(await page.locator('#volume').inputValue(),'100');
+ await knob.press('Home');assert.equal(await page.locator('#volume').inputValue(),'0');
+ await page.locator('#volume').evaluate(el=>{el.value='25';el.dispatchEvent(new Event('input',{bubbles:true}));});
+ assert.equal(await knob.getAttribute('aria-valuenow'),'25','Browser slider updates TV knob');
+ await page.locator('#pause').click();
  for(const model of ['smk-pro','fm1','nes']){
   await page.locator('#simulator-model').selectOption(model);
   await page.waitForFunction(model=>document.querySelector('.console').dataset.simulator===model,model);
@@ -201,5 +236,5 @@ try{
  }
  const ids=await page.locator('[id]').evaluateAll(nodes=>nodes.map(n=>n.id));assert.equal(ids.length,new Set(ids).size,'No duplicate IDs');
  assert.deepEqual(errors,[]);
- console.log('PASS: single picker, NES/ZIP drops, responsive layout, fullscreen, blocked MIDI, FM-1 install, stale-game rejection, SMK Pro/Elite prepare/install/restore, model isolation and exact restart checks.');
+ console.log('PASS: 12 animated demo channels, drag tuning, preserved game, synced TV volume, single picker, NES/ZIP drops, responsive layout, fullscreen, blocked MIDI, FM-1/SMK install and restore, model isolation and exact restart checks.');
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

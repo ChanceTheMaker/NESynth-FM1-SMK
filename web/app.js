@@ -5,6 +5,7 @@ import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';
 import {fetchHomebrew} from './homebrew.js';
 import {normalizeCartridge} from './cartridge.js?v=20261016-headers';
+import {wireTv} from './tv-demos.js?v=1';
 const $=s=>document.querySelector(s), canvas=$('#screen'), ctx=canvas.getContext('2d',{alpha:false});
 let archiveEntries=[],loading=false,installBusy=false;
 const errors=['','File is shorter than an iNES header.','Use a standard iNES 1.0 cartridge. NES 2.0 and special consoles are not supported.','Cartridge size is invalid for its mapper, or the file is truncated.','This cartridge requests unsupported RAM.','PAL cartridges are not supported yet.','This mapper is not supported yet. NESynth currently supports mappers 0 (NROM), 1 (MMC1), 2 (UxROM), 3 (CNROM), 4 (MMC3), 9 (MMC2) and 11 (Color Dreams).','Emulator error.','Emulator timing or audio queue limit reached.'];
@@ -17,6 +18,7 @@ const audio=new BrowserAudio(running=>{
 let inputEpoch=0;const keySince=new Map(),pointerSince=new Map();
 const keyBits=new Map([['ArrowUp',64],['KeyW',64],['ArrowDown',128],['KeyS',128],['ArrowLeft',32],['KeyA',32],['ArrowRight',16],['KeyD',16],['Enter',1],['KeyX',1],['Space',2],['KeyZ',2],['KeyP',8],['ShiftLeft',4],['ShiftRight',4]]);
 const pixels=ctx.createImageData(256,240);
+const tv=wireTv(canvas,()=>{stopAudio();release();clock=0;last=fpsTime=performance.now();frameBase=core?.gp_frame_count()||0;});
 function status(text,error=false){$('#status').textContent=text;$('#status').classList.toggle('error',error);}
 function updateButtons(){let bits=0;for(const k of keys)bits|=keyBits.get(k)||0;for(const bit of pointers.values())bits|=bit;for(const bit of externalControls.values())bits|=bit;core?.gp_buttons(bits);document.querySelectorAll('[data-bit]').forEach(el=>el.classList.toggle('held',!!(bits&Number(el.dataset.bit))));}
 function release(){inputEpoch++;keys.clear();pointers.clear();externalControls.clear();keySince.clear();pointerSince.clear();updateButtons();}
@@ -24,6 +26,7 @@ function focusGame(){canvas.focus({preventScroll:true});}
 function stopAudio(){audio.flush();}
 function save(){if(!loaded||!saveKey||!core.gp_save_size()||!core.gp_save_dirty())return;try{const data=new Uint8Array(core.memory.buffer,core.gp_save_data(),core.gp_save_size());localStorage.setItem(saveKey,btoa(String.fromCharCode(...data)));core.gp_save_clean();}catch{status('Save storage unavailable. Use Export save to keep your progress.',true);}}
 async function load(bytes,title){
+    tv.reset();
     const normalized=await normalizeCartridge(bytes);bytes=normalized.bytes;
     document.querySelector('#game-guide')?.remove();
     document.querySelector('#cartridge-repair')?.remove();
@@ -56,14 +59,15 @@ function frame(){
 }
 setInterval(()=>{
     const now=performance.now(),elapsed=Math.min(100,now-last);last=now;
-    if(!loaded||paused||document.hidden)return;
+    if(!loaded||paused||tv.active||document.hidden)return;
     if(audio.running){
         for(let i=0;i<6&&audio.time<audio.context.currentTime+.08;i++)if(!frame())break;
         clock=0;
     }else{clock+=elapsed;const step=1000*59561/3579545;for(let i=0;i<6&&clock>=step;i++){clock-=step;if(!frame())break;}}
 },8);
 function draw(now){
-    if(loaded){const src=new Uint8Array(core.memory.buffer,core.gp_pixels(),256*240),pal=new Uint32Array(core.memory.buffer,core.np_palette(),64);paintFrame(src,pal,pixels.data);ctx.putImageData(pixels,0,0);
+    if(tv.draw(now)){$('#fps').textContent='DEMO TV';}
+    else if(loaded){const src=new Uint8Array(core.memory.buffer,core.gp_pixels(),256*240),pal=new Uint32Array(core.memory.buffer,core.np_palette(),64);paintFrame(src,pal,pixels.data);ctx.putImageData(pixels,0,0);
         if(now-fpsTime>=1000){const n=core.gp_frame_count();$('#fps').textContent=paused?'PAUSED':`${((n-frameBase)*1000/(now-fpsTime)).toFixed(1)} FPS`;frameBase=n;fpsTime=now;}}
     requestAnimationFrame(draw);
 }requestAnimationFrame(draw);
