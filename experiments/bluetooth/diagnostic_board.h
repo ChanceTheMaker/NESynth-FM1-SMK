@@ -54,8 +54,8 @@ extern uint32_t np_ble_rf_status(unsigned),np_ble_runtime_status(unsigned);
 extern void np_ble_private_probe(void);
 static int np_ble_usb(const uint8_t *p,unsigned n){
 #ifdef NP_BLUETOOTH_LOADER
-    if(np_loader_usb(p,n))return 1;
-#endif
+    return np_loader_usb(p,n);
+#else
     /* Fixed factory region only. Private bytes go to a local paired backup;
      * radio must be off and display DMA idle. No arbitrary address access. */
     if(n==5&&p[0]==0x7d&&p[1]=='N'&&p[2]=='B'&&p[3]==4&&p[4]<128){
@@ -75,6 +75,7 @@ static int np_ble_usb(const uint8_t *p,unsigned n){
     uint8_t response[5+sizeof(values)/sizeof(values[0])*5+1]={0xf0,0x7d,'N','B',3};unsigned k=5;
     for(unsigned i=0;i<sizeof(values)/sizeof(values[0]);i++)for(unsigned j=0;j<5;j++)response[k++]=(values[i]>>(j*7))&127u;
     response[k++]=0xf7;ota_wire_send(response,k);return 1;
+#endif
 }
 uint32_t core_audio_late(void){return 0;}
 uint32_t core_ui_frames(void){return display_count;}

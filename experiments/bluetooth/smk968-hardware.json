@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-16",
+  "board": "SMK-37 Pro",
+  "product": "SMK-37_968",
+  "scope": "Owner unit, private RF calibration; private upgrade also preserved existing user cartridges. No binaries or ROM payloads published.",
+  "app_sha256": "04f2d054c79f4ff87e0bdb49071cfa02f07d26713c14410d55165881c12a207f",
+  "installed_update_sha256": "af1c0263685d2901f3adbe9fb39ebbe18b8e1a14e0b11ebe0f5a9a6dabb04ada",
+  "footprint": {
+    "app_bytes": 215768,
+    "app_limit": 216800,
+    "app_free": 1032,
+    "ram_bytes": 55900,
+    "ram_limit": 73728,
+    "pool_and_cpu1_stacks_bytes": 361952,
+    "pool_limit": 368640,
+    "ram_code_bytes": 22016,
+    "ram_code_limit": 24576,
+    "library_capacity": 401408,
+    "library_slots": 32,
+    "rom_capacity": 262672
+  },
+  "usb_transfer": {
+    "verified": true,
+    "transport": "USB",
+    "radio_state": 0,
+    "bytes": 163856,
+    "crc32": "fc2188db",
+    "seconds": 4.31,
+    "status": "Restarting to save and play; verify library after restart"
+  },
+  "timing_scope": "4.31 seconds from cartridge BEGIN preparation through verified COMMIT; excludes USB discovery/mode handoff and subsequent reboot",
+  "library_preservation": {
+    "count_before": 2,
+    "count_after": 2,
+    "free_before": 98304,
+    "free_after": 98304,
+    "total": 401408,
+    "catalog_generation": 6,
+    "catalog_entries_preserved": true,
+    "game_payloads_matched_to_local_files_by_length_and_crc": true,
+    "duplicate_upload_reused_existing_entry": true
+  },
+  "post_restart": {
+    "loader_mode": 0,
+    "error": 0,
+    "installed_bytes": 163856,
+    "installed_crc32": "fc2188db",
+    "radio_state": 0
+  },
+  "gameplay": {
+    "emulation_fps": 60.16907011437095,
+    "cpu1_online": 1,
+    "cpu1_faults": 0,
+    "cpu1_fallbacks": 0,
+    "lcd_timeouts": 0,
+    "lcd_failed": 0,
+    "core_error": 0,
+    "new_audio_underruns": 0
+  },
+  "tests": [
+    "Target link, code/library boundary and RAM reach",
+    "SMK package round-trip and updater simulation with preserved library",
+    "USB frame adapter under ASan/UBSan: bounds, malformed input, seven-bit byte pairs, sequenced replies, wrong-mode write isolation",
+    "Actual USB browser channel with shared cartridge transfer: full data/CRC, wrong reply sequences and cable loss",
+    "Actual uploader page handlers with simulated Web MIDI and no Bluetooth API: discovery, radio-off mode handoff, library display, reconnect and old-firmware rejection",
+    "Existing Bluetooth transport, library and connection-status regressions"
+  ],
+  "limits": [
+    "Hardware transfer performed through USB CLI; native browser hardware transfer remains a user check",
+    "Existing cartridge uploaded for this test; new-entry flash allocation remains the same backend verified in SMK967",
+    "No physical cable pull during hardware transfer; disconnect handling tested in simulation",
+    "No hardware deletion test performed; shared storage deletion/recovery tests remain available",
+    "Normal generated full firmware packages clear the library; this installation used a private checksum-verified library-preserving package"
+  ]
+}

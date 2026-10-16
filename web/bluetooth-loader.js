@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
+import {connectUsbLibrary} from './usb-library.js';
 import {openCartridge} from './zip.js';
 import {decodeLoaderStatus,transferCartridge,loaderPacket} from './bluetooth-transfer.js';
 import {readLibrary,gameNamePacket,ensureLibrarySpace} from './bluetooth-library.js';
@@ -7,16 +8,19 @@ import {validateHardwareRom} from './rom-firmware.js';
 const SERVICE='f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7f0',VALUE='f86c4cf1-cf8b-4bc4-bc4c-d6f47eabe7f1';
 const $=s=>document.querySelector(s),status=s=>$('#status').textContent=s;
 let device,characteristic,rom,romName='',entries=[],busy=false,checking=false,installing=false,library=null;
+function connectionName(){return device?.transport||($('#transport').value==='usb'?'USB':'Bluetooth');}
 function refresh(){
     const locked=busy||checking,connected=!!characteristic&&!!device?.gatt.connected;
     $('#send').disabled=locked||!rom||!connected;$('#connect').disabled=locked;$('#file').disabled=locked;$('#entries').disabled=locked;
-    $('#connection').textContent=connected?'Bluetooth connected':'Bluetooth disconnected';
+    $('#transport').disabled=locked||connected;
+    $('#bluetooth-help').hidden=$('#transport').value==='usb';$('#usb-help').hidden=$('#transport').value!=='usb';
+    $('#connection').textContent=`${connectionName()} ${connected?'connected':'disconnected'}`;
     $('#connect').textContent=connected?'Disconnect SMK':'Connect SMK';
     document.querySelectorAll('#library button').forEach(b=>b.disabled=locked||!connected);
 }
 function disconnected(current){
     if(current!==device)return;characteristic=null;library=null;$('#library').hidden=true;refresh();
-    if(!busy&&!installing)status('Bluetooth disconnected. Open the SMK library, press REC, and wait for SEND A GAME before connecting again.');
+    if(!busy&&!installing)status(`${connectionName()} disconnected. Choose your connection and reconnect to load another game.`);
 }
 function renderLibrary(){
     $('#library').hidden=!library;if(!library)return;
@@ -43,18 +47,24 @@ async function open(file){if(busy||checking||!file)return;rom=null;refresh();try
 $('#file').onchange=e=>open(e.target.files[0]);$('#entries').onchange=e=>choose(Number(e.target.value)).catch(e=>status(e.message));
 for(const event of ['dragenter','dragover'])$('#drop').addEventListener(event,e=>{e.preventDefault();$('#drop').classList.add('over');});
 for(const event of ['dragleave','drop'])$('#drop').addEventListener(event,e=>{e.preventDefault();$('#drop').classList.remove('over');if(event==='drop')open(e.dataTransfer.files[0]);});
+$('#transport').onchange=()=>{device=null;refresh();};
 $('#connect').onclick=async()=>{
     if(busy||checking)return;
     if(device?.gatt.connected){device.gatt.disconnect();disconnected(device);return;}
     busy=true;installing=false;refresh();
     try{
-        if(!navigator.bluetooth)throw Error('Open this page in Chrome or Edge with Bluetooth enabled.');
-        const selected=await navigator.bluetooth.requestDevice({filters:[{services:[SERVICE]}]});device=selected;
-        selected.addEventListener('gattserverdisconnected',()=>disconnected(selected));
-        const server=await selected.gatt.connect();characteristic=await (await server.getPrimaryService(SERVICE)).getCharacteristic(VALUE);
+        if($('#transport').value==='usb'){
+            const usb=await connectUsbLibrary(status);device=usb.device;characteristic=usb.characteristic;
+            const selected=device;selected.addEventListener('gattserverdisconnected',()=>disconnected(selected));
+        }else{
+            if(!navigator.bluetooth)throw Error('Choose USB or enable Bluetooth in Chrome or Edge.');
+            const selected=await navigator.bluetooth.requestDevice({filters:[{services:[SERVICE]}]});device=selected;
+            selected.addEventListener('gattserverdisconnected',()=>disconnected(selected));
+            const server=await selected.gatt.connect();characteristic=await (await server.getPrimaryService(SERVICE)).getCharacteristic(VALUE);
+        }
         decodeLoaderStatus(await characteristic.readValue());library=await readLibrary(characteristic);renderLibrary();
-        status(library?'Bluetooth connected. Add a game or play one from your library.':'Bluetooth connected. This older firmware stores one game at a time.');
-    }catch(e){device?.gatt.disconnect();disconnected(device);status(e.name==='NotFoundError'?'No SMK selected. On build 967, hold PLAY + REC for the library, then press REC. Wait for SEND A GAME and select NESynth SMK. Check that computer Bluetooth is on.':e.message);}
+        status(library?`${connectionName()} connected. Add a game or play one from your library.`:'Bluetooth connected. This older firmware stores one game at a time.');
+    }catch(e){device?.gatt.disconnect();disconnected(device);status(e.name==='NotFoundError'?'No SMK selected. On builds 967 and newer, hold PLAY + REC for the library, then press REC. Wait for SEND A GAME and select NESynth SMK. Check that computer Bluetooth is on.':e.message);}
     finally{busy=false;refresh();}
 };
 $('#send').onclick=async()=>{
@@ -74,8 +84,8 @@ $('#send').onclick=async()=>{
 setInterval(async()=>{
     if(busy||checking||!characteristic)return;
     const current=device,channel=characteristic;checking=true;refresh();let timer;
-    try{await Promise.race([channel.readValue(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Bluetooth connection timed out.')),5000);})]);}
-    catch(e){if(current===device){current.gatt.disconnect();disconnected(current);status('Bluetooth connection lost. Turn on computer Bluetooth and reconnect when the SMK says SEND A GAME.');}}
+    try{await Promise.race([channel.readValue(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Game-loader connection timed out.')),5000);})]);}
+    catch(e){if(current===device){current.gatt.disconnect();disconnected(current);status(`${connectionName()} connection lost. Check your cable or Bluetooth, then reconnect.`);}}
     finally{clearTimeout(timer);checking=false;refresh();}
 },4000);
 refresh();

@@ -15,7 +15,7 @@ export function decodeGame(value,index){
 }
 export async function readLibrary(channel){
     // Older builds do not implement library queries. Do not send destructive commands.
-    try{await channel.writeValueWithResponse(Uint8Array.of(6));}catch(e){if(!channel.service.device.gatt.connected)throw e;return null;}
+    try{await channel.writeValueWithResponse(Uint8Array.of(6));}catch(e){if(channel.service.device.transport==='USB'||!channel.service.device.gatt.connected)throw e;return null;}
     const library=decodeLibrary(await channel.readValue());library.games=[];
     for(let i=0;i<library.count;i++){
         await channel.writeValueWithResponse(loaderPacket(7,i));library.games.push(decodeGame(await channel.readValue(),i));

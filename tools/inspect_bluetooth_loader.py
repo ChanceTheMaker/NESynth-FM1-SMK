@@ -1,4 +1,4 @@
-"""Inspect SMK965/966/967 cartridge/loader state over USB; optionally open Bluetooth loading."""
+"""Inspect SMK965/966/967/968 cartridge/loader state over USB; optionally open Bluetooth loading."""
 import argparse,json,os,re,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
@@ -6,10 +6,10 @@ sys.path[:0]=[str(ROOT/'build/python-deps'),str(ROOT/'vendor/felucca/tools')]
 import fm1_install as wire
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--open-loader',action='store_true');p.add_argument('--library',action='store_true');p.add_argument('--open-menu',action='store_true');a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--open-loader',action='store_true');p.add_argument('--open-usb',action='store_true');p.add_argument('--library',action='store_true');p.add_argument('--open-menu',action='store_true');a=p.parse_args()
     wire.PORT_RE=re.compile(r'smk|nesynth|ota|composite|sinco|usb-midi',re.I)
-    up=wire.Updater(wire.MidoBackend());d=up.find(lambda i:i.text in ('SMK-37_965','SMK-37_966','SMK-37_967'))
-    if not d:raise RuntimeError('SMK-37_965/966/967 not found')
+    up=wire.Updater(wire.MidoBackend());d=up.find(lambda i:i.text in ('SMK-37_965','SMK-37_966','SMK-37_967','SMK-37_968'))
+    if not d:raise RuntimeError('SMK-37_965/966/967/968 not found')
     prefix=b'\xf0\x7dNL'+bytes([2 if a.library else 0]);d.link.drain();d.link.send(prefix+b'\xf7');end=time.monotonic()+4
     while time.monotonic()<end:
         packet=d.link.read(.2)
@@ -20,6 +20,8 @@ def main():
         print(json.dumps(result,indent=2),flush=True)
         if a.open_loader and result['loader_mode']!=1:
             d.link.send(b'\xf0\x7dNL\x01\xf7');os._exit(0)
+        if a.open_usb and result['loader_mode']!=4:
+            d.link.send(b'\xf0\x7dNL\x04\xf7');os._exit(0)
         if a.open_menu:
             d.link.send(b'\xf0\x7dNL\x03\xf7');os._exit(0)
         d.link.close();return

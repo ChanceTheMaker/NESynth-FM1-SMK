@@ -4,6 +4,8 @@
  * Only the library region is writable; redundant catalogs are committed last. */
 #include "rom_transfer.h"
 #include "library_store.h"
+#define NP_MODE_USB 0x5542504eu
+#define NP_MODE_USB_DELETE 0x4542504eu
 #define NP_MODE_LOAD 0x4c42504eu
 #define NP_MODE_MENU 0x4d42504eu
 #define NP_MODE_RECOVERY 0x5242504eu
@@ -46,13 +48,14 @@ static void np_loader_boot(uint32_t cold){
     if(np_store_load(&np_library,&io)){np_loader_error=11;return;}
     if(valid){
         if(mode==NP_MODE_LOAD)np_loader_mode=1;
+        if(mode==NP_MODE_USB)np_loader_mode=4;
         if(mode==NP_MODE_RECOVERY)np_loader_mode=2;
         if(mode==NP_MODE_WRITE){
             if(n<16||n>NP_CART_LIMIT||np_validate_rom(NP_STAGE,n)||np_rx_crc32(NP_STAGE,n)!=crc)np_loader_error=10;
             else {int index=np_store_add(&np_library,NP_STAGE,n,crc,np_upload_name);if(index<0)np_loader_error=12;else {n=(uint32_t)index;mode=NP_MODE_PLAY;}}
             if(np_loader_error)np_loader_mode=1;
         }
-        if(mode==NP_MODE_DELETE){if(np_store_remove(&np_library,n,crc))np_loader_error=13;np_loader_mode=1;}
+        if(mode==NP_MODE_DELETE||mode==NP_MODE_USB_DELETE){if(np_store_remove(&np_library,n,crc))np_loader_error=13;np_loader_mode=mode==NP_MODE_USB_DELETE?4:1;}
     }
     SFCENC_CON&=(uint8_t)~2u;SFCENC_UNENC_L=FL_XIP(NP_LIBRARY_META);
     SFCENC_UNENC_H=0x07ffffffu;SFCENC_CON|=2u;fl_inval(NP_LIBRARY_META,0x100000u-NP_LIBRARY_META);
@@ -97,7 +100,7 @@ int np_loader_write(const uint8_t *p,unsigned n){
     else if(p[0]==7&&n==5&&np_get32(p+1)<np_library.catalog.count){np_query=2;np_query_index=np_get32(p+1);rc=0;}
     else if((p[0]==8||p[0]==9)&&n==9&&np_loader_rx.state!=NP_RX_RECEIVING){
         unsigned index=np_get32(p+1),crc=np_get32(p+5);
-        if(index<np_library.catalog.count&&np_library.catalog.games[index].crc==crc){np_loader_pending=p[0]==8?NP_MODE_DELETE:NP_MODE_PLAY;np_pending_index=index;np_pending_crc=crc;np_loader_due=core_ms()+1500;rc=0;}
+        if(index<np_library.catalog.count&&np_library.catalog.games[index].crc==crc){np_loader_pending=p[0]==8?(np_loader_mode==4?NP_MODE_USB_DELETE:NP_MODE_DELETE):NP_MODE_PLAY;np_pending_index=index;np_pending_crc=crc;np_loader_due=core_ms()+1500;rc=0;}
     }
     else if(p[0]==10&&n==1&&np_loader_rx.state!=NP_RX_RECEIVING){np_loader_pending=NP_MODE_MENU;np_pending_index=np_pending_crc=0;np_loader_due=core_ms()+1500;rc=0;}
     np_loader_error=rc<0?(uint32_t)-rc:0;return rc?0x80:0;
@@ -112,8 +115,11 @@ unsigned np_loader_read(uint16_t off,uint8_t *p,uint16_t n){
     uint32_t v[]={0x314c504eu,np_loader_rx.state,np_loader_error,np_loader_rx.received,NP_CART_LIMIT};return np_copy_reply(v,sizeof v,off,p,n);
 }
 void np_loader_connected(void){np_query=0;}
+#include "library_usb.h"
 static int np_loader_usb(const uint8_t *p,unsigned n){
+    if(np_library_usb_frame(p,n,np_loader_mode==4))return 1;
     if(n!=4||p[0]!=0x7d||p[1]!='N'||p[2]!='L')return 0;
+    if(p[3]==4&&!np_loader_pending&&np_loader_mode!=4){np_restart_as(NP_MODE_USB,0,0);return 1;}
     if(p[3]==1&&np_loader_mode!=1){np_restart_as(NP_MODE_LOAD,0,0);return 1;}
     if(p[3]==3&&!np_loader_pending){np_restart_as(NP_MODE_MENU,0,0);return 1;}
     if(p[3]!=0&&p[3]!=2)return 0;
@@ -131,9 +137,9 @@ static void np_loader_controls(void){
 }
 #include "loader_art.h"
 static void np_loader_draw(void){
-    uint32_t state=np_ble_diag_state();const char *label=state==4?"CONNECTED":state==3?"SEND A GAME":state==5?"RADIO ERROR":"STARTING";
+    uint32_t state=np_ble_diag_state();const char *label=state==4?"CONNECTED":state==3?"SEND A GAME":state==5?"RADIO ERROR":np_loader_mode==4?"USB READY":"STARTING";
     if(np_loader_rx.state==NP_RX_RECEIVING)label="RECEIVING GAME";
-    if(np_loader_pending)label=np_loader_pending==NP_MODE_WRITE?"INSTALLING GAME":np_loader_pending==NP_MODE_DELETE?"DELETING GAME":"STARTING GAME";
+    if(np_loader_pending)label=np_loader_pending==NP_MODE_WRITE?"INSTALLING GAME":(np_loader_pending==NP_MODE_DELETE||np_loader_pending==NP_MODE_USB_DELETE)?"DELETING GAME":"STARTING GAME";
     if(np_loader_error){label="UPLOAD ERROR";state=5;}
     unsigned percent=np_loader_rx.length?100u*np_loader_rx.received/np_loader_rx.length:0;
     np_loader_art(NP_UI,176,64,label,percent,state);
@@ -156,7 +162,7 @@ static void np_menu_draw(void){
         if(!np_library.catalog.count)np_art_center(&a,120,"NO GAMES YET",2,0xef5c);
         np_art_center(&a,190,"PADS SELECT  PLAY GO",2,0xef5c);
         np_art_center(&a,205,space,2,0x45bf);
-        np_art_center(&a,224,np_loader_error?"GAME ERROR  REC TO LOAD":"REC BLUETOOTH",2,np_loader_error?0xe9e8:0x9cf3);
+        np_art_center(&a,224,np_loader_error?"GAME ERROR  REC TO LOAD":"REC BT  USB ON PC",2,np_loader_error?0xe9e8:0x9cf3);
         smk37_panel_window(&panel,0,y,240,60);lcd_data(NP_UI,240*60*2);
     }
 }
@@ -180,7 +186,7 @@ static __attribute__((noreturn)) void np_loader_run(void){
         np_loader_art(NP_UI,y,60,"STARTING",0,1);
         smk37_panel_window(&panel,0,y,240,60);lcd_data(NP_UI,240*60*2);
     }
-    np_loader_draw();np_ble_diag_start();uint32_t last=0,previous=~0u;
+    np_loader_draw();if(np_loader_mode!=4)np_ble_diag_start();uint32_t last=0,previous=~0u;
     for(;;){
         fm1_wdt_feed();recovery_service();np_ble_diag_service();uint32_t now=core_ms();
         if(np_loader_pending&&(int32_t)(now-np_loader_due)>=0){display_stop();np_restart_as(np_loader_pending,np_loader_pending==NP_MODE_WRITE?np_loader_rx.length:np_pending_index,np_loader_pending==NP_MODE_WRITE?np_loader_rx.expected_crc:np_pending_crc);}
