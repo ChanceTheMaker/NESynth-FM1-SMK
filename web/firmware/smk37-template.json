@@ -1,13 +1,13 @@
 {
-  "product": "SMK-37_961",
+  "product": "SMK-37_962",
   "package": "smk37-template.bin",
-  "bytes": 572536,
-  "sha256": "40c2a23b05c25e5a2d7080073eb814382f7026bd69200a0183393363f7936499",
+  "bytes": 573728,
+  "sha256": "5031c3b612ec3261a9422da02e1277f838f7baf98e196efef82a90b20266a914",
   "models": [
     "SMK-37 Pro",
     "SMK-37 Elite"
   ],
-  "cartridge_offset": 23066,
+  "cartridge_offset": 24258,
   "cartridge_capacity": 524816,
   "usb_updater": true,
   "usb_protocol": "smk37-ram-v2",
@@ -21,11 +21,11 @@
     9,
     11
   ],
-  "protected_app_sha256": "2e0710eabc3576dac1eb1fdb6138aeb124a56f18b999cdd5ea8ba04fb60c8163",
+  "protected_app_sha256": "d5de3a74a4fe9af8c2402e54077485f939bf00f2efc53d45e8640c9dbf11d16e",
   "loader": {
-    "product": "SMK-37_961",
+    "product": "SMK-37_962",
     "bytes": 8160,
-    "sha256": "9478c34424556ce329b8e961d8ef26301e4108c87c9ca305b985aca1b536596e",
+    "sha256": "54095e475e5542be66f03326d55fe75a04ed9322c49decb3682643c86737c19b",
     "entry": "0x01c0a800",
     "write_lo": "0x4000",
     "write_hi": "0x9d000",

@@ -17,7 +17,7 @@ static volatile uint32_t scan_count,audio_count,key_lo,key_hi,audio_underruns;
 static uint32_t display_count;
 static uint32_t video_dirty_top,video_dirty_bottom=225,display_first=1;
 static uint32_t emu_last_ticks,emu_max_ticks,emu_total_ticks,emu_measured_frames;
-static uint32_t irq_total_ticks;
+static volatile uint32_t irq_total_ticks;
 static uint32_t lcd_started,lcd_max_ticks,lcd_measuring;
 static uint32_t input_buttons,input_seen;
 static volatile uint32_t splash_active;
@@ -30,6 +30,9 @@ volatile smk37_bootguard_t gb_bootguard __attribute__((section(".noinit")));
 #include "smk37_time.h"
 #include "smk37_audio.h"
 #include "smk37_lcd_hw.h"
+#define SMK_LCD_DMA_BARRIER() __asm__ volatile("csync" ::: "memory")
+#include "smk37_display_dma.h"
+static smk_display_dma_t display_dma;
 #include "smk37_panel.h"
 #include "smk37_scanner.h"
 #include "smk37_contacts.h"
@@ -53,6 +56,7 @@ static int lcd_data(const void*p,uint32_t n){return smk37_lcd_data(p,n,4000000);
 static const smk37_panel_io_t panel={lcd_command,lcd_data,fm1_delay_ms};
 static const smk37_audio_hooks_t audio_hooks={fm1_delay_ms,fm1_irq_attach};
 void gb_scan_irq(void) {
+    uint32_t begun=fm1_ticks();
     if(!(SMK37_SCAN_CON&0x8000u))return;
     unsigned index=pad_adc.scan.index;
     int result=smk37_adc_spi_done(&pad_adc);
@@ -61,7 +65,7 @@ void gb_scan_irq(void) {
         gb_smk37_pad_sample(&game_pads,p,pad_adc.scan.raw[index]);
     if(result<0)game_pads.held=game_pads.pressed=0;
     smk37_scan_set_analog(smk37_analog_mask(&pad_adc.scan));
-    if(!smk37_scan_tick())return;
+    if(!smk37_scan_tick()){irq_total_ticks+=fm1_ticks()-begun;return;}
     (void)smk37_controls_tick(&panel_controls,smk37_scan_frame);
     smk_buttons=panel_controls.buttons;
     scan_count++;
@@ -73,11 +77,13 @@ void gb_scan_irq(void) {
         if(k<32) {if(duration)key_lo|=1u<<k;else key_lo&=~(1u<<k);}
         else {if(duration)key_hi|=1u<<(k-32);else key_hi&=~(1u<<(k-32));}
     }
+    irq_total_ticks+=fm1_ticks()-begun;
 }
 void gb_audio_irq(void) {
     uint8_t p=smk37_audio_pending();smk37_audio_ack_aux(p);
     if(!(p&SMK37_AUDIO_HALF))return;
-    unsigned h=smk37_audio_free_half();read_samples();
+    unsigned h=smk37_audio_free_half();if(!splash_active&&gp_audio_queued()<256)audio_underruns++;
+    read_samples();
     uint32_t target=smk_volume_target;
     smk_volume_render(dma+h*512,samples,smk_volume_current,target);
     smk_volume_current=target;
@@ -85,10 +91,18 @@ void gb_audio_irq(void) {
 }
 static int display_init(void){smk37_lcd_hw_init(4);return smk37_panel_init(&panel);}
 static void display_frame(void){
+    if(display_dma.busy||display_dma.failed)return;
     unsigned first=video_dirty_top,rows=video_dirty_bottom-first;
-    if(smk37_panel_window(&panel,0,7+first,240,rows))lcd_data(screen+first*240,rows*480);
+    if(!smk37_panel_window(&panel,0,7+first,240,rows)||
+       !smk_display_begin(&display_dma,screen+first*240,rows*480,fm1_ticks())){
+        display_dma.failed=1;smk_display_stop(&display_dma);
+    }
 }
-static int display_ready(void){return 1;}
+static int display_ready(void){
+    int ready=smk_display_poll(&display_dma,fm1_ticks());lcd_max_ticks=display_dma.max_ticks;
+    return ready>0;
+}
+static void display_stop(void){smk_display_stop(&display_dma);}
 static void input_init(void){
     smk37_adc_init(&pad_adc);
     SMK37_LIGHT_REG(0x50080u)&=~(1u<<10);
@@ -184,7 +198,11 @@ static void audio_start(void){fm1_audio_init(dma,512,gb_isr_audio,3);}
 static void audio_stop(void){fm1_audio_stop();}
 #include "fm1_recovery.h"
 #endif
-static void fm1_fault(const fm1_crash_t *c){(void)c;video_retire();audio_stop();fm1_reboot();}
+static void fm1_fault(const fm1_crash_t *c){(void)c;
+#if GB_SMK37
+    display_stop();
+#endif
+    video_retire();audio_stop();fm1_reboot();}
 extern uint32_t _data_start[],_data_end[],_data_load[],_bss_start[],_bss_end[];
 extern uint32_t _pool_start[],_pool_end[],_rt_start[],_rt_end[],_rt_load[];
 extern uint32_t _dsp_start[],_dsp_end[],_dsp_load[];
@@ -247,6 +265,11 @@ void gb_cstart(const uint32_t *parameters){
         master_poll();
 #endif
         recovery_service();
+#if GB_SMK37
+        /* Release the framebuffer only when the peripheral is done. This
+         * leaves CPU0 free for NES/audio while the large pixel DMA runs. */
+        if(display_ok)(void)display_ready();
+#endif
         if(gp_audio_queued()<2955){
 #if GB_SMK37
             input_buttons=smk_input_frame();input_seen|=input_buttons;gp_buttons(input_buttons);

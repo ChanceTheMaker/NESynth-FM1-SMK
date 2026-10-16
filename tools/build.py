@@ -1,5 +1,5 @@
 """Build the NES feasibility prototype; hardware outputs are never install packages."""
-import argparse,hashlib,json,os,re,subprocess
+import argparse,hashlib,json,os,re,subprocess,sys
 from pathlib import Path
 from diagnostic import make_rom
 from cartridge import read_cartridge
@@ -22,6 +22,8 @@ def main():
     if a.target=='test':
         run([a.zig,'c++',*common,*cppflags,'-UNDEBUG',*CPP,'tests/runtime.cpp','-o','build/runtime-test.exe']);run([ROOT/'build/runtime-test.exe',ROOT/'build/diagnostic.nes'])
         run([a.zig,'cc','-O1','-UNDEBUG','-Isrc','tests/smk37_game_controls.c','-o','build/smk37-controls.exe']);run([ROOT/'build/smk37-controls.exe'])
+        run([a.zig,'cc','-O1','-UNDEBUG','tests/smk37_display.c','-o','build/smk37-display.exe']);run([ROOT/'build/smk37-display.exe'])
+        run([sys.executable,'tests/diagnostics.py'])
         return
     native=a.target in ['fm1','smk37'];out=ROOT/'build'/a.target;out.mkdir(exist_ok=True)
     sources=CPP+['src/libc.c']

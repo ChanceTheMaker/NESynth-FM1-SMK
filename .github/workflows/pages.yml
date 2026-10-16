@@ -28,6 +28,9 @@ jobs:
           ./build/runtime-test web/diagnostic.nes
           cc -O1 -UNDEBUG -Isrc tests/smk37_game_controls.c -o build/smk37-controls
           ./build/smk37-controls
+          cc -O1 -UNDEBUG tests/smk37_display.c -o build/smk37-display
+          ./build/smk37-display
+          python tests/diagnostics.py
       - name: Check shipped assets and firmware builder
         run: npm run test:site
       - name: Check SMK model packages and protected flash updater
