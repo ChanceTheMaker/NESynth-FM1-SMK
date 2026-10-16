@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>NESynth</title>
+  <rect width="64" height="64" rx="14" fill="#e5e5e0"/>
+  <rect x="3" y="3" width="58" height="58" rx="12" fill="none" stroke="#d32920" stroke-width="5"/>
+  <path d="M17 47V17h9l12 19V17h9v30h-9L26 28v19Z" fill="#d32920"/>
+</svg>
