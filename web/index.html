@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#cecec9"><title>NESynth · NES on FM-1 &amp; SMK37</title><meta name="description" content="Play NES homebrew in your browser. Build and flash dual-core FM-1 firmware, or try the SMK37 simulator. Bring your own NES and ZIP cartridges."><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="launch.css"><link rel="stylesheet" href="install.css?v=20261016-retro"><link rel="stylesheet" href="retro.css?v=20261016"><link rel="icon" href="favicon.ico?v=20261016" sizes="16x16 32x32 64x64"><link rel="icon" href="favicon.svg?v=20261016" type="image/svg+xml" sizes="any"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#cecec9"><title>NESynth · NES on FM-1 &amp; SMK37</title><meta name="description" content="Play NES homebrew in your browser. Build and flash dual-core FM-1 firmware, or try the SMK37 simulator. Bring your own NES and ZIP cartridges."><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="launch.css"><link rel="stylesheet" href="install.css?v=20261016-fullscreen"><link rel="stylesheet" href="retro.css?v=20261016-fullscreen"><link rel="icon" href="favicon.ico?v=20261016" sizes="16x16 32x32 64x64"><link rel="icon" href="favicon.svg?v=20261016" type="image/svg+xml" sizes="any"></head>
 <body>
 <header><a class="brand" href="./" aria-label="NESynth home">NESynth</a><nav aria-label="Main navigation"><a href="#browser-player">Play</a><a href="#flash-panel">Install on FM-1</a><a href="#homebrew">Free games</a></nav><span class="header-label">8-BIT EXPERIMENTS <b>001</b></span></header>
 <main>
@@ -10,7 +10,7 @@
 </section>
 <div id="player" class="workspace"><div id="browser-player" class="play-column"><h2 class="workflow-heading">Play in your browser.</h2><p class="workflow-intro">Try a game here, then take the same game to your FM-1.</p>
 <section class="console retro-rig" aria-label="NESynth game simulator">
-<div class="console-top"><span class="console-wordmark"><span class="rig-logo">NESynth</span><small>HOME ENTERTAINMENT<br>GAME SIMULATOR</small></span><span id="fps">READY</span></div>
+<div class="console-top"><span class="console-wordmark"><span class="rig-logo">NESynth</span><small>HOME ENTERTAINMENT<br>GAME SIMULATOR</small></span><div class="simulator-actions"><span id="fps">READY</span><button id="fullscreen" type="button" aria-pressed="false">Full screen</button></div></div>
 <div class="simulator-picker"><label for="simulator-model">PLAY ON</label><select id="simulator-model"><option value="nes">NES · classic controller</option><option value="fm1">FM-1</option><option value="smk-pro">SMK-37 Pro</option><option value="smk-elite">SMK-37 Elite</option></select><button id="zoom-screen" aria-pressed="false" hidden>Enlarge screen</button></div>
 <div id="large-screen" hidden></div><div id="hardware" hidden><div id="instrument-art" aria-label="Playable hardware panel"></div><p id="hardware-legend"></p></div>
 <div class="crt-tv" aria-label="CRT television">
@@ -77,5 +77,5 @@
 </main>
 <footer><span>NESYNTH <b>×</b> INFONES <b>/</b> BUILT ON GAMEDUDE<br><a href="credits.html">Credits &amp; licenses</a></span><span>Experimental compatibility. NTSC / NROM / MMC1 / UxROM / CNROM / MMC3 / MMC2.<br>Independent project. Not affiliated with Nintendo.</span></footer>
 <dialog id="confirm-loader"><form method="dialog"><h2>Confirm your instrument</h2><p>The connected loader identifies as <strong id="loader-identity"></strong>. Some SMK37 loaders use the same name.</p><p>Continue only if the connected instrument is an FM-1.</p><div class="log-actions"><button value="cancel">Cancel</button><button value="fm1">It is an FM-1</button></div></form></dialog>
-<script type="module" src="app.js?v=20261016-retro"></script>
+<script type="module" src="app.js?v=20261016-fullscreen"></script>
 </body></html>

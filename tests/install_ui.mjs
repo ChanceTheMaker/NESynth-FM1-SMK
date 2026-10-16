@@ -51,6 +51,15 @@ try{
  }
  const tv=await page.locator('.crt-tv').boundingBox(),nes=await page.locator('.nes-console').boundingBox(),pad=await page.locator('.controller').boundingBox();
  assert(tv.y+tv.height<nes.y&&nes.y+nes.height<pad.y,'CRT, NES, controller stack vertically');
+ await page.locator('#fullscreen').click();
+ await page.waitForFunction(()=>document.fullscreenElement===document.querySelector('.retro-rig'));
+ assert.equal(await page.locator('#fullscreen').getAttribute('aria-pressed'),'true');
+ assert(await page.locator('#screen').isVisible());
+ await fs.mkdir('build/install-ui',{recursive:true});
+ await page.screenshot({path:'build/install-ui/fullscreen.png'});
+ await page.locator('#fullscreen').click();
+ await page.waitForFunction(()=>!document.fullscreenElement);
+ assert.equal(await page.locator('#fullscreen').getAttribute('aria-pressed'),'false');
  assert.equal(await page.locator('#dropzone').count(),1);
  assert.equal(await page.locator('#step-game #rom').count(),1,'The only cartridge picker belongs to step 1');
  assert.equal(await page.locator('.cartridge-panel,#install-choose-game').count(),0,'No duplicate cartridge flow');

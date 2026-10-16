@@ -1,4 +1,6 @@
 /* A playable TV, console and controller, built around the existing canvas. */
+.simulator-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+#fullscreen{padding:7px 9px;border:1px solid #909689;background:#e8eadf;border-radius:3px;font:700 9px var(--mono);white-space:nowrap}
 .retro-rig{padding:22px 22px 17px;background:linear-gradient(135deg,#dadbd4,#c5c7bf);border-radius:9px;overflow:visible;box-shadow:0 6px 0 #a6a89e,0 8px 0 #878b80,0 18px 30px #24281d17}
 .retro-rig .console-top{margin-bottom:19px}
 .retro-rig .console-wordmark{gap:12px}
@@ -41,3 +43,23 @@
 .retro-rig button:focus-visible{outline:3px solid #e35838;outline-offset:3px}
 @media(max-width:1100px) and (min-width:801px),(max-width:420px){.retro-rig{padding:17px 12px 10px}.rig-logo{font-size:23px}.retro-rig .console-wordmark small{display:none}.crt-tv{grid-template-columns:minmax(0,1fr) 33px;padding:11px 9px 0;gap:7px;border-radius:20px 20px 14px 14px}.crt-bezel{padding:7px}.tv-controls{gap:9px}.tv-dial{width:27px;height:27px}.tv-dial:after{left:9px}.tv-speaker{width:21px;min-height:25px}.tv-channel b{font-size:13px}.nes-console{margin-left:4px;margin-right:4px}.nes-top{height:80px;padding:10px 12px 0;gap:10px}.cartridge-door{padding:10px 9px}.nes-vents{width:33px}.retro-rig .controller{padding:20px 10px 25px;gap:8px;min-height:140px;border-width:6px}.retro-rig .dpad{grid-template-columns:23px 23px 23px;grid-template-rows:23px 23px 23px}.retro-rig .actions{gap:5px}.retro-rig .actions button{width:27px;height:27px}.retro-rig .middle{min-width:70px}.retro-rig .system-buttons{gap:7px}.retro-rig .system-buttons button{width:26px}.retro-rig .system-buttons button>span{font-size:6px}.retro-rig .console-bottom{padding:8px}.retro-rig #title{max-width:34%}}
 @media(prefers-reduced-motion:reduce){.retro-rig *{transition:none}}
+body.simulator-fullscreen{overflow:hidden}
+.retro-rig:is(:fullscreen,.fullscreen-fallback){width:100%;height:100dvh;padding:12px 20px;background:#151a14;border:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;align-items:stretch;overflow:auto}
+.retro-rig.fullscreen-fallback{position:fixed;inset:0;z-index:9999}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .console-top{flex-shrink:0;margin:0 0 10px}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .rig-logo{color:#ef5948;border-color:#ef5948}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) :is(.console-wordmark small,#fps){color:#b8c0ae}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) :is(.simulator-picker,.nes-top,.controller-cable,.console-foot,.tv-controls,.tv-foot){display:none}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .crt-tv{flex:1;min-height:120px;display:block;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .crt-tv:after{display:none}
+.retro-rig:is(:fullscreen,.fullscreen-fallback):not([data-simulator="nes"]) .crt-tv{display:none}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .crt-bezel{height:100%;padding:0;border-radius:0;background:none;box-shadow:none}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .screen-frame{height:100%;width:auto;aspect-ratio:256/240;max-width:100%;margin:auto;border-radius:6px}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .screen-frame canvas{width:100%;height:100%;object-fit:contain}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .nes-console{flex-shrink:0;width:min(440px,100%);margin:9px auto 0;box-shadow:none}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .console-bottom{min-height:30px;padding:6px 10px}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) .controller{flex-shrink:0;width:min(440px,100%);min-height:124px;margin:10px auto 7px;padding-top:13px;padding-bottom:22px}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) #hardware{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) #instrument-art{max-width:1100px;width:100%;margin:auto}
+.retro-rig:is(:fullscreen,.fullscreen-fallback) #hardware-legend{color:#b8c0ae}
+@media(max-height:600px){.retro-rig:is(:fullscreen,.fullscreen-fallback){padding:8px 12px}.retro-rig:is(:fullscreen,.fullscreen-fallback) .controller{display:none}.retro-rig:is(:fullscreen,.fullscreen-fallback) .console-wordmark small{display:none}}

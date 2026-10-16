@@ -1,4 +1,5 @@
 import './simulator.js';
+import './fullscreen.js?v=20261016';
 import './flash-ui.js?v=20261016-mappers';
 import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';
