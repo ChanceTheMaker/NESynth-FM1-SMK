@@ -1,0 +1,9 @@
+/* Shared project navigation, matching the SMK family links on GameDude. */
+footer{flex-wrap:wrap;gap:20px}
+.smk-family{flex:0 0 100%;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;padding-top:22px;border-top:1px solid #b4b5ae;text-align:left}
+.smk-family>span{flex:0 0 100%;font:700 10px var(--mono);letter-spacing:1px;text-transform:uppercase;color:#686b61}
+.smk-family a{display:inline-block;padding:6px 0;font:700 12px var(--mono);color:var(--ink);text-decoration:none;white-space:nowrap}
+.smk-family a:first-of-type{color:var(--red)}
+.smk-family a:hover{text-decoration:underline;text-underline-offset:4px}
+.smk-family a:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+@media(max-width:640px){.smk-family{gap:8px 18px}.smk-family a{font-size:11px}}
