@@ -1,6 +1,6 @@
 import './simulator.js';
 import './fullscreen.js?v=20261016-remote';
-import './flash-ui.js?v=974';
+import './flash-ui.js?v=975-live-helper';
 import './main-loader.js?v=970';
 import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';

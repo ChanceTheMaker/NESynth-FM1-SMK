@@ -1,23 +1,30 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import {reportProgress} from './update-progress.js?v=20261013';
-// Only the same-origin loopback preview can own the local USB transport.
-// Hosted sites retain their browser transport; no local-machine probing/CORS.
-let nativeAvailable=false;
+// The Windows SMK handoff must stay out of Chrome's MIDI process.
+const loopback=()=>['127.0.0.1','localhost'].includes(location.hostname);
+export const needsHostedSmkHelper=model=>model==='smk-pro'&&!loopback()&&/win/i.test(navigator.userAgentData?.platform||navigator.platform||'');
+let apiBase='',token='';
 export async function hasNativeSmk(model,fetcher=fetch){
- if(model!=='smk-pro'||!['127.0.0.1','localhost'].includes(location.hostname))return false;
- if(nativeAvailable)return true;
+ if(model!=='smk-pro')return false;
+ const hosted=needsHostedSmkHelper(model);
+ if(!loopback()&&!hosted)return false;
+ apiBase=hosted?'http://127.0.0.1:8817':'';token='';
  try{
-  const response=await fetcher('/api/smk/capabilities',{cache:'no-store',signal:AbortSignal.timeout(2000)});
-  if(!response.ok)return false;
-  const result=await response.json();nativeAvailable=result.available===true&&result.models?.includes(model);return nativeAvailable;
- }catch{throw Error('The local SMK USB service could not be reached. Keep the device powered and restart the local preview before retrying.');}
+  const response=await fetcher(apiBase+'/api/smk/capabilities',{cache:'no-store',signal:AbortSignal.timeout(4000)});
+  if(!response.ok){if(hosted)throw Error();return false;}
+  const result=await response.json();
+  if(hosted&&(result.protocol!==1||typeof result.token!=='string'||result.token.length<32))throw Error();
+  const available=result.available===true&&result.models?.includes(model);
+  if(hosted&&!available)throw Error();
+  token=result.token||'';return available;
+ }catch{throw Error(hosted?'Start the NESynth Windows USB helper, then retry here. Allow local-network access if Chrome asks. The browser MIDI updater was not started.':'The local SMK USB service could not be reached. Keep the device powered and restart the local preview before retrying.');}
 }
 export async function runNativeSmk(action,log=()=>{},fetcher=fetch){
  async function request(url,options={}){
-  try{return await fetcher(url,{...options,signal:AbortSignal.timeout(10000)});}
+  try{return await fetcher(apiBase+url,{...options,signal:AbortSignal.timeout(10000)});}
   catch{throw Error('The local USB connection was lost. Keep the SMK powered; its operation may still be running. Check the local preview before retrying.');}
  }
- const response=await request('/api/smk/jobs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,model:'smk-pro'})});
+ const response=await request('/api/smk/jobs',{method:'POST',headers:{'Content-Type':'application/json',...(token?{'X-NESynth-Token':token}:{})},body:JSON.stringify({action,model:'smk-pro'})});
  const created=await response.json();if(!response.ok||!created.id)throw Error(created.error||'The local USB installer could not start.');
  let logged=0;
  for(;;){
