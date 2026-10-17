@@ -11,13 +11,13 @@
       "product": "SMK-37_969",
       "file": "firmware/nesynth-smk37-969.bin",
       "bytes": 207524,
-      "sha256": "9e9754a5e9235d60dc411fc4df1f0b5c038c784a02500e5a8a344b6cbba60b0d"
+      "sha256": "70b08e0ab1f3790a838a705d68df59546c3782594724900820f711b1739f1aa9"
     },
     "smk-elite": {
       "product": "SMK-37_969",
       "file": "firmware/nesynth-smk37-969.bin",
       "bytes": 207524,
-      "sha256": "9e9754a5e9235d60dc411fc4df1f0b5c038c784a02500e5a8a344b6cbba60b0d"
+      "sha256": "70b08e0ab1f3790a838a705d68df59546c3782594724900820f711b1739f1aa9"
     }
   }
 }

@@ -6,6 +6,12 @@
  * serializer 0x02029454. 36 zero bytes, then 16 GRB words, MSB first;
  * each logical bit becomes 0xf0 (one) or 0xc0 (zero). */
 #define SMK37_LIGHT_BYTES 420u
+#ifndef SMK37_LIGHT_MAX_LEVEL
+#define SMK37_LIGHT_MAX_LEVEL 8u /* Conservative default for hardware diagnostics. */
+#endif
+#if SMK37_LIGHT_MAX_LEVEL > 255
+#error "SMK pad brightness must fit an 8-bit channel"
+#endif
 static const uint8_t smk37_pad_light_order[16] = {
     0,15,14,13,12,11,10,9,1,2,3,4,5,6,7,8
 };
@@ -18,7 +24,7 @@ static const uint8_t smk37_indicator_order[19] = {
 static inline void smk37_light_encode_mask(uint8_t out[SMK37_LIGHT_BYTES],
                                           uint16_t pads, unsigned color, unsigned level)
 {
-    if (level > 8) level = 8; /* bring-up brightness ceiling */
+    if (level > SMK37_LIGHT_MAX_LEVEL) level = SMK37_LIGHT_MAX_LEVEL;
     for (unsigned i=0; i<36; ++i) out[i] = 0;
     for (unsigned i=36; i<SMK37_LIGHT_BYTES; ++i) out[i] = 0xc0;
     if (color >= 3) return;
@@ -41,7 +47,9 @@ static inline void smk37_light_encode_rgb(uint8_t out[SMK37_LIGHT_BYTES],const u
     for(unsigned i=0;i<36;i++)out[i]=0;
     for(unsigned pad=0;pad<16;pad++){
         unsigned r=(rgb[pad]>>16)&255,g=(rgb[pad]>>8)&255,b=rgb[pad]&255;
-        if(r>8)r=8;if(g>8)g=8;if(b>8)b=8;
+        if(r>SMK37_LIGHT_MAX_LEVEL)r=SMK37_LIGHT_MAX_LEVEL;
+        if(g>SMK37_LIGHT_MAX_LEVEL)g=SMK37_LIGHT_MAX_LEVEL;
+        if(b>SMK37_LIGHT_MAX_LEVEL)b=SMK37_LIGHT_MAX_LEVEL;
         uint32_t word=(g<<16)|(r<<8)|b;unsigned start=36+24*smk37_pad_light_order[pad];
         for(unsigned bit=0;bit<24;bit++)out[start+bit]=word&(1u<<(23-bit))?0xf0:0xc0;
     }

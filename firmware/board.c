@@ -40,6 +40,7 @@ static smk_display_dma_t display_dma;
 #include "smk37_keyscan.h"
 #include "smk37_controls.h"
 #include "smk37_adc.h"
+#define SMK37_LIGHT_MAX_LEVEL 96u /* Readable game pads; diagnostics keep their dim default. */
 #include "smk37_lights_hw.h"
 #include "smk37_game_controls.h"
 #include "smk37_game_pads.h"
@@ -115,7 +116,7 @@ static void input_init(void){
     smk37_scan_init(fm1_irq_attach,gb_isr_scan);
     uint32_t rgb[16]={0};
     for(unsigned p=0;p<16;p++)if(gp_smk37_pad_lights()&(1u<<p))
-        rgb[p]=p>=14?0x060006u:0x000406u;
+        rgb[p]=p>=14?0x600060u:0x004060u;
     smk37_light_encode_rgb(pad_lights,rgb);
     (void)smk37_lights_send(pad_lights,4000000);
 }
