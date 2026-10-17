@@ -12,6 +12,8 @@
 #if SMK37_LIGHT_MAX_LEVEL > 255
 #error "SMK pad brightness must fit an 8-bit channel"
 #endif
+/* Capture the cap used when these inline encoders are parsed. */
+enum { SMK37_LIGHT_COMPILED_MAX_LEVEL = SMK37_LIGHT_MAX_LEVEL };
 static const uint8_t smk37_pad_light_order[16] = {
     0,15,14,13,12,11,10,9,1,2,3,4,5,6,7,8
 };

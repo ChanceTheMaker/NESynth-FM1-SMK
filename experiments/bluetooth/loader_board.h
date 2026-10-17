@@ -241,6 +241,9 @@ static __attribute__((noreturn)) void np_loader_run(void){
     if(np_loader_mode!=4)np_ble_diag_start();uint32_t last=0,previous=~0u;
     for(;;){
         fm1_wdt_feed();recovery_service();np_ble_diag_service();uint32_t now=core_ms();
+#if GB_SMK37
+        (void)smk_input_frame(); /* Keep pad feedback active while receiving games. */
+#endif
         if(np_loader_pending&&(int32_t)(now-np_loader_due)>=0){display_stop();np_restart_as(np_loader_pending,np_loader_pending==NP_MODE_WRITE?np_loader_rx.length:np_pending_index,np_loader_pending==NP_MODE_WRITE?np_loader_rx.expected_crc:np_pending_crc);}
         uint32_t buttons=np_panel_buttons(),pressed=buttons&~previous;previous=buttons;
         if((pressed&2u)&&!np_loader_pending&&np_loader_rx.state!=NP_RX_RECEIVING)np_restart_as(NP_MODE_MENU,0,0);

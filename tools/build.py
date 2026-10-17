@@ -22,6 +22,8 @@ def main():
     if a.target=='test':
         run([a.zig,'c++',*common,*cppflags,'-UNDEBUG',*CPP,'tests/runtime.cpp','-o','build/runtime-test.exe']);run([ROOT/'build/runtime-test.exe',ROOT/'build/diagnostic.nes'])
         run([a.zig,'cc','-O1','-UNDEBUG','-Isrc','tests/smk37_game_controls.c','-o','build/smk37-controls.exe']);run([ROOT/'build/smk37-controls.exe'])
+        run([a.zig,'cc','-O1','-UNDEBUG','tests/smk37_brightness.c','-o','build/smk37-brightness.exe']);run([ROOT/'build/smk37-brightness.exe'])
+        run([a.zig,'cc','-O1','-UNDEBUG','tests/smk37_light_transport.c','-o','build/smk37-light-transport.exe']);run([ROOT/'build/smk37-light-transport.exe'])
         run([a.zig,'cc','-O1','-UNDEBUG','tests/smk37_display.c','-o','build/smk37-display.exe']);run([ROOT/'build/smk37-display.exe'])
         run([sys.executable,'tests/diagnostics.py'])
         run([a.zig,'cc','-O1','-UNDEBUG','tests/smk37_scan.c','-o','build/smk37-scan.exe']);run([ROOT/'build/smk37-scan.exe'])

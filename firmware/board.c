@@ -26,6 +26,8 @@ static void read_samples(void){gp_audio_read(samples,256);}
 volatile smk37_bootguard_t gb_bootguard __attribute__((section(".noinit")));
 
 #if GB_SMK37
+/* The scanner also includes the LED encoder: configure it before either HAL. */
+#define SMK37_LIGHT_MAX_LEVEL 255u /* Readable game pads; diagnostics keep their dim default. */
 #include "smk37_boot.h"
 #include "smk37_time.h"
 #include "smk37_audio.h"
@@ -40,11 +42,16 @@ static smk_display_dma_t display_dma;
 #include "smk37_keyscan.h"
 #include "smk37_controls.h"
 #include "smk37_adc.h"
-#define SMK37_LIGHT_MAX_LEVEL 96u /* Readable game pads; diagnostics keep their dim default. */
+#define SMK37_LIGHT_RESET() fm1_delay_us(350)
+#define SMK37_LIGHT_DMA_BARRIER() __asm__ volatile("csync" ::: "memory")
 #include "smk37_lights_hw.h"
+_Static_assert(SMK37_LIGHT_COMPILED_MAX_LEVEL==255u,"SMK pad encoder must use application brightness");
 #include "smk37_game_controls.h"
 #include "smk37_game_pads.h"
 #include "smk37_volume.h"
+#include "smk37_brightness.h"
+static smk_brightness_t smk_brightness_fader;
+static volatile uint32_t smk_brightness=150;
 static volatile uint32_t smk_volume_target=64;
 static uint32_t smk_volume_current=64; /* Same 25% startup level as before. */
 static smk37_keyscan_t keys[37];
@@ -63,6 +70,7 @@ void gb_scan_irq(void) {
     unsigned index=pad_adc.scan.index;
     int result=smk37_adc_spi_done(&pad_adc);
     if(result>0)smk_volume_target=smk_volume_sample(smk_volume_target,index,pad_adc.scan.raw[index]);
+    if(result>0)smk_brightness=smk_brightness_sample(&smk_brightness_fader,smk_brightness,index,pad_adc.scan.raw[index]);
     if(result>0)for(unsigned p=0;p<16;p++)if(index==smk37_pad_input[p])
         gb_smk37_pad_sample(&game_pads,p,pad_adc.scan.raw[index]);
     if(result<0)game_pads.held=game_pads.pressed=0;
@@ -105,6 +113,21 @@ static int display_ready(void){
     return ready>0;
 }
 static void display_stop(void){smk_display_stop(&display_dma);}
+/* Main-loop only: leave the shared SPI peripheral to any active LCD DMA. */
+static void smk_pad_lights(uint32_t held){
+    static uint32_t previous=UINT32_MAX,last;
+    uint32_t lit=gp_smk37_pad_lights()&~held,level=smk_brightness;
+    uint32_t state=lit|(level<<16);
+    if(state==previous||!display_ready())return;
+    uint32_t now=fm1_ticks();
+    /* Coalesce fader changes to 50 Hz; pad press/release feedback stays immediate. */
+    if(lit==(previous&0xffffu)&&(uint32_t)(now-last)<480000u)return;
+    uint32_t rgb[16]={0};
+    for(unsigned p=0;p<16;p++)if(lit&(1u<<p))
+        rgb[p]=p>=14?(level<<16)|level:((level*2/3)<<8)|level;
+    smk37_light_encode_rgb(pad_lights,rgb);
+    if(smk37_lights_send(pad_lights,4000000)){previous=state;last=now;}
+}
 static void input_init(void){
     smk37_adc_init(&pad_adc);
     SMK37_LIGHT_REG(0x50080u)&=~(1u<<10);
@@ -114,16 +137,14 @@ static void input_init(void){
        Output 18 is PLAY's alternate red LED, not the REC input ID. */
     smk37_scan_indicator_bits=(1u<<16)|(1u<<18);
     smk37_scan_init(fm1_irq_attach,gb_isr_scan);
-    uint32_t rgb[16]={0};
-    for(unsigned p=0;p<16;p++)if(gp_smk37_pad_lights()&(1u<<p))
-        rgb[p]=p>=14?0x600060u:0x004060u;
-    smk37_light_encode_rgb(pad_lights,rgb);
-    (void)smk37_lights_send(pad_lights,4000000);
+    smk_pad_lights(0);
 }
 static uint32_t smk_input_frame(void){
     fm1_irq_off();
     uint32_t lo=key_lo,hi=key_hi,pads=gb_smk37_pads_take(&game_pads),buttons=smk_buttons;
+    uint32_t held=game_pads.held;
     fm1_irq_on();
+    smk_pad_lights(held);
     return gp_input_keys(lo,hi)|gp_smk37_pads(pads)|gp_smk37_panel(buttons);
 }
 static void audio_start(void){(void)smk37_audio_init(dma,512,gb_isr_audio,3,&audio_hooks);}
