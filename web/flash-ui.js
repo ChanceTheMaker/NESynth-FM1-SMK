@@ -1,3 +1,4 @@
+import {requestMidiSession,releaseMidiSession} from './midi-session.js?v=session1';
 import {loadNesynthFirmware} from './nesynth-firmware.js?v=971';
 import {Updater} from './vendor/fm1ota.js?v=973';
 import {installFirmware,fm1Identity} from './install-firmware.js?v=20261013';
@@ -66,11 +67,7 @@ function reveal(){
 async function midi(){
  if(!window.isSecureContext||!navigator.requestMIDIAccess)throw Error('Open this site in Chrome or Edge over HTTPS (or localhost) for USB installation.');
  $('device-status').textContent='Allow MIDI access in the browser prompt.';
- let timer;
- try{return await Promise.race([
-  navigator.requestMIDIAccess({sysex:true}),
-  new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('MIDI permission is still pending. Allow the browser prompt, then retry.')),20000);})
- ]);}finally{clearTimeout(timer);}
+ return requestMidiSession();
 }
 function readableError(e){return e.name==='NotAllowedError'?'MIDI access was blocked. Allow MIDI for this site in Chrome or Edge, then retry.':e.message;}
 function confirmGeneric(identity,model='FM-1'){
@@ -95,7 +92,7 @@ $('connect-device').onclick=async()=>{
   access.onstatechange=e=>{if(e.port.state==='disconnected'&&!busy){connectionChecked=false;$('device-status').textContent='USB connection changed. Reconnect your '+modelName()+' and check the connection.';controls();}};
   progress.stage('ready','Device connected');message(modelName()+' connected. Press Install NESynth.');
  }catch(e){$('device-status').textContent=readableError(e);message(readableError(e),true);$('connection-help').open=true;log(readableError(e));progress.fail();}
- finally{busy=false;operation='';controls();}
+ finally{await releaseMidiSession();access=null;busy=false;operation='';controls();}
 };
 async function run(action){
  if(deviceLocked||busy||!modelName())return;
@@ -127,7 +124,7 @@ async function run(action){
   connectionChecked=false;const error=readableError(e);log(error);message(error,true);progress.fail();
   if(action==='restore')$('restore-status').textContent=error;
   $('retry-install').hidden=false;$('device-status').textContent='Installation not confirmed. See the log and retry instructions below.';
- }finally{await wake?.release().catch(()=>{});busy=false;operation='';controls();}
+ }finally{await releaseMidiSession();access=null;await wake?.release().catch(()=>{});busy=false;operation='';controls();}
 }
 $('flash-device').onclick=()=>run('firmware');$('restore-device').onclick=()=>run('restore');
 $('retry-install').onclick=()=>{if(lastAction)run(lastAction);};

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {connectUsbLibrary} from './usb-library.js';
+import {connectUsbLibrary} from './usb-library.js?v=midi-session1';
 import {openCartridge} from './zip.js';
 import {decodeLoaderStatus,transferCartridge,loaderPacket} from './bluetooth-transfer.js';
 import {readLibrary,gameNamePacket,ensureLibrarySpace} from './bluetooth-library.js';

@@ -1,3 +1,4 @@
+import {requestMidiSession,releaseMidiSession} from './midi-session.js?v=session1';
 // SPDX-License-Identifier: GPL-3.0-only
 // Cartridge commands over USB MIDI. Never sends a firmware-upgrade command.
 import {Updater} from './vendor/fm1ota.js';
@@ -37,7 +38,7 @@ async function mode(link){
 }
 export async function connectUsbLibrary(status=()=>{}){
     if(!navigator.requestMIDIAccess)throw Error('Use Chrome or Edge with a USB data cable for USB loading.');
-    const access=await navigator.requestMIDIAccess({sysex:true});if(access.sysexEnabled===false)throw Error('Allow MIDI/SysEx access to upload games over USB.');
+    const access=await requestMidiSession();if(access.sysexEnabled===false){await releaseMidiSession();throw Error('Allow MIDI/SysEx access to upload games over USB.');}
     const updater=new Updater(access,()=>{},/fm-?1|felucca|smk|nesynth|ota|composite|sinco|usb-midi/i);let dev;
     try{
         dev=await updater.findAny(id=>['FM-1','SMK-37'].includes(id.model));if(!dev)throw Error('FM-1 or SMK not found over USB. Check the data cable and close other MIDI installers.');
@@ -52,6 +53,6 @@ export async function connectUsbLibrary(status=()=>{}){
         }
         const result=createUsbChannel(dev.link);
         const changed=()=>{if(dev.link.lost){result.device.gatt.disconnect();access.removeEventListener?.('statechange',changed);}};
-        access.addEventListener?.('statechange',changed);result.device.addEventListener('gattserverdisconnected',()=>access.removeEventListener?.('statechange',changed));return result;
-    }catch(e){if(dev)await dev.link.close();throw e;}
+        access.addEventListener?.('statechange',changed);result.device.addEventListener('gattserverdisconnected',()=>{access.removeEventListener?.('statechange',changed);void releaseMidiSession();});return result;
+    }catch(e){try{if(dev)await dev.link.close();}finally{await releaseMidiSession();}throw e;}
 }

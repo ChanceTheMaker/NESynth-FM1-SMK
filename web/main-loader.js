@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-import {mountDeviceLoader} from './device-loader.js?v=970';
+import {mountDeviceLoader} from './device-loader.js?v=midi-session1';
 const tabs=[...document.querySelectorAll('.device-tabs [role="tab"]')];
 function selectTab(name,focus=false){
     for(const tab of tabs){
