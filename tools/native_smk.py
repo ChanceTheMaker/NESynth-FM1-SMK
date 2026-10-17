@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 """Loopback-only SMK Pro installer. USB stages run outside the browser process."""
 from pathlib import Path
-import hashlib,json,os,re,shutil,subprocess,sys,threading,time,uuid
+import hashlib,json,os,re,shutil,subprocess,sys,threading,time,uuid,tempfile
 
 ROOT=Path(__file__).resolve().parents[1]
 WORK=ROOT/'build/native-smk'
@@ -51,12 +51,11 @@ class Bridge:
         device_lock=None
         try:
             WORK.mkdir(parents=True,exist_ok=True)
-            # Both preview ports share this OS lock; two tabs/servers cannot flash
-            # the same instrument concurrently.
+            # All three app helpers share this OS lock, including separate checkouts.
+            # A competing site must not open MIDI while this update is running.
             import msvcrt
-            device_lock=open(WORK/'device.lock','a+b');device_lock.seek(0)
-            if device_lock.read(1)==b'':device_lock.write(b'0');device_lock.flush()
-            device_lock.seek(0)
+            device_lock=open(Path(tempfile.gettempdir())/'fm1-smk-native-usb.lock','a+b');device_lock.seek(0)
+            # Windows can lock beyond EOF; do not read a byte another helper locked.
             try:msvcrt.locking(device_lock.fileno(),msvcrt.LK_NBLCK,1)
             except OSError:raise RuntimeError('Another local SMK operation is running. Wait for it to finish.')
             directory=WORK/job['id']
