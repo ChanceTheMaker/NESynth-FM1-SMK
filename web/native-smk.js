@@ -17,7 +17,7 @@ export async function hasNativeSmk(model,fetcher=fetch){
   const available=result.available===true&&result.models?.includes(model);
   if(hosted&&!available)throw Error();
   token=result.token||'';return available;
- }catch{throw Error(hosted?'Start the NESynth Windows USB helper, then retry here. Allow local-network access if Chrome asks. The browser MIDI updater was not started.':'The local SMK USB service could not be reached. Keep the device powered and restart the local preview before retrying.');}
+ }catch{throw Error(hosted?'Start the current NESynth Windows USB helper (update older copies), then retry here. Allow local-network access if Chrome asks. The browser MIDI updater was not started.':'The local SMK USB service could not be reached. Keep the device powered and restart the local preview before retrying.');}
 }
 export async function runNativeSmk(action,log=()=>{},fetcher=fetch){
  async function request(url,options={}){

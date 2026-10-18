@@ -18,7 +18,7 @@ await assert.rejects(()=>prepareFirmwareFile(corrupt,'fm1'));
 for(const [i,file] of process.argv.slice(2).entries()){
  const model=['smk-pro','smk-elite'][i],name=['SMK-37 Pro','SMK-37 Elite'][i];
  const pkg=new SMKPackage(new Uint8Array(await fs.readFile(file)));pkg.setProduct(name+'_969');const candidate=pkg.serialize();
- const prepared=await prepareFirmwareFile(candidate,model);assert.equal(prepared.product,'SMK-37_969');assert(prepared.install);
+ const prepared=await prepareFirmwareFile(candidate,model);assert.equal(prepared.product,'SMK-37_970');assert(prepared.install);
  await assert.rejects(()=>prepareFirmwareFile(candidate,model==='smk-pro'?'smk-elite':'smk-pro'),/does not match/);
  await assert.rejects(()=>prepareFirmwareFile(candidate,'fm1'));
  const broken=candidate.slice();broken[100]^=1;await assert.rejects(()=>prepareFirmwareFile(broken,model));

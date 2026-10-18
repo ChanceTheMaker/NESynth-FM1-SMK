@@ -104,7 +104,7 @@ async function run(action){
   try{wake=await navigator.wakeLock?.request('screen');}catch{}
   if(await hasNativeSmk($('flash-model').value)){
    const product=await runNativeSmk(action==='restore'?'restore':'install',log);
-   const expected=action==='restore'?'SMK-37 Pro_016':'SMK-37_969';
+   const expected=action==='restore'?'SMK-37 Pro_016':'SMK-37_970';
    if(product!==expected)throw Error('Unexpected firmware after restart: '+product+'; expected '+expected+'.');
    installed=action==='firmware';connectionChecked=true;progress.done();$('device-status').textContent='Restart verified: '+product;
    if(action==='restore'){$('restore-status').textContent='M-VAVE 016 restored and restart verified.';message('Your '+model+' is back on its original M-VAVE firmware.');}
