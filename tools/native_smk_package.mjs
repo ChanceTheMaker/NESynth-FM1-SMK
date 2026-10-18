@@ -21,13 +21,13 @@ if(action==='restore'){
  let release=manifest.models['smk-pro'],appFile=path.join(root,'web',release.file);
  if(owner==='owner'){
   const report=JSON.parse(await fs.readFile(path.join(root,'build/bluetooth-loader/report.json'),'utf8'));
-  if(!report.private_device_calibration||report.product!=='SMK-37_969')throw Error('Invalid owner core');
+  if(!report.private_device_calibration||report.product!=='SMK-37_970')throw Error('Invalid owner core');
   release={product:report.product,bytes:report.app_bytes,sha256:report.sha256};
-  appFile=path.join(root,'build/bluetooth-loader/SMK969-BLUETOOTH-RAW.bin');
+  appFile=path.join(root,'build/bluetooth-loader/SMK970-BLUETOOTH-RAW.bin');
  }
  const app=new Uint8Array(await fs.readFile(appFile));
- if(manifest.version!==969||release.product!=='SMK-37_969'||app.length!==release.bytes||app.length>216800||await sha256hex(app)!==release.sha256)throw Error('Core verification failed');
- const built=await buildSmkPublicPackage(stock,app,{...release,public:true,board:'SMK-37 Pro',version:'NESYNTH SMK 969'});
+ if(manifest.version!==969||release.product!=='SMK-37_970'||app.length!==release.bytes||app.length>216800||await sha256hex(app)!==release.sha256)throw Error('Core verification failed');
+ const built=await buildSmkPublicPackage(stock,app,{...release,public:true,board:'SMK-37 Pro',version:'NESYNTH SMK 970'});
  image=built.image;packet=built.bytes;expected=release.product;
 }
 await fs.mkdir(out,{recursive:true});

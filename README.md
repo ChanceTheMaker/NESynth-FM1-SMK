@@ -406,3 +406,11 @@ python tools/start_windows_usb.py
 The first run installs pinned MIDI dependencies inside `build/python-deps` and downloads the SHA-256-verified official Pro 016 base if missing. Leave the helper running, use the normal live NESynth site, select SMK-37 Pro, and click Connect or Install. Allow Chrome's local-network permission if prompted. No Chrome flag changes or different browser are needed. Stop the helper with Ctrl+C when finished; start it again for later installs. Games still use the existing Bluetooth / USB uploader.
 
 `--allow-hosted` explicitly enables the official GitHub Pages origin on a loopback-only listener. Other origins and Host headers are rejected. Hosted mutations require a per-process token obtained through the allowed capability request, JSON requests and fixed actions; callers cannot provide firmware bytes, shell commands or filesystem paths. The page fails before requesting Web MIDI when the Windows Pro helper is absent, incompatible or permission is denied. A failed status request does not retry programming automatically. The existing local service still works without hosted access enabled.
+
+
+## SMK flash compatibility release
+
+The SMK update and stock-restore path now accepts the reported EB6014 flash
+chip alongside 856014 and displays detailed loader failures. Update older
+Windows USB-helper checkouts before installing this release.
+See [release scope, evidence and recovery limits](docs/SMK_FLASH_COMPATIBILITY.md).

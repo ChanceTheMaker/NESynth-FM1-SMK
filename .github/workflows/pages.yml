@@ -47,6 +47,9 @@ jobs:
           ./build/smk37-update-test
           ./build/smk37-update-test build/smk37/synthetic-0.bin build/smk37/candidate-0.smkupdate
           ./build/smk37-update-test build/smk37/synthetic-1.bin build/smk37/candidate-1.smkupdate
+      - run: node tests/smk_diagnostics.mjs && python3 tests/smk_diagnostics.py
+      - run: cc -O1 -UNDEBUG -DTEST_PUBLIC -Ivendor/smk-updater vendor/smk-updater/update_test.c -o /tmp/smk-compat && /tmp/smk-compat
+      - run: cc -O1 -UNDEBUG -Ivendor/smk-updater tests/smk37_flash_profile_test.c -o /tmp/smk-profile && /tmp/smk-profile
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

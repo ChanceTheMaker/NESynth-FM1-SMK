@@ -34,6 +34,7 @@ def main():
     if a.loader and a.diagnostic:p.error('Choose loader or diagnostic')
     if a.board=='fm1' and not a.loader:p.error('FM-1 requires --loader')
     if a.board=='fm1' and (a.private_calibration_backups or a.private_unit_backups):p.error('SMK private calibration must never be used on FM-1')
+    revision='969' if a.board=='fm1' else '970'
     fm1=a.board=='fm1';model='FM-1' if fm1 else 'SMK-37';tag='FM1' if fm1 else 'SMK'
     library_meta=0x36000 if fm1 else 0x39000;library_end=0x92000 if fm1 else 0x9d000
     installable=a.diagnostic or a.loader
@@ -67,7 +68,7 @@ def main():
     player=ROOT/'build'/a.board;baseline=json.loads((player/'manifest.json').read_text())
     if installable and not fm1:
         import build_smk_loader
-        build_smk_loader.PRODUCT='SMK-37_969' if a.loader else 'SMK-37_964'
+        build_smk_loader.PRODUCT='SMK-37_970' if a.loader else 'SMK-37_964'
         build_smk_loader.build(a.toolchain,player)
     shutil.copytree(ref/'firmware/src/ble',out/'ble',dirs_exist_ok=True)
     def edit(file,old,new):
@@ -223,7 +224,7 @@ static int ble_rf_trim_load(void){
         core.append(dest)
     objects=[*core,out/'board.o',out/'ble.o',out/'ctx.o',*([out/'hooks.o'] if not installable else []),out/'receiver.o',out/'lto_stubs.o',*cfg,*members,*peripheral]
     profile_roots=['np_ble_diag_start','np_ble_diag_service','np_ble_diag_state','np_ble_diag_error','np_ble_diag_writes'] if a.peripheral else ['ble_user_start','ble_service','ble_console','ble_midi_send']
-    elf=out/(f'nesynth-{tag}969-BLUETOOTH.elf' if a.loader else 'nesynth-SMK964-BLE-DIAGNOSTIC.elf' if a.diagnostic else 'nesynth-BLE-PROBE-DO-NOT-FLASH.elf')
+    elf=out/(f'nesynth-{tag}{revision}-BLUETOOTH.elf' if a.loader else 'nesynth-SMK964-BLE-DIAGNOSTIC.elf' if a.diagnostic else 'nesynth-BLE-PROBE-DO-NOT-FLASH.elf')
     run(['wsl','-e',a.toolchain+'/pi32v2/bin/ld','--gc-sections','--plugin',a.toolchain+'/pi32v2/bin/LLVMgold.so',
          '--plugin-opt=mcpu=r3','--plugin-opt=-pi32v2-large-program=true','--plugin-opt=-pi32v2-always-use-itblock=false',
          '--plugin-opt=-dont-used-symbol-list='+','.join(deps.LOG_FUNCS),'--orphan-handling=error','--wrap=memcpy',
@@ -273,7 +274,7 @@ static int ble_rf_trim_load(void){
         for name in ([] if a.loader else ['fl_erase4k_ram','fl_prog_ram']):
             body=ram_dis.split(name+':\n')[1].split('\n\n')[0]
             assert re.search(r'r0 = -1\b',body) and not re.search(r'\b(call|goto)\b|\]\s*=',body),'Flash writer was not disabled'
-        binary=out/(f'{tag}969-BLUETOOTH-RAW.bin' if a.loader else 'SMK964-BLE-DIAGNOSTIC-RAW.bin')
+        binary=out/(f'{tag}{revision}-BLUETOOTH-RAW.bin' if a.loader else 'SMK964-BLE-DIAGNOSTIC-RAW.bin')
         data=bytearray()
         for section,address in [('.text',0x2000120),('.ram_text',sym('_rt_load')),('.dsp_text',sym('_dsp_load')),('.data',sym('_data_load'))]:
             part=out/(section[1:]+'.bin');part.unlink(missing_ok=True)
@@ -288,7 +289,7 @@ static int ble_rf_trim_load(void){
             limitations=['Radio starts only after a fresh physical PLAY press','No game playback or cartridge upload in this diagnostic','No hardware test performed; power-cycle before USB restore'])
     if a.loader:
         assert size<=library_meta-0x4120, 'Application overlaps game library'
-        result.update(library_capacity=library_end-library_meta-8192,library_slots=32,controller_packet_bytes=251,controller_data_length_extension=True,adapted_controller_config_sha256=hashlib.sha256((out/'loader_btctrler_config.c').read_bytes()).hexdigest(),app_limit=library_meta-0x4120,app_free=library_meta-0x4120-size,kind=f'{tag}969 Bluetooth loader and player',product=model+'_969',board=a.board,mappers=[0,1,2,3,4,7,9,11],dual_core=True,usb_updater=True,rom_capacity=262672,bluetooth_role='cartridge loader',flash_writes=True,application_flash_writers_disabled=False,cartridge_flash_lo=library_meta,cartridge_flash_hi=library_end,shared_workspace='exclusive loader mode: ROM 0x1c1a000, LCD 0x1c5b000, BLE 0x1c65000',limitations=['Maximum cartridge size 262672 bytes','Radio active only in loader mode','Hardware validation pending'])
+        result.update(library_capacity=library_end-library_meta-8192,library_slots=32,controller_packet_bytes=251,controller_data_length_extension=True,adapted_controller_config_sha256=hashlib.sha256((out/'loader_btctrler_config.c').read_bytes()).hexdigest(),app_limit=library_meta-0x4120,app_free=library_meta-0x4120-size,kind=f'{tag}{revision} Bluetooth loader and player',product=model+'_'+revision,board=a.board,mappers=[0,1,2,3,4,7,9,11],dual_core=True,usb_updater=True,rom_capacity=262672,bluetooth_role='cartridge loader',flash_writes=True,application_flash_writers_disabled=False,cartridge_flash_lo=library_meta,cartridge_flash_hi=library_end,shared_workspace='exclusive loader mode: ROM 0x1c1a000, LCD 0x1c5b000, BLE 0x1c65000',limitations=['Maximum cartridge size 262672 bytes','Radio active only in loader mode','Hardware validation pending'])
     (out/'report.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
 
 if __name__=='__main__':main()

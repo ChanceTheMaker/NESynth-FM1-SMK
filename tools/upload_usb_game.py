@@ -50,7 +50,7 @@ def main():
     if not a.prepare:
         subprocess.run([sys.executable,__file__,'--prepare'],check=True);time.sleep(1)
     wire.PORT_RE=re.compile(r'fm-?1|felucca|smk|nesynth|ota|composite|sinco|usb-midi',re.I)
-    up=wire.Updater(wire.MidoBackend());dev=up.wait_for(lambda i:i.text in ('SMK-37_968','SMK-37_969','FM-1_969'),20)
+    up=wire.Updater(wire.MidoBackend());dev=up.wait_for(lambda i:i.text in ('SMK-37_968','SMK-37_970','FM-1_969'),20)
     if not dev:raise RuntimeError('NESynth SMK968/969 or FM1969 not found over USB')
     link=dev.link
     try:
