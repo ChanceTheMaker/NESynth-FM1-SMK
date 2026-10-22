@@ -6,7 +6,7 @@ import {restoreLatest} from './restore-firmware.js?v=20261013';
 import {createProgress,PROGRESS_EVENT,progressView} from './update-progress.js?v=20261013';
 import {SMK_MODELS,getSmkStock,prepareSmkRestore} from './smk-firmware.js?v=963';
 import {installSmkFirmware,smkIdentity,SMK_PORT_PATTERN} from './smk-install.js';
-import {hasNativeSmk,runNativeSmk,needsHostedSmkHelper} from './native-smk.js?v=975-live-helper';
+import {hasNativeSmk,runNativeSmk,needsHostedSmkHelper} from './native-smk.js?v=universal-restore1';
 const $=id=>document.getElementById(id);
 const isFm=()=>$('flash-model').value==='fm1';
 const modelName=()=>isFm()?'FM-1':SMK_MODELS[$('flash-model').value];
@@ -81,7 +81,7 @@ $('flash-model').onchange=()=>{prepared=null;lastAction=null;installed=false;con
 $('connect-device').onclick=async()=>{
  if(deviceLocked||busy)return;busy=true;operation='connect';connectionChecked=false;controls();progress.start('connect');
  try{
-  if(await hasNativeSmk($('flash-model').value)){
+  if(await hasNativeSmk($('flash-model').value,fetch,'connect')){
    const identity=await runNativeSmk('connect',log);connectionChecked=true;
    $('device-status').textContent='Connected: '+identity;progress.stage('ready','Device connected');message(modelName()+' connected. Press Install NESynth.');return;
   }
@@ -102,7 +102,7 @@ async function run(action){
  document.dispatchEvent(new Event('nesynth-pause'));let wake;
  try{
   try{wake=await navigator.wakeLock?.request('screen');}catch{}
-  if(await hasNativeSmk($('flash-model').value)){
+  if(await hasNativeSmk($('flash-model').value,fetch,action==='restore'?'restore':'install')){
    const product=await runNativeSmk(action==='restore'?'restore':'install',log);
    const expected=action==='restore'?'SMK-37 Pro_016':'SMK-37_970';
    if(product!==expected)throw Error('Unexpected firmware after restart: '+product+'; expected '+expected+'.');

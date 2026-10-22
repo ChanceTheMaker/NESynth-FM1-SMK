@@ -12,6 +12,14 @@ a=p.parse_args()
 hosted_origin='https://chancethemaker.github.io'
 api_token=secrets.token_urlsafe(32)
 root=Path(__file__).resolve().parents[1]/'web'
+def application_sha256():
+    if a.owner_firmware:
+        return report['sha256']
+    try:
+        return json.loads((root/'firmware/nesynth.json').read_text(encoding='utf-8'))['models']['smk-pro']['sha256']
+    except (OSError,ValueError,KeyError,TypeError,StopIteration):
+        return None  # OG recovery does not require a custom firmware manifest.
+
 owner_app=None
 if a.owner_firmware:
     build=root.parent/'build/bluetooth-loader'
@@ -54,7 +62,7 @@ class Handler(SimpleHTTPRequestHandler):
         path=urlsplit(self.path).path
         if path.startswith('/api/smk/'):
             if not self.api_allowed():self.send_error(403);return
-            if path=='/api/smk/capabilities':self.json_reply({'available':bridge.available,'models':['smk-pro'] if bridge.available else [],'protocol':1,'token':api_token});return
+            if path=='/api/smk/capabilities':self.json_reply({'available':bridge.available,'models':['smk-pro'] if bridge.available else [],'protocol':1,'token':api_token,'restore_product':'SMK-37 Pro_016','application_sha256':application_sha256(),'app':'nesynth'});return
             if path.startswith('/api/smk/jobs/'):
                 job=bridge.status(path.removeprefix('/api/smk/jobs/'))
                 self.json_reply(job if job else {'error':'Unknown operation'},200 if job else 404);return
