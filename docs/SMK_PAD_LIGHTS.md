@@ -23,3 +23,7 @@ The complete candidate builds and passes RAM/application bounds, protected-byte
 package round-trip, and simulated installation of the actual packet.
 Application SHA-256: `232364b0b828851a17881a4da729f98e3488fdf280fcea88e977364d9c0758c8`.
 Application bytes: 208260; free application space: 8540.
+
+Hardware installation from Color 985 completed with exact SMK-37_971 restart.
+The bundled From Below cartridge (40,976 bytes) uploaded over USB in 1.06
+seconds with CRC 8ce49adb verified. Physical fader/pad confirmation is pending.
