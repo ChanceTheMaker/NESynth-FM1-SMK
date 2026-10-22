@@ -27,7 +27,7 @@ const raw=new Uint8Array(16400);raw.set([78,69,83,26,1,0]);fileEvent('drop',{nam
 await new Promise(r=>setImmediate(r));assert.match(document.querySelector('#name').textContent,/USB during check/);
 await pending;assert.equal(document.querySelector('#connection').textContent,'USB connection unconfirmed');assert.equal(input.connection,'open');assert.equal(gameCommands,0);
 timeout=false;await beat();assert.equal(document.querySelector('#connection').textContent,'USB connected');assert(!document.querySelector('#send').disabled);
-await document.querySelector('#connect').onclick();assert.equal(document.querySelector('#connection').textContent,'USB disconnected');
+await document.querySelector('#connect').onclick();assert.equal(document.querySelector('#connection').textContent,'USB disconnected');assert.equal(document.body.children.length,0,'Disconnect removes the MIDI session iframe');assert.equal(input.connection,'closed');
 await document.querySelector('#connect').onclick();assert.equal(document.querySelector('#connection').textContent,'USB connected');assert.equal(handoffs,1,'Already in USB mode: no extra reboot');
 await document.querySelector('#connect').onclick();version=minimum-1;await document.querySelector('#connect').onclick();assert.match(document.querySelector('#status').textContent,new RegExp(String(minimum)));assert.equal(handoffs,1);
 console.log('PASS: real USB page handlers, MIDI permission, identity/mode discovery, radio-off handoff, shared library, reconnect and old-firmware rejection with Bluetooth absent');
