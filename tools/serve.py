@@ -24,8 +24,8 @@ owner_app=None
 if a.owner_firmware:
     build=root.parent/'build/bluetooth-loader'
     report=json.loads((build/'report.json').read_text())
-    owner_app=(build/'SMK969-BLUETOOTH-RAW.bin').read_bytes()
-    assert report['private_device_calibration'] and report['product']=='SMK-37_970'
+    owner_app=(build/'SMK971-BLUETOOTH-RAW.bin').read_bytes()
+    assert report['private_device_calibration'] and report['product']=='SMK-37_971'
     assert len(owner_app)==report['app_bytes']<=216800 and hashlib.sha256(owner_app).hexdigest()==report['sha256']
 bridge=Bridge(owner=owner_app is not None)
 class Handler(SimpleHTTPRequestHandler):
@@ -73,7 +73,7 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_error(403);return
             if path.endswith('.json'):
                 manifest=json.loads((root/'firmware/nesynth.json').read_text())
-                manifest['models']['smk-pro']={'product':'SMK-37_970','file':'firmware/nesynth-smk-pro-local.bin','bytes':len(owner_app),'sha256':report['sha256']}
+                manifest['models']['smk-pro']={'product':'SMK-37_971','file':'firmware/nesynth-smk-pro-local.bin','bytes':len(owner_app),'sha256':report['sha256']}
                 data=json.dumps(manifest).encode();mime='application/json'
             else:data=owner_app;mime='application/octet-stream'
             self.send_response(200);self.send_header('Content-Type',mime);self.send_header('Content-Length',str(len(data)));self.end_headers();self.wfile.write(data);return

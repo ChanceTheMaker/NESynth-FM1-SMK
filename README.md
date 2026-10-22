@@ -1,5 +1,9 @@
 # NESynth — NES on FM-1 / SMK37 — v2.0
 
+SMK pad-light release **971**: stable colors during pad presses and Fader 2
+brightness changes, validated on SMK Pro. [Test evidence](docs/SMK_PAD_LIGHTS.md).
+FM-1 firmware and original-firmware restore are unchanged.
+
 **Now with Bluetooth and Multi-game storage.**
 
 - Install the core once, then add games over Bluetooth or USB.
