@@ -2,12 +2,13 @@
 import assert from 'node:assert/strict';
 export function setupDom(){
  class Element extends EventTarget{
-  constructor(){super();this.children=[];this.value='';this.disabled=false;this.hidden=false;this.textContent='';this.classList={add(){},remove(){}};}
-  append(...c){this.children.push(...c);}replaceChildren(...c){this.children=c;}
+  constructor(tag=''){super();this.tag=tag;this.dataset={};this.parent=null;this.children=[];this.value='';this.disabled=false;this.hidden=false;this.textContent='';this.classList={add(){},remove(){}};}
+  append(...c){for(const child of c){child.parent=this;this.children.push(child);if(child.tag==='iframe')queueMicrotask(()=>child.dispatchEvent(new Event('load')));}}replaceChildren(...c){this.children=c;}
+  remove(){if(this.parent)this.parent.children=this.parent.children.filter(c=>c!==this);this.parent=null;}
   contains(target){return target===this||this.children.some(c=>c.contains(target));}
  }
  const elements=new Map(),doc=new EventTarget();
- Object.assign(doc,{hidden:false,hasFocus:()=>true,querySelector:s=>{if(!elements.has(s))elements.set(s,new Element());return elements.get(s);},querySelectorAll:()=>doc.querySelector('#games').children.flatMap(r=>r.children.slice(1)),createElement:()=>new Element()});
+ Object.assign(doc,{hidden:false,hasFocus:()=>true,querySelector:s=>{if(!elements.has(s))elements.set(s,new Element());return elements.get(s);},querySelectorAll:()=>doc.querySelector('#games').children.flatMap(r=>r.children.slice(1)),body:new Element('body'),createElement:tag=>{const el=new Element(tag);if(tag==='iframe')el.contentWindow={get navigator(){return globalThis.navigator;}};return el;}});
  globalThis.document=doc;globalThis.Option=class extends Element{constructor(name,value){super();this.textContent=name;this.value=value;}};
  return doc;
 }
