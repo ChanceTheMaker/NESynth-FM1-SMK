@@ -173,6 +173,15 @@ static int np_loader_usb(const uint8_t *p,unsigned n){
     if(p[3]==4&&!np_loader_pending&&np_loader_mode!=4){np_restart_as(NP_MODE_USB,0,0);return 1;}
     if(p[3]==1&&np_loader_mode!=1){np_restart_as(NP_MODE_LOAD,0,0);return 1;}
     if(p[3]==3&&!np_loader_pending){np_restart_as(NP_MODE_MENU,0,0);return 1;}
+#if GB_SMK37
+    if(p[3]==7){
+        const uint32_t v[]={smk_brightness,pad_adc.scan.raw[smk37_fader_input[1]],
+            game_pads.held,smk_light_state,smk_light_writes,smk_light_errors};
+        uint8_t reply[36]={0xf0,0x7d,'N','L',7};unsigned k=5;
+        for(unsigned i=0;i<6;i++)for(unsigned j=0;j<5;j++)reply[k++]=(v[i]>>(7*j))&127;
+        reply[k++]=0xf7;ota_wire_send(reply,k);return 1;
+    }
+#endif
     if(p[3]!=0&&p[3]!=2)return 0;
     uint32_t v[]={np_loader_mode,np_loader_error,np_installed_length,np_installed_crc,np_loader_rx.received,np_ble_diag_state()};
     if(p[3]==2){v[0]=np_library.catalog.count;v[1]=np_store_free(&np_library);v[2]=NP_LIBRARY_BYTES;v[3]=np_store_largest(&np_library);v[4]=np_menu_index;v[5]=np_loader_mode;}

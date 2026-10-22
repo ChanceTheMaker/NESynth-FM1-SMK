@@ -12,7 +12,7 @@ static void reset_gap(void){
 static void barrier(void){assert(resets==1);barriers++;}
 static void poll(void){
     assert(resets==1&&barriers==1);
-    assert(regs[0x51020/4]==0x20010&&regs[0x11d04/4]==8&&regs[0x11d10/4]==420);
+    assert(regs[0x51020/4]==0x20010&&regs[0x11d04/4]==8&&regs[0x11d10/4]==1408);
     assert(regs[0x50088/4]&(1u<<9));
     if(++polls==complete_after)regs[0x11d00/4]|=0x8000;
 }
@@ -28,7 +28,9 @@ int main(void){
     for(unsigned level=0;level<256;level++)for(unsigned held=0;held<16;held++){
         for(unsigned p=0;p<16;p++)rgb[p]=p==held?0:p>=14?(level<<16)|level:((level*2/3)<<8)|level;
         smk37_light_encode_rgb(data,rgb);
-        for(unsigned p=0;p<16;p++){unsigned c=rgb[p],wire=((c>>8)&255)<<16|((c>>16)&255)<<8|(c&255);assert(decode(data+36+24*smk37_pad_light_order[p])==wire);}
+        for(unsigned i=0;i<SMK37_LIGHT_RESET_BYTES;i++)assert(data[i]==0);
+        for(unsigned i=SMK37_LIGHT_RESET_BYTES+SMK37_LIGHT_COLOR_BYTES;i<SMK37_LIGHT_BYTES;i++)assert(data[i]==0);
+        for(unsigned p=0;p<16;p++){unsigned c=rgb[p],wire=((c>>8)&255)<<16|((c>>16)&255)<<8|(c&255);assert(decode(data+SMK37_LIGHT_RESET_BYTES+24*smk37_pad_light_order[p])==wire);}
     }
     for(unsigned failed=0;failed<2;failed++){
         regs[0x11d00/4]=0x4021;regs[0x11d04/4]=4;regs[0x51020/4]=0x20000;
