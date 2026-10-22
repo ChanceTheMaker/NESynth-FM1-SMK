@@ -52,6 +52,7 @@ _Static_assert(SMK37_LIGHT_COMPILED_MAX_LEVEL==255u,"SMK pad encoder must use ap
 #include "smk37_brightness.h"
 static smk_brightness_t smk_brightness_fader;
 static volatile uint32_t smk_brightness=150;
+static uint32_t smk_light_state,smk_light_writes,smk_light_errors;
 static volatile uint32_t smk_volume_target=64;
 static uint32_t smk_volume_current=64; /* Same 25% startup level as before. */
 static smk37_keyscan_t keys[37];
@@ -126,7 +127,8 @@ static void smk_pad_lights(uint32_t held){
     for(unsigned p=0;p<16;p++)if(lit&(1u<<p))
         rgb[p]=p>=14?(level<<16)|level:((level*2/3)<<8)|level;
     smk37_light_encode_rgb(pad_lights,rgb);
-    if(smk37_lights_send(pad_lights,4000000)){previous=state;last=now;}
+    if(smk37_lights_send(pad_lights,4000000)){previous=smk_light_state=state;last=now;smk_light_writes++;}
+    else smk_light_errors++;
 }
 static void input_init(void){
     smk37_adc_init(&pad_adc);

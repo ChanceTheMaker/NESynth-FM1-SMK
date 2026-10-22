@@ -34,7 +34,7 @@ def main():
     if a.loader and a.diagnostic:p.error('Choose loader or diagnostic')
     if a.board=='fm1' and not a.loader:p.error('FM-1 requires --loader')
     if a.board=='fm1' and (a.private_calibration_backups or a.private_unit_backups):p.error('SMK private calibration must never be used on FM-1')
-    revision='969' if a.board=='fm1' else '970'
+    revision='969' if a.board=='fm1' else '971'
     fm1=a.board=='fm1';model='FM-1' if fm1 else 'SMK-37';tag='FM1' if fm1 else 'SMK'
     library_meta=0x36000 if fm1 else 0x39000;library_end=0x92000 if fm1 else 0x9d000
     installable=a.diagnostic or a.loader
@@ -68,7 +68,7 @@ def main():
     player=ROOT/'build'/a.board;baseline=json.loads((player/'manifest.json').read_text())
     if installable and not fm1:
         import build_smk_loader
-        build_smk_loader.PRODUCT='SMK-37_970' if a.loader else 'SMK-37_964'
+        build_smk_loader.PRODUCT='SMK-37_971' if a.loader else 'SMK-37_964'
         build_smk_loader.build(a.toolchain,player)
     shutil.copytree(ref/'firmware/src/ble',out/'ble',dirs_exist_ok=True)
     def edit(file,old,new):
