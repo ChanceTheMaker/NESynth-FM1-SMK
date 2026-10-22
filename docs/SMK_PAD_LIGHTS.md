@@ -26,4 +26,4 @@ Application bytes: 208260; free application space: 8540.
 
 Hardware installation from Color 985 completed with exact SMK-37_971 restart.
 The bundled From Below cartridge (40,976 bytes) uploaded over USB in 1.06
-seconds with CRC 8ce49adb verified. Physical fader/pad confirmation is pending.
+seconds with CRC 8ce49adb verified. The owner confirmed the NESynth fader/pad check: "Looks good".
