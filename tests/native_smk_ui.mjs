@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
-const app='nesynth',expected='SMK-37_970';
+const app='nesynth',expected='SMK-37_971';
 const base='https://chancethemaker.github.io/NESynth-FM1-SMK/';
 const helper='http://127.0.0.1:8817',token='t'.repeat(43);
-const appHash="8b81af123853efd8b5d4f7dee1e863d0945b2c970f322bc358b28028108a74a0";
+const appHash="232364b0b828851a17881a4da729f98e3488fdf280fcea88e977364d9c0758c8";
 const types={'.js':'text/javascript','.html':'text/html','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.wasm':'application/wasm'};
 const browser=await chromium.launch({channel:'chrome',headless:true});
 try{

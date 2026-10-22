@@ -206,7 +206,7 @@ try{
  for(const [value,model] of [['smk-pro','SMK-37 Pro'],['smk-elite','SMK-37 Elite']]){
   await page.locator('#flash-model').selectOption(value);
   assert(await page.locator('#flash-device').isEnabled(),'New model automatically selects its firmware');
-  await page.evaluate(model=>{window.testDevice=model+'_016';window.testWaits=['ota-'+model+'_016','SMK-37_970'];},model);
+  await page.evaluate(model=>{window.testDevice=model+'_016';window.testWaits=['ota-'+model+'_016','SMK-37_971'];},model);
   await page.locator('#connect-device').click();
   await page.waitForFunction(model=>document.getElementById('device-status').textContent.includes(model+'_016'),model);
   const before=await page.evaluate(()=>window.midiWrites);
@@ -216,8 +216,8 @@ try{
   await page.waitForFunction(()=>document.getElementById('install-state').textContent==='Verified');
   assert.equal(await page.evaluate(()=>window.midiWrites),before+1);
   assert.match(await page.evaluate(()=>window.transferStatus),/Transferring firmware data.*50%/,'Main status follows the transfer instead of remaining on download');
-  assert.match(await page.locator('#device-status').textContent(),/SMK-37_970/);
-  await page.evaluate(model=>{window.testDevice='SMK-37_970';window.testWaits=['ota-SMK-37_970',model+'_016'];},model);
+  assert.match(await page.locator('#device-status').textContent(),/SMK-37_971/);
+  await page.evaluate(model=>{window.testDevice='SMK-37_971';window.testWaits=['ota-SMK-37_971',model+'_016'];},model);
   await page.locator('#restore-device').evaluate(el=>el.closest('details').open=true);
   await page.locator('#restore-device').click();
   await page.waitForFunction(()=>document.getElementById('restore-status').textContent.includes('restored and restart verified'));
@@ -265,7 +265,7 @@ try{
  });
  await page.route('**/api/smk/jobs/test-job',route=>{
   const done=++nativePolls>1;
-  return route.fulfill({json:{state:done?'done':'running',phase:'transfer',bytes:512,total:1024,logs:['Local USB test'],identity:nativeWrong?'SMK-37_900':nativeAction==='install'?'SMK-37_970':'SMK-37 Pro_016'}});
+  return route.fulfill({json:{state:done?'done':'running',phase:'transfer',bytes:512,total:1024,logs:['Local USB test'],identity:nativeWrong?'SMK-37_900':nativeAction==='install'?'SMK-37_971':'SMK-37 Pro_016'}});
  });
  await page.locator('#firmware-tab').click();await page.locator('#flash-model').selectOption('smk-pro');
  await page.evaluate(()=>window.denyMidi=true);const writesBeforeNative=await page.evaluate(()=>window.midiWrites);

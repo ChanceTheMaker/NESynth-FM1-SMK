@@ -5,12 +5,12 @@ ROOT=Path(__file__).resolve().parents[1]
 def main():
     out=ROOT/'web/firmware';models={}
     for folder,tag,model,board,limit in [('fm1-bluetooth-loader','FM1','fm1','fm1',204512),('public-bluetooth-loader','SMK','smk-pro','smk37',216800)]:
-        revision=969 if model=='fm1' else 970
+        revision=969 if model=='fm1' else 971
         build=ROOT/'build'/folder;report=json.loads((build/'report.json').read_text())
         data=(build/f'{tag}{revision}-BLUETOOTH-RAW.bin').read_bytes()
         assert report['private_device_calibration'] is False, 'Private calibration must never be staged for the website'
         assert report['board']==board and report['ram_reach_check'] and report['usb_updater']
-        assert report['product']==('FM-1_969' if model=='fm1' else 'SMK-37_970')
+        assert report['product']==('FM-1_969' if model=='fm1' else 'SMK-37_971')
         assert len(data)==report['app_bytes']<=limit and hashlib.sha256(data).hexdigest()==report['sha256']
         file=f'nesynth-{board}-{revision}.bin';(out/file).write_bytes(data)
         models[model]={'product':report['product'],'file':'firmware/'+file,'bytes':len(data),'sha256':report['sha256']}

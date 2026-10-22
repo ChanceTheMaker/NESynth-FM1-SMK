@@ -8,20 +8,20 @@
       "sha256": "58cecddc98b584d375f37af90c10a761ce4d383f576504e3574942c0c5a07054"
     },
     "smk-pro": {
-      "product": "SMK-37_970",
-      "file": "firmware/nesynth-smk37-970.bin",
-      "bytes": 208036,
-      "sha256": "8b81af123853efd8b5d4f7dee1e863d0945b2c970f322bc358b28028108a74a0"
+      "product": "SMK-37_971",
+      "file": "firmware/nesynth-smk37-971.bin",
+      "bytes": 208260,
+      "sha256": "232364b0b828851a17881a4da729f98e3488fdf280fcea88e977364d9c0758c8"
     },
     "smk-elite": {
-      "product": "SMK-37_970",
-      "file": "firmware/nesynth-smk37-970.bin",
-      "bytes": 208036,
-      "sha256": "8b81af123853efd8b5d4f7dee1e863d0945b2c970f322bc358b28028108a74a0"
+      "product": "SMK-37_971",
+      "file": "firmware/nesynth-smk37-971.bin",
+      "bytes": 208260,
+      "sha256": "232364b0b828851a17881a4da729f98e3488fdf280fcea88e977364d9c0758c8"
     }
   },
-  "smk_revision": 970,
-  "smk_source": "https://github.com/ChanceTheMaker/NESynth-FM1-SMK/tree/smk-flash-compat-970",
-  "smk_source_archive": "https://github.com/ChanceTheMaker/NESynth-FM1-SMK/archive/refs/tags/smk-flash-compat-970.zip",
-  "smk_hardware_validation": "SMK Pro: installed and restarted as SMK-37_970, then restored original Pro 016 with successful transfer/readback completion and exact restart identity. EB6014 and Elite hardware confirmation remain pending; UI, sound and long-run validation are not claimed."
+  "smk_revision": 971,
+  "smk_source": "https://github.com/ChanceTheMaker/NESynth-FM1-SMK/tree/smk-pad-lights-971",
+  "smk_source_archive": "https://github.com/ChanceTheMaker/NESynth-FM1-SMK/archive/refs/tags/smk-pad-lights-971.zip",
+  "smk_hardware_validation": "SMK Pro: installed and restarted as SMK-37_971; game upload CRC verified and owner accepted pad colors and Fader 2 brightness. Zero reported LED transfer errors. Existing original-firmware restore is retained; a new physical stock round trip and Elite hardware test were not performed for this release. See docs/SMK_PAD_LIGHTS.md."
 }

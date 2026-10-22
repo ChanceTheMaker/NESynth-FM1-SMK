@@ -1,6 +1,6 @@
 import './simulator.js';
 import './fullscreen.js?v=20261016-remote';
-import './flash-ui.js?v=midi-session1';
+import './flash-ui.js?v=padlights971';
 import './main-loader.js?v=midi-session1';
 import {openCartridge} from './zip.js';
 import {paintFrame,BrowserAudio} from './media.js';
